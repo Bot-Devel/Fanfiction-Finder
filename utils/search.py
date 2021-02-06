@@ -12,8 +12,11 @@ def get_ao3_id(query):
 
     url = 'https://www.google.com/search?q=' + \
         query+"+ao3"
-
-    page = requests.get(url)
+    try:
+        page = requests.get(url)
+    except Exception:
+        ao3_id = 1
+        return ao3_id
 
     soup = BeautifulSoup(page.content, 'html.parser')
     found = soup.findAll('a')
@@ -22,8 +25,9 @@ def get_ao3_id(query):
 
     if re.search(r"\bseries\b", url) is not None:  # if the query has series
         for i in range(len(hrefs)):
-            if re.search(r"\barchiveofourown.org\W", hrefs[i]) is not None:
+            if re.search(r"\barchiveofourown.org/series/\b", hrefs[i]) is not None:
                 ao3_list.append(hrefs[i])
+
     else:
         for i in range(len(hrefs)):
             if re.search(r"\barchiveofourown.org/works/\b", hrefs[i]) is not None:
@@ -36,8 +40,8 @@ def get_ao3_id(query):
     ao3_url = re.search(
         r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&//=]*", ao3_list[0])
 
-    if re.search(r"archiveofourown.org/series\W", ao3_url.group(0)) is None:
-        ao3_page = requests.get(ao3_url.group(0))  # , verify=False)
+    if re.search(r"archiveofourown.org/series/\b", ao3_url.group(0)) is None:
+        ao3_page = requests.get(ao3_url.group(0))
         ao3_soup = BeautifulSoup(ao3_page.content, 'html.parser')
 
         ao3_list_clean = (ao3_soup.find(
@@ -74,7 +78,10 @@ def get_ffn_id(query):
 
     url = 'https://www.google.com/search?q=' + \
         query+"+fanfiction"
-    page = requests.get(url)  # , verify=False)
+    try:
+        page = requests.get(url)
+    except Exception:
+        ffn_id = 1
     soup = BeautifulSoup(page.content, 'html.parser')
     found = soup.findAll('a')
 
