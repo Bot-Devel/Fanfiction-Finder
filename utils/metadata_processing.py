@@ -5,7 +5,7 @@ from utils.processing import story_last_up_clean, ao3_story_chapter_clean, ao3_c
 
 
 def ao3_metadata_works(ao3_url):
-    ao3_page = requests.get(ao3_url)  # , verify=False)  # , headers)
+    ao3_page = requests.get(ao3_url)
     ao3_soup = BeautifulSoup(ao3_page.content, 'html.parser')
 
     ao3_story_name = (ao3_soup.find(
