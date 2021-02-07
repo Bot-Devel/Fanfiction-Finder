@@ -28,7 +28,7 @@ def ao3_metadata_works(ao3_url):
         ao3_story_status = ao3_story_status.replace(":", "")
 
     except AttributeError:  # if story status not found
-        ao3_story_status = "Complete"
+        ao3_story_status = "Completed"
 
     try:
         ao3_story_last_up = (ao3_soup.find(
@@ -86,7 +86,7 @@ def ao3_metadata_series(ao3_url):
             ao3_series_status = "Updated"
 
     except AttributeError:  # if story status not found
-        ao3_series_status = "Complete"
+        ao3_series_status = "Completed"
 
     try:
         ao3_series_last_up = ao3_soup.find(
@@ -112,9 +112,12 @@ def ao3_metadata_series(ao3_url):
     ao3_series_last_up = story_last_up_clean(ao3_series_last_up)
 
     if len(list(ao3_series_summary)) > 2048:
-        ao3_series_summary = ao3_series_summary[:2030] + "..."
+        ao3_series_summary = ao3_series_summary[:1930] + "..."
     else:
         ao3_series_summary = ao3_series_summary + \
             '\n\n'+"📚 **Works**:\n"+ao3_series_works_index
+
+    if len(list(ao3_series_summary)) > 2048:  # recheck the size of summary
+        ao3_series_summary = ao3_series_summary[:1930] + "..."
 
     return ao3_series_name, ao3_author_name, ao3_series_summary, ao3_series_status, ao3_series_last_up, ao3_series_length, ao3_series_works

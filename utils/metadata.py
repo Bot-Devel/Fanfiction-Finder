@@ -10,13 +10,15 @@ from utils.metadata_processing import ao3_metadata_works, ao3_metadata_series
 
 def ao3_metadata(query):
     if re.search(r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&//=]*", query) is None:
+        if re.search(r"ffn\b", query):
+            embed = None
+            return embed
+
         query = query.replace(" ", "+")
         ao3_id = get_ao3_id(query)
 
         if not ao3_id:
-            embed = discord.Embed(
-                description="Fanfic not found!"
-            )
+            embed = None
             return embed
 
         if ao3_id == 1:
@@ -107,9 +109,7 @@ def ffn_metadata(query):
         ffn_id = get_ffn_id(query)
 
         if not ffn_id:
-            embed = discord.Embed(
-                description="Fanfic not found!"
-            )
+            embed = None
             return embed
 
         if ffn_id == 1:
