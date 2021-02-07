@@ -1,6 +1,7 @@
 import os
 import re
 import discord
+import datetime
 from dotenv import load_dotenv
 from utils.metadata import ao3_metadata, ffn_metadata
 from utils.bot_status import keep_alive
@@ -68,6 +69,7 @@ async def on_message(message):
                 elif re.search(r"archiveofourown.org\b", message.content) is not None:
                     # if not found in ffn, search in ao3
                     embed_pg = ao3_metadata(message.content)
+                    embed_pg.timestamp = datetime.datetime.utcnow()
 
                 # if embed_pg is None:
                 #     embed_pg = discord.Embed(
@@ -77,7 +79,9 @@ async def on_message(message):
                 if do_not_delete == 0:  # Delete msg only when the msg doesnt contain url
                     await message.delete()
             else:
-                await message.channel.send("Searched by `"+str(message.author)+"`")
+                embed_pg.set_footer(text="Searched by " + str(message.author))
+                embed_pg.timestamp = datetime.datetime.utcnow()
+
             await message.channel.send(embed=embed_pg)
             if do_not_delete == 0:  # Delete msg only when the msg doesnt contain url
                 await message.delete()

@@ -37,7 +37,7 @@ def ao3_metadata(query):
 
             elif ao3_series_status == "Updated":
                 des = ao3_series_summary+"\n\n"+"**📜 Last Updated:** "+ao3_series_last_up +\
-                    " - "+ao3_series_status+"\n"+"**📖 Length:** " + ao3_series_length + \
+                    "\n"+"**📖 Length:** " + ao3_series_length + \
                     " words in "+ao3_series_works+" works"
 
             embed = discord.Embed(
@@ -75,7 +75,7 @@ def ao3_metadata(query):
 
         elif ao3_series_status == "Updated":
             des = ao3_series_summary+"\n\n"+"**📜 Last Updated:** "+ao3_series_last_up +\
-                " - "+ao3_series_status+"\n"+"**📖 Length:** " + ao3_series_length + \
+                "\n"+"**📖 Length:** " + ao3_series_length + \
                 " words in "+ao3_series_works+" works"
 
         embed = discord.Embed(

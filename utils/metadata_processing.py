@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import re
-from utils.processing import story_last_up_clean, ao3_story_chapter_clean, ao3_convert_chapters_to_works, get_ao3_series_works_index
+from utils.processing import story_last_up_clean, ao3_story_chapter_clean, get_ao3_series_works_index
 
 
 def ao3_metadata_works(ao3_url):
@@ -84,6 +84,8 @@ def ao3_metadata_series(ao3_url):
             'dd')).string.strip()
         if ao3_series_status == "No":
             ao3_series_status = "Updated"
+        elif ao3_series_status == "Yes":
+            ao3_series_status = "Completed"
 
     except AttributeError:  # if story status not found
         ao3_series_status = "Completed"
