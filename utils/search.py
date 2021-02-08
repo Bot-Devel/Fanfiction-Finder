@@ -37,10 +37,11 @@ def get_ao3_id(query):
     if not ao3_list:
         return None
 
+    # extract the https url from the the string since it contains /url?q=
     ao3_url = re.search(
         r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&//=]*", ao3_list[0])
 
-    if re.search(r"archiveofourown.org/series/\b", ao3_url.group(0)) is None:
+    if re.search(r"archiveofourown.org/series/\b", ao3_url.group(0)) is None:  # if not an ao3 series
         ao3_page = requests.get(ao3_url.group(0))
         ao3_soup = BeautifulSoup(ao3_page.content, 'html.parser')
 
@@ -66,6 +67,7 @@ def get_ao3_id(query):
         ao3_id = ''.join(ao3_id_list1)
 
     else:
+        # if its an ao3 series, the url can be used directly in ao3_metadata_series()
         ao3_id = ao3_url.group(0)
     return ao3_id
 
@@ -78,6 +80,7 @@ def get_ffn_id(query):
 
     url = 'https://www.google.com/search?q=' + \
         query+"+fanfiction"
+
     try:
         page = requests.get(url)
     except Exception:
