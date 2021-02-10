@@ -29,14 +29,16 @@ async def on_message(message):
             if re.search(r"^ao3\b", message.content.lower()) is not None:
                 msg = message.content.replace("ao3", "")
                 embed_pg = ao3_metadata(msg)
-
+                print("embed_pg", embed_pg)
                 if embed_pg is None:  # if not found in ao3, search in ffn
                     embed_pg = ffn_metadata(msg)
 
-                if embed_pg is None:
-                    embed_pg = discord.Embed(
-                        description="Fanfiction not found!"
-                    )
+                embed_pg.set_footer(text="Searched by " +
+                                    str(message.author))
+                embed_pg.timestamp = datetime.datetime.utcnow()
+
+                await message.channel.send(embed=embed_pg)
+
             elif re.search(r"^ffn\b", message.content.lower()) is not None:
                 msg = message.content.replace("ffn", "")
                 embed_pg = ffn_metadata(msg)
@@ -44,23 +46,26 @@ async def on_message(message):
                 if embed_pg is None:  # if not found in ffn, search in ao3
                     embed_pg = ao3_metadata(msg)
 
-                if embed_pg is None:
-                    embed_pg = discord.Embed(
-                        description="Fanfiction not found!"
-                    )
+                embed_pg.set_footer(text="Searched by " +
+                                    str(message.author))
+                embed_pg.timestamp = datetime.datetime.utcnow()
+
+                await message.channel.send(embed=embed_pg)
 
             elif re.search(r"`(.*?)`", message.content.lower()) is not None:
-                msg = re.search(r"`(.*?)`", message.content.lower())
-                embed_pg = ffn_metadata(msg.group(1))
+                msg_found = re.findall(r"`(.*?)`", message.content.lower())
+                for msg in msg_found:
+                    embed_pg = ffn_metadata(msg)
 
-                if embed_pg is None:  # if not found in ffn, search in ao3
-                    msg2 = msg.group(1).replace("ao3", "")
-                    embed_pg = ao3_metadata(msg2)
+                    if embed_pg is None:  # if not found in ffn, search in ao3
+                        msg2 = msg.replace("ao3", "")
+                        embed_pg = ao3_metadata(msg2)
 
-                if embed_pg is None:
-                    embed_pg = discord.Embed(
-                        description="Fanfiction not found!"
-                    )
+                    embed_pg.set_footer(text="Searched by " +
+                                        str(message.author))
+                    embed_pg.timestamp = datetime.datetime.utcnow()
+
+                    await message.channel.send(embed=embed_pg)
 
             elif re.search(r"https?:\/\/(www.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&=]*", message.content.lower()) is not None:
                 if re.search(r"fanfiction.net\b",  message.content) is not None:
@@ -70,16 +75,11 @@ async def on_message(message):
                     # if not found in ffn, search in ao3
                     embed_pg = ao3_metadata(message.content)
 
-                elif embed_pg is None:
-                    embed_pg = discord.Embed(
-                        description="Fanfiction not found!"
-                    )
+                embed_pg.set_footer(text="Searched by " +
+                                    str(message.author))
+                embed_pg.timestamp = datetime.datetime.utcnow()
 
-            embed_pg.set_footer(text="Searched by " +
-                                str(message.author))
-            embed_pg.timestamp = datetime.datetime.utcnow()
-
-            await message.channel.send(embed=embed_pg)
+                await message.channel.send(embed=embed_pg)
 
 keep_alive()
 client.run(TOKEN)
