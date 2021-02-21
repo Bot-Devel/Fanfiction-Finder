@@ -12,6 +12,7 @@ def get_ao3_id(query):
 
     url = 'https://www.google.com/search?q=' + \
         query+"+ao3"
+
     try:
         page = requests.get(url)
     except Exception:

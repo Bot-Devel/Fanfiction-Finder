@@ -67,23 +67,27 @@ def ffn_process_details(ffn_soup):
 
 
 def get_ffn_story_status(ffn_soup, details):
-    date_key = 'data-xutime'
     dates = [date for date in ffn_soup.find_all(
-        'span') if date.has_attr(date_key)]
+        'span') if date.has_attr('data-xutime')]
 
-    if details[-3].startswith('Updated:'):
-        status = date.fromtimestamp(
-            int(dates[0][date_key]))
-        return "Updated", status
+    cnt = 0
+    for i in range(0, len(details)):
+        if details[i].startswith('Updated:'):
+            cnt = 1
+            ffn_story_last_up = str(date.fromtimestamp(
+                int(dates[0]['data-xutime'])))
 
-    elif details[-4].startswith('Updated:'):
-        status = date.fromtimestamp(
-            int(dates[0][date_key]))
-        return "Updated", status
+            break  # if found, exit the loop to prevent overwriting of the variable
 
-    else:
-        status = date.fromtimestamp(int(dates[1][date_key]))  # Published date
-        return "Completed", status
+        else:
+            cnt = 2
+            ffn_story_last_up = str(date.fromtimestamp(
+                int(dates[1]['data-xutime'])))  # Published date
+
+    if cnt == 1:
+        return "Updated", ffn_story_last_up
+    elif cnt == 2:
+        return "Completed", ffn_story_last_up
 
 
 def get_ffn_word_cnt(details):

@@ -15,6 +15,6 @@ def run():
     # app.run(host='0.0.0.0',port=8080) #development server
 
 
-def keep_alive():
+def start_server():
     t = Thread(target=run)
     t.start()
