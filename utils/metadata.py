@@ -28,20 +28,29 @@ def ao3_metadata(query):
             ao3_series_name, ao3_author_name, ao3_author_url, ao3_series_summary, ao3_series_status, ao3_series_last_up, ao3_series_length, ao3_series_works = ao3_metadata_series(
                 ao3_url)
 
-            if ao3_series_status == "Completed":
-                des = ao3_series_summary+"\n\n"+"**📜 Last Updated:** "+ao3_series_last_up +\
-                    "\n"+"**📖 Length:** " + ao3_series_length + \
-                    " words in "+ao3_series_works+" works"
-
-            elif ao3_series_status == "Updated":
-                des = ao3_series_summary+"\n\n"+"**📜 Last Updated:** "+ao3_series_last_up +\
-                    "\n"+"**📖 Length:** " + ao3_series_length + \
-                    " words in "+ao3_series_works+" works"
             embed = discord.Embed(
                 title=ao3_series_name,
                 url=ao3_url,
-                description=des,
+                description=ao3_series_summary,
                 colour=discord.Colour(0x272b28))
+
+            if ao3_series_status == "Completed":
+
+                embed.add_field(
+                    name='**📜 Last Updated:**',
+                    value=ao3_series_last_up +
+                    " - "+ao3_series_status, inline=True)
+
+            elif ao3_series_status == "Updated":
+
+                embed.add_field(
+                    name='**📜 Last Updated:**',
+                    value=ao3_series_last_up, inline=True)
+
+            embed.add_field(
+                name='**📖 Length:**',
+                value=ao3_series_length +
+                " words in "+ao3_series_works+" works", inline=True)
 
             embed.set_author(name=ao3_author_name, url=ao3_author_url,
                              icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
@@ -69,42 +78,58 @@ def ao3_metadata(query):
         ao3_series_name, ao3_author_name, ao3_author_url, ao3_series_summary, ao3_series_status, ao3_series_last_up, ao3_series_length, ao3_series_works = ao3_metadata_series(
             ao3_url)
 
-        if ao3_series_status == "Completed":
-            des = ao3_series_summary+"\n\n"+"**📜 Last Updated:** "+ao3_series_last_up +\
-                "\n"+"**📖 Length:** " + ao3_series_length + \
-                " words in "+ao3_series_works+" works"
-
-        elif ao3_series_status == "Updated":
-            des = ao3_series_summary+"\n\n"+"**📜 Last Updated:** "+ao3_series_last_up +\
-                "\n"+"**📖 Length:** " + ao3_series_length + \
-                " words in "+ao3_series_works+" works"
-
         embed = discord.Embed(
             title=ao3_series_name,
             url=ao3_url,
-            description=des,
+            description=ao3_series_summary,
             colour=discord.Colour(0x272b28))
+
+        if ao3_series_status == "Completed":
+
+            embed.add_field(
+                name='**📜 Last Updated:**',
+                value=ao3_series_last_up +
+                " - "+ao3_series_status, inline=True)
+
+        elif ao3_series_status == "Updated":
+
+            embed.add_field(
+                name='**📜 Last Updated:**',
+                value=ao3_series_last_up, inline=True)
+
+        embed.add_field(
+            name='**📖 Length:**',
+            value=ao3_series_length +
+            " words in "+ao3_series_works+" works", inline=True)
 
         embed.set_author(name=ao3_author_name, url=ao3_author_url,
                          icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
 
         return embed
 
-    if ao3_story_status == "Completed":
-        des = ao3_story_summary+"\n\n"+"**📜 Last Updated:** "+ao3_story_last_up +\
-            " - "+ao3_story_status+"\n"+"**📖 Length:** " + ao3_story_length +\
-            " words in "+ao3_story_chapters+" chapters"
-
-    elif ao3_story_status == "Updated":
-        des = ao3_story_summary+"\n\n"+"**📜 Last Updated:** "+ao3_story_last_up +\
-            "\n"+"**📖 Length:** " + ao3_story_length +\
-            " words in "+ao3_story_chapters+" chapters"
-
     embed = discord.Embed(
         title=ao3_story_name,
         url=ao3_url,
-        description=des,
+        description=ao3_story_summary,
         colour=discord.Colour(0x272b28))
+
+    if ao3_story_status == "Completed":
+
+        embed.add_field(
+            name='**📜 Last Updated:**',
+            value=ao3_story_last_up +
+            " - "+ao3_story_status, inline=True)
+
+    elif ao3_story_status == "Updated":
+
+        embed.add_field(
+            name='**📜 Last Updated:**',
+            value=ao3_story_last_up, inline=True)
+
+    embed.add_field(
+        name='**📖 Length:**',
+        value=ao3_story_length +
+        " words in "+ao3_story_chapters+" chapters", inline=True)
 
     embed.set_author(name=ao3_author_name, url=ao3_author_url,
                      icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
@@ -114,11 +139,9 @@ def ao3_metadata(query):
 
 def ffn_metadata(query):
     if re.search(r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&//=]*", query) is None:
-
         if re.search(r"ao3\b", query):
             embed = None
             return embed
-
         query = query.replace(" ", "+")
         ffn_id = get_ffn_id(query)
 
@@ -157,24 +180,33 @@ def ffn_metadata(query):
 
         ffn_story_last_up = story_last_up_clean(ffn_story_last_up)
         ffn_author_url = "https://www.fanfiction.net"+ffn_author_url
-
         if len(list(ffn_story_summary)) > 2048:
             ffn_story_summary = ffn_story_summary[:2030] + "..."
-
-        if ffn_story_status == "Complete":
-            des = ffn_story_summary+"\n\n"+"**📜 Last Updated:** "+ffn_story_last_up +\
-                " - "+ffn_story_status+"\n"+"**📖 Length:** " + ffn_story_length + \
-                " words in "+ffn_story_chapters+" chapters"
-        elif ffn_story_status == "Updated":
-            des = ffn_story_summary+"\n\n"+"**📜 Last Updated:** "+ffn_story_last_up +\
-                "\n"+"**📖 Length:** " + ffn_story_length +\
-                " words in "+ffn_story_chapters+" chapters"
 
         embed = discord.Embed(
             title=ffn_story_name,
             url=ffn_url,
-            description=des,
+            description=ffn_story_summary,
             colour=discord.Colour(0x272b28))
+
+        if ffn_story_status == "Completed":
+
+            embed.add_field(
+                name='**📜 Last Updated:**',
+                value=ffn_story_last_up +
+                " - "+ffn_story_status, inline=True)
+
+        elif ffn_story_status == "Updated":
+
+            embed.add_field(
+                name='**📜 Last Updated:**',
+                value=ffn_story_last_up, inline=True)
+
+        embed.add_field(
+            name='**📖 Length:**',
+            value=ffn_story_length +
+            " words in "+ffn_story_chapters+" chapters", inline=True)
+
         embed.set_author(name=ffn_author_name, url=ffn_author_url,
                          icon_url="https://pbs.twimg.com/profile_images/843841615122784256/WXbuqyjo_bigger.jpg")
 
