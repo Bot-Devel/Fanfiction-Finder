@@ -131,7 +131,7 @@ def ffn_metadata(query):
 
         ffn_story_last_up = story_last_up_clean(ffn_story_last_up)
         ffn_author_url = "https://www.fanfiction.net"+ffn_author_url
-        
+
         if len(list(ffn_story_summary)) > 2048:
             ffn_story_summary = ffn_story_summary[:2030] + "..."
 
