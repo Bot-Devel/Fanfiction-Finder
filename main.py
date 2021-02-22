@@ -5,7 +5,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from utils.metadata import ao3_metadata, ffn_metadata
-from utils.bot_status import start_server
+# from utils.bot_status import start_server
 
 client = commands.Bot(command_prefix=',', help_command=None)
 load_dotenv()
@@ -35,6 +35,7 @@ async def on_message(message):
             if re.search(r"^ao3\b", message.content.lower()) is not None:
 
                 msg = message.content.replace("ao3", "")
+                msg = message.content.replace("ffn", "")
                 embed_pg = ao3_metadata(msg)
 
                 if embed_pg is None:  # if not found in ao3, search in ffn
@@ -45,6 +46,7 @@ async def on_message(message):
             elif re.search(r"^ffn\b", message.content.lower()) is not None:
 
                 msg = message.content.replace("ffn", "")
+                msg = message.content.replace("ao3", "")
                 embed_pg = ffn_metadata(msg)
 
                 if embed_pg is None:  # if not found in ffn, search in ao3
@@ -52,6 +54,7 @@ async def on_message(message):
 
                 await message.channel.send(embed=embed_pg)
 
+            # if in code blocks
             elif re.search(r"`(.*?)`", message.content.lower()) is not None:
 
                 msg_found = re.findall(r"`(.*?)`", message.content.lower())
@@ -76,7 +79,7 @@ async def on_message(message):
                 await message.channel.send(embed=embed_pg)
 
 
-start_server()
+# start_server()
 client.load_extension("cogs.settings")
 client.load_extension("cogs.help")
 client.run(TOKEN)

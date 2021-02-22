@@ -27,18 +27,13 @@ def get_embed(page=0):
         )
         embed.add_field(
             name="Search using code blocks:",
-            value="**Example:** \n\`cadmean victory\` will default to ffnet.\n \
-            \`rogue knight ao3\` for ao3.\n \
-            \`prince of slytherin ao3 series\` for ao3 series."
+            value="**Example:** \n\`cadmean victory\` will default to ffnet.\n\`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series."
         )
 
     elif page == 1:
         embed = discord.Embed(
             title="Bot Configuration",
-            description="This section requires Channel ID for the configuration \
-            so copy the Channel ID by right clicking on the channel.\n \
-            To use these commands, you need either administrator \
-            permissions or Admin or Mods role."
+            description="This section requires Channel ID for the configuration so copy the Channel ID by right clicking on the channel.\nTo use these commands, you need either administrator permissions or Admin or Mods role."
         )
         embed.add_field(
             name="To add new channels:",
