@@ -76,7 +76,7 @@ def ffn_process_details(ffn_soup):
     ffn_story_length = get_ffn_word_cnt(details)
     ffn_story_length = "{:,}".format(int(ffn_story_length))
     ffn_story_chapters = get_ffn_chapters_cnt(details)
-    
+
     return ffn_story_status, ffn_story_last_up, ffn_story_length, ffn_story_chapters, ffn_story_rating, ffn_story_genre, ffn_story_characters
 
 
@@ -93,10 +93,10 @@ def get_ffn_story_status(ffn_soup, details):
 
             break  # if found, exit the loop to prevent overwriting of the variable
 
-        else:
+        elif details[i].startswith('Published:'):
             cnt = 2
             ffn_story_last_up = str(date.fromtimestamp(
-                int(dates[1]['data-xutime'])))  # Published date
+                int(dates[0]['data-xutime'])))  # Published date
 
     if cnt == 1:
         return "Updated", ffn_story_last_up
@@ -114,7 +114,7 @@ def get_ffn_word_cnt(details):
 def get_ffn_chapters_cnt(details):
     search = [x for x in details if x.startswith("Chapters:")]
     if len(search) == 0:
-        return 0
+        return 1  # 1 as the default chapter number
     return int(search[0][len("Chapters:"):].replace(',', ''))
 
 

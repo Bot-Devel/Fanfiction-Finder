@@ -66,9 +66,10 @@ async def on_message(message):
 
                     await message.channel.send(embed=embed_pg)
 
-            elif re.search(r"https?:\/\/(www.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&=]*", message.content.lower()) is not None:
+            elif re.search(r"https?:\/\/(www.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&=]*", message.content.lower()) is not None:
 
                 if re.search(r"fanfiction.net\b",  message.content) is not None:
+
                     embed_pg = ffn_metadata(message.content)
 
                 elif re.search(r"archiveofourown.org\b", message.content) is not None:
