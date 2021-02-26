@@ -1,10 +1,14 @@
 from bs4 import BeautifulSoup
 import requests
+import time
 import re
-from utils.processing import story_last_up_clean, ao3_story_chapter_clean, get_ao3_series_works_index
+from utils.processing import story_last_up_clean, ao3_story_chapter_clean, \
+    get_ao3_series_works_index
 
 
 def ao3_metadata_works(ao3_url):
+
+    time.sleep(2)
     ao3_page = requests.get(ao3_url)
     ao3_soup = BeautifulSoup(ao3_page.content, 'html.parser')
 
@@ -51,6 +55,32 @@ def ao3_metadata_works(ao3_url):
         'dl', attrs={'class': 'stats'}).find(
         'dd', attrs={'class': 'chapters'}).contents[0]).strip()
 
+    ao3_story_rating = (ao3_soup.find(
+        'dd', attrs={'class': 'rating tags'}).find('a').contents[0]).strip()
+
+    try:  # not found in every story
+        ao3_story_relationships = [
+            a.contents[0].strip()
+            for a in ao3_soup.find(
+                'dd', attrs={'class': 'relationship tags'}).find_all('a')
+        ]
+        ao3_story_relationships = ", ".join(ao3_story_relationships)
+
+    except AttributeError:
+        ao3_story_relationships = None
+
+    try:  # not found in every story
+        ao3_story_characters = [
+            a.contents[0].strip()
+            for a in ao3_soup.find(
+                'dd', attrs={'class': 'character tags'}).find_all('a')
+        ]
+
+        ao3_story_characters = ", ".join(ao3_story_characters)
+
+    except AttributeError:
+        ao3_story_characters = None
+
     ao3_story_length = "{:,}".format(int(ao3_story_length))
     ao3_story_chapters = ao3_story_chapter_clean(ao3_story_chapters)
     ao3_story_last_up = story_last_up_clean(ao3_story_last_up)
@@ -59,10 +89,15 @@ def ao3_metadata_works(ao3_url):
     if len(list(ao3_story_summary)) > 2048:
         ao3_story_summary = ao3_story_summary[:2030] + "..."
 
-    return ao3_story_name, ao3_author_name, ao3_author_url, ao3_story_summary, ao3_story_status, ao3_story_last_up, ao3_story_length, ao3_story_chapters
+    return ao3_story_name, ao3_author_name, ao3_author_url, \
+        ao3_story_summary, ao3_story_status, ao3_story_last_up, \
+        ao3_story_length, ao3_story_chapters, ao3_story_rating, \
+        ao3_story_relationships, ao3_story_characters
 
 
 def ao3_metadata_series(ao3_url):
+
+    time.sleep(2)
     ao3_page = requests.get(ao3_url)
     ao3_soup = BeautifulSoup(ao3_page.content, 'html.parser')
 
@@ -126,7 +161,10 @@ def ao3_metadata_series(ao3_url):
     else:
         ao3_series_summary = ao3_series_summary + \
             '\n\n'+"📚 **Works**:\n"+ao3_series_works_index
+
     if len(list(ao3_series_summary)) > 2048:  # recheck the size of summary
         ao3_series_summary = ao3_series_summary[:1930] + "..."
 
-    return ao3_series_name, ao3_author_name, ao3_author_url, ao3_series_summary, ao3_series_status, ao3_series_last_up, ao3_series_length, ao3_series_works
+    return ao3_series_name, ao3_author_name, ao3_author_url, \
+        ao3_series_summary, ao3_series_status, ao3_series_last_up,\
+        ao3_series_length, ao3_series_works

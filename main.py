@@ -1,11 +1,10 @@
 import os
 import re
-import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
 from utils.metadata import ao3_metadata, ffn_metadata
-# from utils.bot_status import start_server
+from utils.bot_status import start_server
 
 client = commands.Bot(command_prefix=',', help_command=None)
 load_dotenv()
@@ -24,7 +23,7 @@ async def on_message(message):
 
     msg = list(message.content.lower())
 
-    with open('data/channels.txt', 'r') as f:
+    with open('data/live_channels.txt', 'r') as f:
         channels = f.read().splitlines()
 
     whitelist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'é',
@@ -72,14 +71,13 @@ async def on_message(message):
                 if re.search(r"fanfiction.net\b",  message.content) is not None:
                     embed_pg = ffn_metadata(message.content)
 
-                if re.search(r"archiveofourown.org\b", message.content) is not None:
+                elif re.search(r"archiveofourown.org\b", message.content) is not None:
                     # if not found in ffn, search in ao3
                     embed_pg = ao3_metadata(message.content)
 
                 await message.channel.send(embed=embed_pg)
 
-
-# start_server()
+start_server()
 client.load_extension("cogs.settings")
 client.load_extension("cogs.help")
 client.run(TOKEN)
