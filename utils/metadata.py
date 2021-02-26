@@ -10,13 +10,14 @@ from utils.metadata_processing import ao3_metadata_works, ao3_metadata_series
 
 
 def ao3_metadata(query):
-    if re.search(r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&//=]*", query) is None:
+    if re.search(r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&//=]*", query) is None:
 
         query = query.replace(" ", "+")
         ao3_url = get_ao3_url(query)
 
-    else:  # if the query is an url, no need to call get_ao3_url
-        ao3_url = query
+    else:  # clean the url if the query was a url
+        ao3_url = re.search(
+            r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&//=]*", query).group(0)
 
     if ao3_url is None:
         return None
@@ -66,7 +67,7 @@ def ao3_metadata(query):
         embed.add_field(
             name='**📖 Length:**',
             value=ao3_series_length +
-            " words in "+ao3_series_works+" works", inline=True)
+            " words in "+ao3_series_works+" work(s)", inline=True)
 
         embed.set_author(
             name=ao3_author_name, url=ao3_author_url,
@@ -96,7 +97,7 @@ def ao3_metadata(query):
     embed.add_field(
         name='**📖 Length:**',
         value=ao3_story_length +
-        " words in "+ao3_story_chapters+" chapters", inline=True)
+        " words in "+ao3_story_chapters+" chapter(s)", inline=True)
 
     footer = str(ao3_story_rating)+" | " + \
         str(ao3_story_relationships)+" | " + str(ao3_story_characters)
@@ -114,18 +115,22 @@ def ao3_metadata(query):
 
 
 def ffn_metadata(query):
-    if re.search(r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&//=]*", query) is None:
+    if re.search(r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&//=]*", query) is None:
         if re.search(r"ao3\b", query):
             embed = None
             return embed
         query = query.replace(" ", "+")
         ffn_url = get_ffn_url(query)
 
-    else:  # if the query was ffn url, no need to call get_ffn_url
-        ffn_url = query
+    else:  # clean the url if the query was a url
+        ffn_url = re.search(
+            r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&//=]*", query).group(0)
 
     if ffn_url is None:
         return None
+
+    # convert m.fanfiction.net to www.fanfiction.net
+    ffn_url = ffn_url.replace(r"/m.", r"/www.")
 
     scraper = cloudscraper.CloudScraper(
         delay=2, browser={
@@ -186,7 +191,7 @@ def ffn_metadata(query):
         embed.add_field(
             name='**📖 Length:**',
             value=str(ffn_story_length) +
-            " words in "+str(ffn_story_chapters)+" chapters", inline=True)
+            " words in "+str(ffn_story_chapters)+" chapter(s)", inline=True)
 
         if re.search(r'\d', ffn_story_characters) is None:
 
