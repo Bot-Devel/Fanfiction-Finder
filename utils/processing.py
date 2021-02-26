@@ -60,10 +60,24 @@ def ffn_process_details(ffn_soup):
     ffn_story_status, ffn_story_last_up = get_ffn_story_status(
         ffn_soup, details)
 
+    for i in range(0, len(details)):
+        if details[i].startswith('Rated:'):
+
+            ffn_story_rating = details[i].replace('Rated:', '').strip()
+
+            break  # if found, exit the loop to prevent overwriting of the variable
+
+        else:
+            ffn_story_rating = 'Not found'
+
+    ffn_story_genre = details[2]
+    ffn_story_characters = details[3]
+
     ffn_story_length = get_ffn_word_cnt(details)
     ffn_story_length = "{:,}".format(int(ffn_story_length))
     ffn_story_chapters = get_ffn_chapters_cnt(details)
-    return ffn_story_status, str(ffn_story_last_up), str(ffn_story_length), str(ffn_story_chapters)
+    
+    return ffn_story_status, ffn_story_last_up, ffn_story_length, ffn_story_chapters, ffn_story_rating, ffn_story_genre, ffn_story_characters
 
 
 def get_ffn_story_status(ffn_soup, details):
