@@ -68,10 +68,13 @@ def ffn_process_details(ffn_soup):
             break  # if found, exit the loop to prevent overwriting of the variable
 
         else:
-            ffn_story_rating = 'Not found'
+            ffn_story_rating = None
 
     ffn_story_genre = details[2]
     ffn_story_characters = details[3]
+
+    if re.search(r'\d', str(ffn_story_characters)) is not None:
+        ffn_story_characters = None
 
     ffn_story_length = get_ffn_word_cnt(details)
     ffn_story_length = "{:,}".format(int(ffn_story_length))
@@ -162,3 +165,45 @@ def get_ao3_series_works_index(ao3_soup):
 
     ao3_series_works_index = '\n'.join(ao3_series_works_index)
     return ao3_series_works_index
+
+
+def get_ffn_footer(ffn_story_characters, ffn_story_genre, ffn_story_rating):
+
+    if all(v is not None for v in [
+            ffn_story_characters,
+            ffn_story_genre, ffn_story_rating]):
+
+        footer = str(ffn_story_rating)+" | " + \
+            str(ffn_story_genre)+" | "+str(ffn_story_characters)
+
+    elif all(v is not None for v in [
+            ffn_story_characters,
+            ffn_story_genre]):
+        footer = str(ffn_story_genre)+" | "+str(ffn_story_characters)
+
+    elif all(v is not None for v in [
+            ffn_story_characters,
+            ffn_story_rating]):
+        footer = str(ffn_story_rating)+" | "+str(ffn_story_characters)
+
+    elif all(v is not None for v in [
+            ffn_story_genre,
+            ffn_story_rating]):
+        footer = str(ffn_story_rating)+" | "+str(ffn_story_genre)
+
+    elif all(v is not None for v in [
+            ffn_story_characters]):
+        footer = str(ffn_story_characters)
+
+    elif all(v is not None for v in [
+            ffn_story_rating]):
+        footer = str(ffn_story_rating)
+
+    elif all(v is not None for v in [
+            ffn_story_genre]):
+        footer = str(ffn_story_genre)
+
+    if len(list(footer)) > 100:
+        footer = footer[:100]
+
+    return footer

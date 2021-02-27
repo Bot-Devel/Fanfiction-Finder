@@ -22,7 +22,7 @@ def get_embed(page=0):
         )
         embed.add_field(
             name="Search using Urls:",
-            value="**Example:**\nhttps://archiveofourown.org/series/1119027",
+            value="**Example:** \nSomething https://archiveofourown.org/series/1119027",
             inline=False
         )
         embed.add_field(
@@ -33,7 +33,7 @@ def get_embed(page=0):
     elif page == 1:
         embed = discord.Embed(
             title="Bot Configuration",
-            description="This section requires Channel ID for the configuration so copy the Channel ID by right clicking on the channel.\nTo use these commands, you need either administrator permissions or Admin or Mods role."
+            description="This section requires Channel ID for the configuration so copy the Channel ID by right clicking on the channel.\nTo use these commands, you need administrator permission."
         )
         embed.add_field(
             name="To add new channels:",
