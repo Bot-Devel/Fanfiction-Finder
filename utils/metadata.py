@@ -5,7 +5,7 @@ import cloudscraper
 
 from utils.search import get_ao3_url, get_ffn_url
 from utils.processing import story_last_up_clean, ffn_process_details, \
-    ao3_convert_chapters_to_works
+    ao3_convert_chapters_to_works, get_ffn_footer
 from utils.metadata_processing import ao3_metadata_works, ao3_metadata_series
 
 
@@ -54,18 +54,18 @@ def ao3_metadata(query):
         if ao3_series_status == "Completed":
 
             embed.add_field(
-                name='**📜 Last Updated:**',
+                name='**📜 Last Updated**',
                 value=ao3_series_last_up +
                 " - "+ao3_series_status, inline=True)
 
         elif ao3_series_status == "Updated":
 
             embed.add_field(
-                name='**📜 Last Updated:**',
+                name='**📜 Last Updated**',
                 value=ao3_series_last_up, inline=True)
 
         embed.add_field(
-            name='**📖 Length:**',
+            name='**📖 Length**',
             value=ao3_series_length +
             " words in "+ao3_series_works+" work(s)", inline=True)
 
@@ -84,14 +84,14 @@ def ao3_metadata(query):
     if ao3_story_status == "Completed":
 
         embed.add_field(
-            name='**📜 Last Updated:**',
+            name='**📜 Last Updated**',
             value=ao3_story_last_up +
             " - "+ao3_story_status, inline=True)
 
     elif ao3_story_status == "Updated":
 
         embed.add_field(
-            name='**📜 Last Updated:**',
+            name='**📜 Last Updated**',
             value=ao3_story_last_up, inline=True)
 
     embed.add_field(
@@ -178,32 +178,23 @@ def ffn_metadata(query):
         if ffn_story_status == "Completed":
 
             embed.add_field(
-                name='**📜 Last Updated:**',
+                name='**📜 Last Updated**',
                 value=ffn_story_last_up +
                 " - "+ffn_story_status, inline=True)
 
         elif ffn_story_status == "Updated":
 
             embed.add_field(
-                name='**📜 Last Updated:**',
+                name='**📜 Last Updated**',
                 value=ffn_story_last_up, inline=True)
 
         embed.add_field(
-            name='**📖 Length:**',
+            name='**📖 Length**',
             value=str(ffn_story_length) +
             " words in "+str(ffn_story_chapters)+" chapter(s)", inline=True)
 
-        if re.search(r'\d', ffn_story_characters) is None:
-
-            footer = str(ffn_story_rating)+" | " + \
-                str(ffn_story_genre)+" | "+str(ffn_story_characters)
-        else:
-
-            footer = str(ffn_story_rating)+" | " + \
-                str(ffn_story_genre)
-
-        if len(list(footer)) > 100:
-            footer = footer[:100]
+        footer = get_ffn_footer(ffn_story_characters,
+                                ffn_story_genre, ffn_story_rating)
 
         embed.set_footer(text=footer)
 

@@ -10,7 +10,7 @@ class Help(Cog):
     @command()
     async def help(self, ctx):
 
-        with open('data/channels.txt', 'r') as f:
+        with open('data/live_channels.txt', 'r') as f:
             channels = f.read().splitlines()
 
         if str(ctx.channel.id) in channels:
