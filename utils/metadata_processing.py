@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import time
 import re
+from datetime import datetime
 from utils.processing import story_last_up_clean, ao3_story_chapter_clean, \
     get_ao3_series_works_index
 
@@ -39,14 +40,25 @@ def ao3_metadata_works(ao3_url):
         ao3_story_status = "Completed"
 
     try:
-        ao3_story_last_up = (ao3_soup.find(
-            'dl', attrs={'class': 'stats'}).find(
-            'dd', attrs={'class': 'status'}).contents[0]).strip()
+        ao3_story_last_up = ao3_soup.find(
+            'li', attrs={'class': 'download'}).find(
+            'ul', attrs={'class': 'expandable secondary'}).find('a', href=True)['href']
 
-    except AttributeError:  # if story last updated not found
-        ao3_story_last_up = (ao3_soup.find(
-            'dl', attrs={'class': 'stats'}).find(
-            'dd', attrs={'class': 'published'}).contents[0]).strip()
+        ao3_story_last_up = int(re.search(
+            r"updated_at=(\d+)", ao3_story_last_up).group(1))
+
+        ao3_story_last_up = str(datetime.fromtimestamp(ao3_story_last_up))
+
+    except Exception:
+        try:
+            ao3_story_last_up = (ao3_soup.find(
+                'dl', attrs={'class': 'stats'}).find(
+                'dd', attrs={'class': 'status'}).contents[0]).strip()
+
+        except AttributeError:  # if story last updated not found
+            ao3_story_last_up = (ao3_soup.find(
+                'dl', attrs={'class': 'stats'}).find(
+                'dd', attrs={'class': 'published'}).contents[0]).strip()
 
     ao3_story_length = (ao3_soup.find(
         'dl', attrs={'class': 'stats'}).find(
@@ -84,7 +96,7 @@ def ao3_metadata_works(ao3_url):
 
     ao3_story_length = "{:,}".format(int(ao3_story_length))
     ao3_story_chapters = ao3_story_chapter_clean(ao3_story_chapters)
-    ao3_story_last_up = story_last_up_clean(ao3_story_last_up)
+    ao3_story_last_up = story_last_up_clean(ao3_story_last_up, 1)
     ao3_author_url = "https://archiveofourown.org"+ao3_author_url
 
     if len(list(ao3_story_summary)) > 2048:
@@ -155,7 +167,7 @@ def ao3_metadata_series(ao3_url):
         'dd').string.strip()
 
     ao3_series_works_index = get_ao3_series_works_index(ao3_soup)
-    ao3_series_last_up = story_last_up_clean(ao3_series_last_up)
+    ao3_series_last_up = story_last_up_clean(ao3_series_last_up, 2)
     ao3_author_url = "https://archiveofourown.org"+ao3_author_url
 
     if len(list(ao3_series_summary)) > 2048:
