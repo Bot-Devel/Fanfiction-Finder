@@ -1,5 +1,5 @@
 from dateutil.relativedelta import relativedelta
-from datetime import *
+from datetime import datetime
 from bs4 import BeautifulSoup
 import requests
 import re
@@ -22,32 +22,50 @@ def ao3_story_chapter_clean(ao3_story_chapters):
     return ao3_chapter
 
 
-def story_last_up_clean(story_last_up):
-    today = date.today()
-    today_date = today.strftime('%Y-%m-%d')
-    today_date = tuple(map(int, today_date.split('-')))
-    last_updated = tuple(map(int, story_last_up.split('-')))
+def story_last_up_clean(story_last_up, _type):
 
-    diff_in_date = relativedelta(
-        date(*today_date), date(*last_updated))
+    curr_time = datetime.now()
 
-    if diff_in_date.years:
-        if diff_in_date.years == 1:
-            last_up = str(diff_in_date.years)+" year ago"
+    if _type == 1:  # ffn & ao3 works
+        datetimeFormat = '%Y-%m-%d %H:%M:%S'
+    elif _type == 2:  # ao3 series
+        datetimeFormat = '%Y-%m-%d'
+
+    story_last_up = datetime.strptime(story_last_up, datetimeFormat)
+
+    diff_in_time = relativedelta(curr_time, story_last_up)
+
+    if diff_in_time.years:
+
+        if diff_in_time.years == 1:
+            last_up = str(diff_in_time.years)+" year ago"
         else:
-            last_up = str(diff_in_date.years)+" years ago"
+            last_up = str(diff_in_time.years)+" years ago"
 
-    elif diff_in_date.months:
-        if diff_in_date.months == 1:
-            last_up = str(diff_in_date.months)+" month ago"
-        else:
-            last_up = str(diff_in_date.months)+" months ago"
+    elif diff_in_time.months:
 
-    elif diff_in_date.days:
-        if diff_in_date.days == 1:
-            last_up = str(diff_in_date.days)+" day ago"
+        if diff_in_time.months == 1:
+            last_up = str(diff_in_time.months)+" month ago"
         else:
-            last_up = str(diff_in_date.days)+" days ago"
+            last_up = str(diff_in_time.months)+" months ago"
+
+    elif diff_in_time.days:
+        if diff_in_time.days == 1:
+            last_up = str(diff_in_time.days)+" day ago"
+        else:
+            last_up = str(diff_in_time.days)+" days ago"
+
+    elif diff_in_time.hours:
+        if diff_in_time.hours == 1:
+            last_up = str(diff_in_time.hours)+" hour ago"
+        else:
+            last_up = str(diff_in_time.hours)+" hours ago"
+
+    elif diff_in_time.minutes:
+        if diff_in_time.minutes == 1:
+            last_up = str(diff_in_time.minutes)+" minute ago"
+        else:
+            last_up = str(diff_in_time.minutes)+" minutes ago"
 
     return str(last_up)
 
@@ -91,14 +109,14 @@ def get_ffn_story_status(ffn_soup, details):
     for i in range(0, len(details)):
         if details[i].startswith('Updated:'):
             cnt = 1
-            ffn_story_last_up = str(date.fromtimestamp(
+            ffn_story_last_up = str(datetime.fromtimestamp(
                 int(dates[0]['data-xutime'])))
 
             break  # if found, exit the loop to prevent overwriting of the variable
 
         elif details[i].startswith('Published:'):
             cnt = 2
-            ffn_story_last_up = str(date.fromtimestamp(
+            ffn_story_last_up = str(datetime.fromtimestamp(
                 int(dates[0]['data-xutime'])))  # Published date
 
     if cnt == 1:
