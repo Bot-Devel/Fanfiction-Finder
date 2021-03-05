@@ -56,10 +56,15 @@ def ao3_metadata(query):
             embed.add_field(
                 name='**📜 Last Updated**',
                 value=ao3_series_last_up +
-                " - "+ao3_series_status, inline=True)
+                " ✓Complete", inline=True)
 
         elif ao3_series_status == "Updated":
 
+            embed.add_field(
+                name='**📜 Last Updated**',
+                value=ao3_series_last_up, inline=True)
+
+        elif ao3_series_status is None:
             embed.add_field(
                 name='**📜 Last Updated**',
                 value=ao3_series_last_up, inline=True)
@@ -86,7 +91,7 @@ def ao3_metadata(query):
         embed.add_field(
             name='**📜 Last Updated**',
             value=ao3_story_last_up +
-            " - "+ao3_story_status, inline=True)
+            " ✓Complete", inline=True)
 
     elif ao3_story_status == "Updated":
 
@@ -94,8 +99,13 @@ def ao3_metadata(query):
             name='**📜 Last Updated**',
             value=ao3_story_last_up, inline=True)
 
+    elif ao3_story_status is None:
+        embed.add_field(
+            name='**📜 Last Updated**',
+            value=ao3_story_last_up, inline=True)
+
     embed.add_field(
-        name='**📖 Length:**',
+        name='**📖 Length**',
         value=ao3_story_length +
         " words in "+ao3_story_chapters+" chapter(s)", inline=True)
 
@@ -163,7 +173,7 @@ def ffn_metadata(query):
             ffn_story_characters = ffn_process_details(
                 ffn_soup)
 
-        ffn_story_last_up = story_last_up_clean(ffn_story_last_up)
+        ffn_story_last_up = story_last_up_clean(ffn_story_last_up, 1)
         ffn_author_url = "https://www.fanfiction.net"+ffn_author_url
 
         if len(list(ffn_story_summary)) > 2048:
@@ -175,12 +185,12 @@ def ffn_metadata(query):
             description=ffn_story_summary,
             colour=discord.Colour(0x272b28))
 
-        if ffn_story_status == "Completed":
+        if ffn_story_status == "Complete":
 
             embed.add_field(
                 name='**📜 Last Updated**',
                 value=ffn_story_last_up +
-                " - "+ffn_story_status, inline=True)
+                " ✓"+ffn_story_status, inline=True)
 
         elif ffn_story_status == "Updated":
 
@@ -195,8 +205,8 @@ def ffn_metadata(query):
 
         footer = get_ffn_footer(ffn_story_characters,
                                 ffn_story_genre, ffn_story_rating)
-
-        embed.set_footer(text=footer)
+        if footer is not None:
+            embed.set_footer(text=footer)
 
         embed.set_author(
             name=ffn_author_name, url=ffn_author_url,

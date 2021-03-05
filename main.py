@@ -1,5 +1,6 @@
 import os
 import re
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -9,6 +10,13 @@ from utils.bot_status import start_server
 client = commands.Bot(command_prefix=',', help_command=None)
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+
+
+@client.event
+async def on_ready():
+    await client.change_presence(
+        activity=discord.Game(name=",help")
+    )
 
 
 @client.event
