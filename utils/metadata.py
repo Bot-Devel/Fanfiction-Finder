@@ -1,5 +1,6 @@
 import discord
 import re
+import time
 from bs4 import BeautifulSoup
 import cloudscraper
 
@@ -143,7 +144,7 @@ def ffn_metadata(query):
     ffn_url = ffn_url.replace(r"/m.", r"/www.")
 
     scraper = cloudscraper.CloudScraper(
-        delay=2, browser={
+        delay=3, browser={
             'browser': 'chrome',
             'platform': 'windows',
             'mobile': False,
@@ -151,6 +152,7 @@ def ffn_metadata(query):
         }
     )
 
+    time.sleep(3)
     ffn_page = scraper.get(ffn_url).text
     ffn_soup = BeautifulSoup(ffn_page, 'html.parser')
 
