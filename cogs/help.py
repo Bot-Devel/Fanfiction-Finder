@@ -10,47 +10,42 @@ class Help(Cog):
     @command()
     async def help(self, ctx):
 
-        with open('data/live_channels.txt', 'r') as f:
-            channels = f.read().splitlines()
+        embed_pg, page_limit = get_embed(0)
+        message = await ctx.send(embed=embed_pg)
 
-        if str(ctx.channel.id) in channels:
+        await message.add_reaction('⏮')
+        await message.add_reaction('◀')
+        await message.add_reaction('▶')
+        await message.add_reaction('⏭')
 
-            embed_pg, page_limit = get_embed(0)
-            message = await ctx.send(embed=embed_pg)
+        def check(reaction, user):
+            return user == ctx.author
 
-            await message.add_reaction('⏮')
-            await message.add_reaction('◀')
-            await message.add_reaction('▶')
-            await message.add_reaction('⏭')
-
-            def check(reaction, user):
-                return user == ctx.author
-
-            page = 0
-            reaction = None
-            while True:
-                if str(reaction) == '⏮':
-                    page = 0
+        page = 0
+        reaction = None
+        while True:
+            if str(reaction) == '⏮':
+                page = 0
+                embed_pg, page_limit = get_embed(page)
+                await message.edit(embed=embed_pg)
+            elif str(reaction) == '◀':
+                if page > 0:
+                    page -= 1
                     embed_pg, page_limit = get_embed(page)
                     await message.edit(embed=embed_pg)
-                elif str(reaction) == '◀':
-                    if page > 0:
-                        page -= 1
-                        embed_pg, page_limit = get_embed(page)
-                        await message.edit(embed=embed_pg)
-                elif str(reaction) == '▶':
-                    if page < page_limit:
-                        page += 1
-                        embed_pg, page_limit = get_embed(page)
-                        await message.edit(embed=embed_pg)
-                elif str(reaction) == '⏭':
-                    page = page_limit-1
+            elif str(reaction) == '▶':
+                if page < page_limit:
+                    page += 1
                     embed_pg, page_limit = get_embed(page)
                     await message.edit(embed=embed_pg)
-                reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
-                await message.remove_reaction(reaction, user)
+            elif str(reaction) == '⏭':
+                page = page_limit-1
+                embed_pg, page_limit = get_embed(page)
+                await message.edit(embed=embed_pg)
+            reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
+            await message.remove_reaction(reaction, user)
 
-            await message.clear_reactions()
+        await message.clear_reactions()
 
 
 def setup(client):
