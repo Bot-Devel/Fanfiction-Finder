@@ -37,28 +37,17 @@ def ao3_metadata_works(ao3_url):
         ao3_story_status = ao3_story_status.replace(":", "")
 
     except AttributeError:  # if story status not found
-        ao3_story_status = "Completed"
+        ao3_story_status = None
 
     try:
-        ao3_story_last_up = ao3_soup.find(
-            'li', attrs={'class': 'download'}).find(
-            'ul', attrs={'class': 'expandable secondary'}).find('a', href=True)['href']
+        ao3_story_last_up = (ao3_soup.find(
+            'dl', attrs={'class': 'stats'}).find(
+            'dd', attrs={'class': 'status'}).contents[0]).strip()
 
-        ao3_story_last_up = int(re.search(
-            r"updated_at=(\d+)", ao3_story_last_up).group(1))
-
-        ao3_story_last_up = str(datetime.fromtimestamp(ao3_story_last_up))
-
-    except Exception:
-        try:
-            ao3_story_last_up = (ao3_soup.find(
-                'dl', attrs={'class': 'stats'}).find(
-                'dd', attrs={'class': 'status'}).contents[0]).strip()
-
-        except AttributeError:  # if story last updated not found
-            ao3_story_last_up = (ao3_soup.find(
-                'dl', attrs={'class': 'stats'}).find(
-                'dd', attrs={'class': 'published'}).contents[0]).strip()
+    except AttributeError:  # if story last updated not found
+        ao3_story_last_up = (ao3_soup.find(
+            'dl', attrs={'class': 'stats'}).find(
+            'dd', attrs={'class': 'published'}).contents[0]).strip()
 
     ao3_story_length = (ao3_soup.find(
         'dl', attrs={'class': 'stats'}).find(
@@ -96,7 +85,7 @@ def ao3_metadata_works(ao3_url):
 
     ao3_story_length = "{:,}".format(int(ao3_story_length))
     ao3_story_chapters = ao3_story_chapter_clean(ao3_story_chapters)
-    ao3_story_last_up = story_last_up_clean(ao3_story_last_up, 1)
+    ao3_story_last_up = story_last_up_clean(ao3_story_last_up, 2)
     ao3_author_url = "https://archiveofourown.org"+ao3_author_url
 
     if len(list(ao3_story_summary)) > 2048:
@@ -141,10 +130,10 @@ def ao3_metadata_series(ao3_url):
         if ao3_series_status == "No":
             ao3_series_status = "Updated"
         elif ao3_series_status == "Yes":
-            ao3_series_status = "Completed"
+            ao3_series_status = "Complete"
 
     except AttributeError:  # if story status not found
-        ao3_series_status = "Completed"
+        ao3_series_status = None
 
     try:
         ao3_series_last_up = ao3_soup.find(

@@ -5,7 +5,7 @@ import re
 
 def get_ao3_url(query):
     ao3_list = []
-    hrefs = []
+    href = []
 
     url = 'https://www.google.com/search?q=' + \
         query+"+ao3"
@@ -15,19 +15,19 @@ def get_ao3_url(query):
     soup = BeautifulSoup(page.content, 'html.parser')
     found = soup.findAll('a')
     for link in found:
-        hrefs.append(link['href'])
+        href.append(link['href'])
 
     if re.search(r"\bseries\b", url) is not None:  # if the query has series
-        for i in range(len(hrefs)):
-            if re.search(r"\barchiveofourown.org/series/\b", hrefs[i]) is not None:
-                ao3_list.append(hrefs[i])
+        for i in range(len(href)):
+            if re.search(r"\barchiveofourown.org/series/\b", href[i]) is not None:
+                ao3_list.append(href[i])
 
     else:
-        for i in range(len(hrefs)):
-            if re.search(r"\barchiveofourown.org/works/\b", hrefs[i]) is not None:
-                ao3_list.append(hrefs[i])
-            if re.search(r"\barchiveofourown.org/chapters/\b", hrefs[i]) is not None:
-                ao3_list.append(hrefs[i])
+        for i in range(len(href)):
+            if re.search(r"\barchiveofourown.org/works/\b", href[i]) is not None:
+                ao3_list.append(href[i])
+            if re.search(r"\barchiveofourown.org/chapters/\b", href[i]) is not None:
+                ao3_list.append(href[i])
     if not ao3_list:
         return None
 
@@ -40,7 +40,7 @@ def get_ao3_url(query):
 
 def get_ffn_url(query):
     ffn_list = []
-    hrefs = []
+    href = []
 
     url = 'https://www.google.com/search?q=' + \
         query+"+fanfiction"
@@ -51,11 +51,11 @@ def get_ffn_url(query):
     found = soup.findAll('a')
 
     for link in found:
-        hrefs.append(link['href'])
+        href.append(link['href'])
 
-    for i in range(len(hrefs)):
-        if re.search(r"fanfiction.net\W", hrefs[i]) is not None:
-            ffn_list.append(hrefs[i])
+    for i in range(len(href)):
+        if re.search(r"fanfiction.net\W", href[i]) is not None:
+            ffn_list.append(href[i])
 
     if not ffn_list:
         return

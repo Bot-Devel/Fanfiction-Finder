@@ -8,51 +8,39 @@ class Settings(Cog):
         self.client = client
 
     @has_permissions(administrator=True)
-    @command(aliases=['add'], pass_context=True)
-    async def add_channel(self, ctx, message):
+    @command(aliases=['allow'], pass_context=True)
+    async def add_channel(self, ctx):
         """Adds channels to the bot's settings"""
 
         with open("data/live_channels.txt", "r") as f:
             channels = f.read().splitlines()
 
-        error = 0
         channels = [int(i) for i in channels]
-        try:  # check if the message is a channel ID
+        with open("data/live_channels.txt", "a") as f:
 
-            message = int(message)
+            if ctx.channel.id not in channels:
+                f.write(str(ctx.channel.id)+"\n")
+                embed = discord.Embed(
+                    description="The channel has been added."
+                )
 
-        except ValueError:
-            error = 1
-            embed = discord.Embed(
-                description="That is not a valid channel ID."
-            )
-
-        if error == 0:  # If no errors found, add the channel
-            with open("data/live_channels.txt", "a") as f:
-
-                if message not in channels:
-                    f.write(str(message)+"\n")
-                    embed = discord.Embed(
-                        description="The channel has been added."
-                    )
-
-                else:
-                    embed = discord.Embed(
-                        description="The channel is already registered!"
-                    )
+            else:
+                embed = discord.Embed(
+                    description="The channel is already registered!"
+                )
 
         await ctx.channel.send(embed=embed)
 
     @has_permissions(administrator=True)
-    @command(aliases=['del', 'remove'], pass_context=True)
-    async def remove_channel(self, ctx, message):
+    @command(aliases=['disallow'], pass_context=True)
+    async def remove_channel(self, ctx):
         """Removes channels from the bot's settings"""
 
         with open("data/live_channels.txt", "r") as f:
             channels = f.read().splitlines()
 
-        if message in channels:
-            channels.remove(message)
+        if str(ctx.channel.id) in channels:
+            channels.remove(str(ctx.channel.id))
 
         with open("data/live_channels.txt", "w") as f:
             for channel in channels:

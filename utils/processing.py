@@ -26,9 +26,9 @@ def story_last_up_clean(story_last_up, _type):
 
     curr_time = datetime.now()
 
-    if _type == 1:  # ffn & ao3 works
+    if _type == 1:  # ffn last updated
         datetimeFormat = '%Y-%m-%d %H:%M:%S'
-    elif _type == 2:  # ao3 series
+    elif _type == 2:  # ao3 last updated
         datetimeFormat = '%Y-%m-%d'
 
     story_last_up = datetime.strptime(story_last_up, datetimeFormat)
@@ -91,6 +91,9 @@ def ffn_process_details(ffn_soup):
     ffn_story_genre = details[2]
     ffn_story_characters = details[3]
 
+    if re.search(r'\d', str(ffn_story_genre)) is not None:
+        ffn_story_genre = None
+
     if re.search(r'\d', str(ffn_story_characters)) is not None:
         ffn_story_characters = None
 
@@ -115,14 +118,18 @@ def get_ffn_story_status(ffn_soup, details):
             break  # if found, exit the loop to prevent overwriting of the variable
 
         elif details[i].startswith('Published:'):
-            cnt = 2
+            cnt = 1
             ffn_story_last_up = str(datetime.fromtimestamp(
                 int(dates[0]['data-xutime'])))  # Published date
+
+    for i in range(0, len(details)):
+        if details[i].startswith('Status: Complete'):
+            cnt = 2
 
     if cnt == 1:
         return "Updated", ffn_story_last_up
     elif cnt == 2:
-        return "Completed", ffn_story_last_up
+        return "Complete", ffn_story_last_up
 
 
 def get_ffn_word_cnt(details):
@@ -220,6 +227,8 @@ def get_ffn_footer(ffn_story_characters, ffn_story_genre, ffn_story_rating):
     elif all(v is not None for v in [
             ffn_story_genre]):
         footer = str(ffn_story_genre)
+    else:
+        footer = None
 
     if len(list(footer)) > 100:
         footer = footer[:100]
