@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import requests
 import time
 import re
-from datetime import datetime
 from utils.processing import story_last_up_clean, ao3_story_chapter_clean, \
     get_ao3_series_works_index
 
