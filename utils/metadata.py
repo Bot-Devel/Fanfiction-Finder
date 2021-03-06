@@ -6,7 +6,7 @@ import cloudscraper
 
 from utils.search import get_ao3_url, get_ffn_url
 from utils.processing import story_last_up_clean, ffn_process_details, \
-    ao3_convert_chapters_to_works, get_ffn_footer
+    ao3_convert_chapters_to_works
 from utils.metadata_processing import ao3_metadata_works, ao3_metadata_series
 
 
@@ -110,9 +110,14 @@ def ao3_metadata(query):
         value=ao3_story_length +
         " words in "+ao3_story_chapters+" chapter(s)", inline=True)
 
-    footer = str(ao3_story_rating)+" | " + \
-        str(ao3_story_relationships)+" | " + str(ao3_story_characters)
+    footer = []
+    for var in [ao3_story_rating,
+                ao3_story_relationships, ao3_story_characters]:
+        if var is not None:
+            footer.append(str(var))
+            footer.append(" | ")
 
+    footer = ''.join(footer[:len(footer)-1])
     if len(list(footer)) > 100:
         footer = footer[:100]
 
@@ -205,8 +210,17 @@ def ffn_metadata(query):
             value=str(ffn_story_length) +
             " words in "+str(ffn_story_chapters)+" chapter(s)", inline=True)
 
-        footer = get_ffn_footer(ffn_story_characters,
-                                ffn_story_genre, ffn_story_rating)
+        footer = []
+        for var in [ffn_story_rating, ffn_story_genre,
+                    ffn_story_characters]:
+            if var is not None:
+                footer.append(str(var))
+                footer.append(" | ")
+
+        footer = ''.join(footer[:len(footer)-1])
+        if len(list(footer)) > 100:
+            footer = footer[:100]
+
         if footer is not None:
             embed.set_footer(text=footer)
 
