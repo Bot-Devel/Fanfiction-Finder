@@ -1,6 +1,6 @@
 <h1 align="center">Fanfiction Finder</h1>
 
-[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) <br>
 This is a discord bot which scrapes google for a fanfiction and parses the html into readable metadata and sends the metadata as an embed message. <br>
 Features-
 - Currently supports searching for fanfiction.net & archiveofourown.org <br>
