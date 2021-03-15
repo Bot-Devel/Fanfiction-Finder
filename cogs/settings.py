@@ -21,7 +21,7 @@ class Settings(Cog):
             if ctx.channel.id not in channels:
                 f.write(str(ctx.channel.id)+"\n")
                 embed = discord.Embed(
-                    description="The channel has been added."
+                    description="The bot will now start responding to this channel."
                 )
 
             else:
@@ -47,8 +47,7 @@ class Settings(Cog):
                 f.write(str(channel)+"\n")
 
         embed = discord.Embed(
-            description="The channel has been removed \
-             from the bot's config."
+            description="The bot won't respond to this channel anymore."
         )
 
         await ctx.channel.send(embed=embed)

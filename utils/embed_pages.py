@@ -27,8 +27,7 @@ def get_embed(page=0):
         )
         embed.add_field(
             name="Search using code blocks:",
-            value="**Example:** \n\`cadmean victory\` will default to ffnet.\n \
-            \`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series."
+            value="**Example:** \n\`cadmean victory\` will default to ffnet.\n\`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series."
         )
 
     elif page == 1:
@@ -38,12 +37,12 @@ def get_embed(page=0):
             \nGo to the channel you want to add/remove and use the below commands"
         )
         embed.add_field(
-            name="To add a channel",
+            name="To allow the bot to respond to this channel",
             value="`,allow`"
         )
 
         embed.add_field(
-            name="To remove a channel",
+            name="To disallow the bot from responding to this channel",
             value="`,disallow`"
         )
     else:

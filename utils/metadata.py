@@ -149,15 +149,14 @@ def ffn_metadata(query):
     ffn_url = ffn_url.replace(r"/m.", r"/www.")
 
     scraper = cloudscraper.CloudScraper(
-        delay=3, browser={
+        delay=2, browser={
             'browser': 'chrome',
             'platform': 'windows',
             'mobile': False,
             'desktop': True,
         }
     )
-
-    time.sleep(3)
+    time.sleep(2)
     ffn_page = scraper.get(ffn_url).text
     ffn_soup = BeautifulSoup(ffn_page, 'html.parser')
 

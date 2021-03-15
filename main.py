@@ -34,11 +34,14 @@ async def on_message(message):
     with open('data/live_channels.txt', 'r') as f:
         channels = f.read().splitlines()
 
+    query = message.content.lower().splitlines()
+    query = ' '.join(query)
+
     if str(message.channel.id) in channels:
 
-        if re.search(r"^ao3\b", message.content.lower()) is not None:
-            msg = message.content.replace("ao3", "")
-            msg = message.content.replace("ffn", "")
+        if re.search(r"^ao3\b", query) is not None:
+            msg = query.replace("ao3", "")
+            msg = msg.replace("ffn", "")
             embed_pg = ao3_metadata(msg)
 
             if embed_pg is None:  # if not found in ao3, search in ffn
@@ -46,9 +49,9 @@ async def on_message(message):
 
             await message.channel.send(embed=embed_pg)
 
-        elif re.search(r"^ffn\b", message.content.lower()) is not None:
-            msg = message.content.replace("ffn", "")
-            msg = message.content.replace("ao3", "")
+        elif re.search(r"^ffn\b", query) is not None:
+            msg = query.replace("ffn", "")
+            msg = msg.replace("ao3", "")
             embed_pg = ffn_metadata(msg)
 
             if embed_pg is None:  # if not found in ffn, search in ao3
@@ -57,10 +60,10 @@ async def on_message(message):
             await message.channel.send(embed=embed_pg)
 
         # if in code blocks
-        elif re.search(r"`(.*?)`", message.content.lower()) is not None:
+        elif re.search(r"`(.*?)`", query) is not None:
 
             msg_found = re.findall(
-                r"`(.*?)`", message.content.lower(), re.MULTILINE)
+                r"`(.*?)`", query.lower(), re.MULTILINE)
 
             for msg in msg_found:
                 embed_pg = ffn_metadata(msg)
@@ -71,20 +74,20 @@ async def on_message(message):
 
                 await message.channel.send(embed=embed_pg)
 
-        elif re.search(r"https?:\/\/(www.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&=]*", message.content.lower()) is not None:
+        elif re.search(r"https?:\/\/(www.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&=]*", query) is not None:
 
-            if re.search(r"fanfiction.net\b",  message.content) is not None:
+            if re.search(r"fanfiction.net\b",  query) is not None:
                 msg_found = re.findall(
-                    r"(?:http|https)://(?:[\w_-]+(?:(?:\.[\w_-]+)+))(?:[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?",  message.content, re.M)
+                    r"(?:http|https)://(?:[\w_-]+(?:(?:\.[\w_-]+)+))(?:[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?",  query, re.M)
 
                 for msg in msg_found:
                     embed_pg = ffn_metadata(msg)
                     await message.channel.send(embed=embed_pg)
 
-            elif re.search(r"archiveofourown.org\b", message.content) is not None:
+            elif re.search(r"archiveofourown.org\b", query) is not None:
                 # if not found in ffn, search in ao3
                 msg_found = re.findall(
-                    r"(?:http|https)://(?:[\w_-]+(?:(?:\.[\w_-]+)+))(?:[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?",  message.content, re.M)
+                    r"(?:http|https)://(?:[\w_-]+(?:(?:\.[\w_-]+)+))(?:[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?",  query, re.M)
 
                 for msg in msg_found:
                     embed_pg = ao3_metadata(msg)
