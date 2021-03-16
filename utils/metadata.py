@@ -46,6 +46,11 @@ def ao3_metadata(query):
             ao3_series_works = ao3_metadata_series(
                 ao3_url)
 
+        # remove everything after &sa from the url
+        if re.search(r"^(.*?)&", ao3_url) is not None:
+            ao3_url = re.search(
+                r"^(.*?)&", ao3_url).group(1)
+
         embed = discord.Embed(
             title=ao3_series_name,
             url=ao3_url,
@@ -80,6 +85,11 @@ def ao3_metadata(query):
             icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
 
         return embed
+
+    # remove everything after &sa from the url
+    if re.search(r"^(.*?)&", ao3_url) is not None:
+        ao3_url = re.search(
+            r"^(.*?)&", ao3_url).group(1)
 
     embed = discord.Embed(
         title=ao3_story_name,
@@ -181,6 +191,11 @@ def ffn_metadata(query):
 
         ffn_story_last_up = story_last_up_clean(ffn_story_last_up, 1)
         ffn_author_url = "https://www.fanfiction.net"+ffn_author_url
+
+        # remove everything after &sa from the url
+        if re.search(r"^(.*?)&", ffn_url) is not None:
+            ffn_url = re.search(
+                r"^(.*?)&", ffn_url).group(1)
 
         if len(list(ffn_story_summary)) > 2048:
             ffn_story_summary = ffn_story_summary[:2030] + "..."

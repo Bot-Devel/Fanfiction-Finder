@@ -75,22 +75,16 @@ async def on_message(message):
                 await message.channel.send(embed=embed_pg)
 
         elif re.search(r"https?:\/\/(www.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&=]*", query) is not None:
+            query = query.split(" ")
+            query = query[:2]  # To limit it to 2 fanfiction search
 
-            if re.search(r"fanfiction.net\b",  query) is not None:
-                msg_found = re.findall(
-                    r"(?:http|https)://(?:[\w_-]+(?:(?:\.[\w_-]+)+))(?:[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?",  query, re.M)
-
-                for msg in msg_found:
-                    embed_pg = ffn_metadata(msg)
+            for i in query:
+                if re.search(r"fanfiction.net\b",  i) is not None:
+                    embed_pg = ffn_metadata(i)
                     await message.channel.send(embed=embed_pg)
 
-            elif re.search(r"archiveofourown.org\b", query) is not None:
-                # if not found in ffn, search in ao3
-                msg_found = re.findall(
-                    r"(?:http|https)://(?:[\w_-]+(?:(?:\.[\w_-]+)+))(?:[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?",  query, re.M)
-
-                for msg in msg_found:
-                    embed_pg = ao3_metadata(msg)
+                if re.search(r"archiveofourown.org\b", i) is not None:
+                    embed_pg = ao3_metadata(i)
                     await message.channel.send(embed=embed_pg)
 
 start_server()
