@@ -9,19 +9,23 @@ from utils.processing import story_last_up_clean, ffn_process_details, \
     ao3_convert_chapters_to_works
 from utils.metadata_processing import ao3_metadata_works, ao3_metadata_series
 
+URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"
+
 
 def ao3_metadata(query):
-    if re.search(r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&//=]*", query) is None:
+    if re.search(URL_VALIDATE, query) is None:
 
         query = query.replace(" ", "+")
         ao3_url = get_ao3_url(query)
 
-    else:  # clean the url if the query was a url
-        ao3_url = re.search(
-            r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&//=]*", query).group(0)
+    else:  # clean the url if the query contains a url
+        ao3_url = re.search(URL_VALIDATE, query).group(0)
 
     if ao3_url is None:
-        return None
+        embed = discord.Embed(
+            description="Fanfiction not found.",
+            colour=discord.Colour(0x272b28))
+        return embed
 
     if re.search(r"/chapters/\b", ao3_url) is not None:
         ao3_url = ao3_convert_chapters_to_works(
@@ -60,25 +64,28 @@ def ao3_metadata(query):
         if ao3_series_status == "Completed":
 
             embed.add_field(
-                name='**📜 Last Updated**',
+                name='📜 Last Updated',
                 value=ao3_series_last_up +
                 " ✓Complete", inline=True)
 
         elif ao3_series_status == "Updated":
 
             embed.add_field(
-                name='**📜 Last Updated**',
+                name='📜 Last Updated',
                 value=ao3_series_last_up, inline=True)
 
         elif ao3_series_status is None:
             embed.add_field(
-                name='**📜 Last Updated**',
+                name='📜 Last Updated',
                 value=ao3_series_last_up, inline=True)
 
         embed.add_field(
-            name='**📖 Length**',
+            name='📖 Length',
             value=ao3_series_length +
             " words in "+ao3_series_works+" work(s)", inline=True)
+
+        embed.set_footer(
+            text="If this content violates the server rules, react to the 🗑️ and it will be removed.")
 
         embed.set_author(
             name=ao3_author_name, url=ao3_author_url,
@@ -100,38 +107,42 @@ def ao3_metadata(query):
     if ao3_story_status == "Completed":
 
         embed.add_field(
-            name='**📜 Last Updated**',
+            name='📜 Last Updated',
             value=ao3_story_last_up +
             " ✓Complete", inline=True)
 
     elif ao3_story_status == "Updated":
 
         embed.add_field(
-            name='**📜 Last Updated**',
+            name='📜 Last Updated',
             value=ao3_story_last_up, inline=True)
 
     elif ao3_story_status is None:
         embed.add_field(
-            name='**📜 Last Updated**',
+            name='📜 Last Updated',
             value=ao3_story_last_up, inline=True)
 
     embed.add_field(
-        name='**📖 Length**',
+        name='📖 Length',
         value=ao3_story_length +
         " words in "+ao3_story_chapters+" chapter(s)", inline=True)
 
-    footer = []
-    for var in [ao3_story_rating,
-                ao3_story_relationships, ao3_story_characters]:
+    other_info = []
+    for var in [ao3_story_relationships, ao3_story_characters]:
         if var is not None:
-            footer.append(str(var))
-            footer.append(" | ")
+            other_info.append(str(var))
+            other_info.append(" **|** ")
 
-    footer = ''.join(footer[:len(footer)-1])
-    if len(list(footer)) > 100:
-        footer = footer[:100]
+    other_info = ''.join(other_info[:len(other_info)-1])
+    if len(list(other_info)) > 100:
+        other_info = other_info[:100] + "..."
 
-    embed.set_footer(text=footer)
+    if other_info is not None:
+        embed.add_field(name=f"➳ Rating: {ao3_story_rating}",
+                        value=other_info, inline=False)
+
+    embed.set_footer(
+        text="If this content violates the server rules, react to the 🗑️ emote and it will be removed.")
 
     embed.set_author(
         name=ao3_author_name, url=ao3_author_url,
@@ -141,16 +152,16 @@ def ao3_metadata(query):
 
 
 def ffn_metadata(query):
-    if re.search(r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&//=]*", query) is None:
+    if re.search(URL_VALIDATE, query) is None:
         if re.search(r"ao3\b", query):
             embed = None
             return embed
         query = query.replace(" ", "+")
         ffn_url = get_ffn_url(query)
 
-    else:  # clean the url if the query was a url
+    else:  # clean the url if the query contains a url
         ffn_url = re.search(
-            r"https?:\/\/(www/.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&//=]*", query).group(0)
+            URL_VALIDATE, query).group(0)
 
     if ffn_url is None:
         return None
@@ -216,33 +227,39 @@ def ffn_metadata(query):
         elif ffn_story_status == "Updated":
 
             embed.add_field(
-                name='**📜 Last Updated**',
+                name='📜 Last Updated',
                 value=ffn_story_last_up, inline=True)
 
         embed.add_field(
-            name='**📖 Length**',
+            name='📖 Length',
             value=str(ffn_story_length) +
             " words in "+str(ffn_story_chapters)+" chapter(s)", inline=True)
 
-        footer = []
-        for var in [ffn_story_rating, ffn_story_genre,
+        other_info = []
+        for var in [ffn_story_genre,
                     ffn_story_characters]:
             if var is not None:
-                footer.append(str(var))
-                footer.append(" | ")
+                other_info.append(str(var))
+                other_info.append(" **|** ")
 
-        footer = ''.join(footer[:len(footer)-1])
-        if len(list(footer)) > 100:
-            footer = footer[:100]
+        other_info = ''.join(other_info[:len(other_info)-1])
+        if len(list(other_info)) > 100:
+            other_info = other_info[:100] + "..."
 
-        if footer is not None:
-            embed.set_footer(text=footer)
+        if other_info is not None:
+            embed.add_field(name=f"➳ Rating: {ffn_story_rating}",
+                            value=other_info, inline=False)
+
+        embed.set_footer(
+            text="If this content violates the server rules, react to the 🗑️ and it will be removed.")
 
         embed.set_author(
             name=ffn_author_name, url=ffn_author_url,
             icon_url="https://pbs.twimg.com/profile_images/843841615122784256/WXbuqyjo_bigger.jpg")
 
     except IndexError:
-        embed = None
+        embed = discord.Embed(
+            description="Fanfiction not found.",
+            colour=discord.Colour(0x272b28))
 
     return embed

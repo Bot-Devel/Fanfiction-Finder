@@ -1,5 +1,6 @@
 import os
 import re
+
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -8,8 +9,10 @@ from utils.metadata import ao3_metadata, ffn_metadata
 from utils.bot_status import start_server
 
 client = commands.Bot(command_prefix=',', help_command=None)
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"
 
 
 @client.event
@@ -27,7 +30,10 @@ async def on_message(message):
     await client.process_commands(message)
 
     if message.author == client.user:
-        return  # None
+        return  # Do not reply to yourself
+
+    if message.author.bot:
+        return  # Do not reply to other bots
 
     msg = list(message.content.lower())
 
@@ -36,6 +42,9 @@ async def on_message(message):
 
     query = message.content.lower().splitlines()
     query = ' '.join(query)
+
+    def check(reaction, user):
+        return str(reaction.emoji) == '🗑️' and not user.bot and reaction.message.id == msg.id
 
     if str(message.channel.id) in channels:
 
@@ -47,7 +56,11 @@ async def on_message(message):
             if embed_pg is None:  # if not found in ao3, search in ffn
                 embed_pg = ffn_metadata(msg)
 
-            await message.channel.send(embed=embed_pg)
+            msg = await message.channel.send(embed=embed_pg)
+            await msg.add_reaction("🗑️")
+
+            reaction, user = await client.wait_for('reaction_add', check=check)
+            await msg.delete()
 
         elif re.search(r"^ffn\b", query) is not None:
             msg = query.replace("ffn", "")
@@ -57,35 +70,52 @@ async def on_message(message):
             if embed_pg is None:  # if not found in ffn, search in ao3
                 embed_pg = ao3_metadata(msg)
 
-            await message.channel.send(embed=embed_pg)
+            msg = await message.channel.send(embed=embed_pg)
+            await msg.add_reaction("🗑️")
+
+            reaction, user = await client.wait_for('reaction_add',  check=check)
+            await msg.delete()
 
         # if in code blocks
         elif re.search(r"`(.*?)`", query) is not None:
 
-            msg_found = re.findall(
+            url_found = re.findall(
                 r"`(.*?)`", query.lower(), re.MULTILINE)
 
-            for msg in msg_found:
-                embed_pg = ffn_metadata(msg)
+            url_found = url_found[:1]  # to limit the url to 1 only
+            for i in url_found:
+                embed_pg = ffn_metadata(i)
 
                 if embed_pg is None:  # if not found in ffn, search in ao3
-                    msg2 = msg.replace("ao3", "")
+                    msg2 = i.replace("ao3", "")
                     embed_pg = ao3_metadata(msg2)
 
-                await message.channel.send(embed=embed_pg)
+                msg = await message.channel.send(embed=embed_pg)
+                await msg.add_reaction("🗑️")
 
-        elif re.search(r"https?:\/\/(www.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#\?&=]*", query) is not None:
-            query = query.split(" ")
-            query = query[:2]  # To limit it to 2 fanfiction search
+                reaction, user = await client.wait_for('reaction_add', check=check)
+                await msg.delete()
 
-            for i in query:
+        elif re.search(URL_VALIDATE, query) is not None:
+            url_found = re.findall(URL_VALIDATE, query.lower(), re.MULTILINE)
+            url_found = url_found[:1]  # to limit the url to 1 only
+
+            for i in url_found:
                 if re.search(r"fanfiction.net\b",  i) is not None:
                     embed_pg = ffn_metadata(i)
-                    await message.channel.send(embed=embed_pg)
+                    msg = await message.channel.send(embed=embed_pg)
+                    await msg.add_reaction("🗑️")
+
+                    reaction, user = await client.wait_for('reaction_add', check=check)
+                    await msg.delete()
 
                 if re.search(r"archiveofourown.org\b", i) is not None:
                     embed_pg = ao3_metadata(i)
-                    await message.channel.send(embed=embed_pg)
+                    msg = await message.channel.send(embed=embed_pg)
+                    await msg.add_reaction("🗑️")
+
+                    reaction, user = await client.wait_for('reaction_add', check=check)
+                    await msg.delete()
 
 start_server()
 client.load_extension("cogs.settings")
