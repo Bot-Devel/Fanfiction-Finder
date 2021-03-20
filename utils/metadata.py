@@ -84,8 +84,8 @@ def ao3_metadata(query):
             value=ao3_series_length +
             " words in "+ao3_series_works+" work(s)", inline=True)
 
-        embed.set_footer(
-            text="If this content violates the server rules, react to the 🗑️ and it will be removed.")
+        embed.add_field(name="\u200b",  # zero-width whitespace character
+                        value="*If this content violates the server rules, reply to the bot message with `del` and it will be removed.*", inline=False)
 
         embed.set_author(
             name=ao3_author_name, url=ao3_author_url,
@@ -141,8 +141,8 @@ def ao3_metadata(query):
         embed.add_field(name=f"➳ Rating: {ao3_story_rating}",
                         value=other_info, inline=False)
 
-    embed.set_footer(
-        text="If this content violates the server rules, react to the 🗑️ emote and it will be removed.")
+    embed.add_field(name="\u200b",  # zero-width whitespace character
+                    value="*If this content violates the server rules, reply to the bot message with `del` and it will be removed.*", inline=False)
 
     embed.set_author(
         name=ao3_author_name, url=ao3_author_url,
@@ -250,8 +250,8 @@ def ffn_metadata(query):
             embed.add_field(name=f"➳ Rating: {ffn_story_rating}",
                             value=other_info, inline=False)
 
-        embed.set_footer(
-            text="If this content violates the server rules, react to the 🗑️ and it will be removed.")
+        embed.add_field(name="\u200b",  # zero-width whitespace character
+                        value="*If this content violates the server rules, reply to the bot message with `del` and it will be removed.*", inline=False)
 
         embed.set_author(
             name=ffn_author_name, url=ffn_author_url,

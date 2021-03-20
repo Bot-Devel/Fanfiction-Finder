@@ -8,7 +8,7 @@ def get_embed(page=0):
     if page == 0:
         embed = discord.Embed(
             title="Bot Usage Instructions",
-            description="Only one search can be processed per message so to search multiple fanfiction, use multiple messages."
+            description="Only two search queries can be processed per message so to search multiple fanfiction, use multiple messages."
         )
         embed.add_field(
             name="AO3 Searching:",
