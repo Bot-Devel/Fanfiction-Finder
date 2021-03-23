@@ -16,8 +16,8 @@ def ao3_metadata_works(ao3_url):
     ao3_story_name = (ao3_soup.find(
         'h2', attrs={'class': 'title heading'}).contents[0]).strip()
 
-    ao3_author_name = (ao3_soup.find(
-        'h3', attrs={'class': 'byline heading'}).find('a').contents[0]).strip()
+    ao3_author_name_list = ao3_soup.find(
+        'h3', attrs={'class': 'byline heading'}).find_all('a')
 
     ao3_author_url = ao3_soup.find(
         'h3', attrs={'class': 'byline heading'}).find('a', href=True)['href']
@@ -87,13 +87,19 @@ def ao3_metadata_works(ao3_url):
     ao3_story_last_up = story_last_up_clean(ao3_story_last_up, 2)
     ao3_author_url = "https://archiveofourown.org"+ao3_author_url
 
+    ao3_author_name = []
+    for author in ao3_author_name_list:
+        ao3_author_name.append(author.string.strip())
+    ao3_author_name = ", ".join(ao3_author_name)
+
     if len(list(ao3_story_summary)) > 2048:
         ao3_story_summary = ao3_story_summary[:2030] + "..."
 
     return ao3_story_name, ao3_author_name, ao3_author_url, \
         ao3_story_summary, ao3_story_status, ao3_story_last_up, \
         ao3_story_length, ao3_story_chapters, ao3_story_rating, \
-        ao3_story_relationships, ao3_story_characters
+        ao3_story_relationships, ao3_story_characters \
+
 
 
 def ao3_metadata_series(ao3_url):
@@ -107,12 +113,8 @@ def ao3_metadata_series(ao3_url):
         'div', attrs={'class': 'series-show region'}).find(
         'h2', attrs={'class': 'heading'}).contents[0]).strip()
 
-    ao3_author_name = (ao3_soup.find(
-        'div', attrs={'class': 'series-show region'}).find(
-        'a', attrs={'rel': 'author'}).contents[0]).strip()
-
-    ao3_author_url = ao3_soup.find('div', attrs={'class': 'series-show region'}).find(
-        'dt', text='Creator:').findNext('dd').find('a', href=True)['href']
+    ao3_author_name_list = ao3_soup.find(
+        'dl', attrs={'class': 'series meta group'}).find('dd').find_all('a')
 
     ao3_series_summary = ao3_soup.find(
         'div', attrs={'class': 'series-show region'}).find(
@@ -156,7 +158,17 @@ def ao3_metadata_series(ao3_url):
 
     ao3_series_works_index = get_ao3_series_works_index(ao3_soup)
     ao3_series_last_up = story_last_up_clean(ao3_series_last_up, 2)
+
+    for author in ao3_author_name_list:
+        ao3_author_url = author['href']
+        break  # To only get the 1st author url
+
     ao3_author_url = "https://archiveofourown.org"+ao3_author_url
+
+    ao3_author_name = []
+    for author in ao3_author_name_list:
+        ao3_author_name.append(author.string.strip())
+    ao3_author_name = ", ".join(ao3_author_name)
 
     if len(list(ao3_series_summary)) > 2048:
         ao3_series_summary = ao3_series_summary[:1930] + "..."
