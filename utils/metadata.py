@@ -137,7 +137,7 @@ def ao3_metadata(query):
     if len(list(other_info)) > 100:
         other_info = other_info[:100] + "..."
 
-    if other_info is not None:
+    if other_info:
         embed.add_field(name=f"➳ Rating: {ao3_story_rating}",
                         value=other_info, inline=False)
 
@@ -243,10 +243,11 @@ def ffn_metadata(query):
                 other_info.append(" **|** ")
 
         other_info = ''.join(other_info[:len(other_info)-1])
+
         if len(list(other_info)) > 100:
             other_info = other_info[:100] + "..."
 
-        if other_info is not None:
+        if other_info:
             embed.add_field(name=f"➳ Rating: {ffn_story_rating}",
                             value=other_info, inline=False)
 

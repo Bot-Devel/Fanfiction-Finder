@@ -55,7 +55,8 @@ async def on_message(message):
             if embed_pg is None:  # if not found in ao3, search in ffn
                 embed_pg = ffn_metadata(msg)
 
-            msg = await message.channel.send(embed=embed_pg)
+            embed_pg.set_footer(text="User ID: "+str(message.author.id))
+            await message.channel.send(embed=embed_pg)
 
         elif re.search(r"^ffn\b", query) is not None:
             await message.channel.trigger_typing()
@@ -66,7 +67,8 @@ async def on_message(message):
             if embed_pg is None:  # if not found in ffn, search in ao3
                 embed_pg = ao3_metadata(msg)
 
-            msg = await message.channel.send(embed=embed_pg)
+            embed_pg.set_footer(text="User ID: "+str(message.author.id))
+            await message.channel.send(embed=embed_pg)
 
         # if in code blocks
         elif re.search(r"`(.*?)`", query) is not None:
@@ -82,7 +84,8 @@ async def on_message(message):
                     msg2 = i.replace("ao3", "")
                     embed_pg = ao3_metadata(msg2)
 
-                msg = await message.channel.send(embed=embed_pg)
+                embed_pg.set_footer(text="User ID: "+str(message.author.id))
+                await message.channel.send(embed=embed_pg)
 
         elif re.search(URL_VALIDATE, query) is not None:
 
@@ -93,11 +96,18 @@ async def on_message(message):
                 await message.channel.trigger_typing()
                 if re.search(r"fanfiction.net\b",  i) is not None:
                     embed_pg = ffn_metadata(i)
-                    msg = await message.channel.send(embed=embed_pg)
+
+                    embed_pg.set_footer(
+                        text="User ID: "+str(message.author.id))
+
+                    await message.channel.send(embed=embed_pg)
 
                 if re.search(r"archiveofourown.org\b", i) is not None:
                     embed_pg = ao3_metadata(i)
-                    msg = await message.channel.send(embed=embed_pg)
+
+                    embed_pg.set_footer(
+                        text="User ID: "+str(message.author.id))
+                    await message.channel.send(embed=embed_pg)
 
         elif re.search(r"^del\b", query) and message.reference is not None:
             message_ref = message.reference  # message id of reply
@@ -105,14 +115,39 @@ async def on_message(message):
 
             # if the messsage was created by a bot
             if message_to_delete.author.bot:
-                await message_to_delete.delete()
-                await message.delete()
+                embeds = message_to_delete.embeds
+                for embed in embeds:
+                    try:
+                        author_id = embed.to_dict()['footer']['text']
+                    except KeyError:
+                        await message.delete()
+                        msg = await message.channel.send(
+                            embed=discord.Embed(
+                                description="This message cannot be deleted because the  \
+                                message was created before the new `del` feature was added."))
+                        await asyncio.sleep(5)
+                        await msg.delete()
+
+                    author_id = author_id.replace("User ID: ", "")
+
+                    if int(message.author.id) == int(author_id):
+                        await message_to_delete.delete()
+                        await message.delete()
+                    else:
+                        await message.delete()
+                        msg = await message.channel.send(
+                            embed=discord.Embed(
+                                description="You are not allowed to delete someone else's message. \
+                                Only the message author can delete this message."))
+                        await asyncio.sleep(5)
+                        await msg.delete()
+
             else:
                 await message.delete()
                 msg = await message.channel.send(
                     embed=discord.Embed(
                         description="I am not allowed to do that. I can only delete my messages."))
-                await asyncio.sleep(3)
+                await asyncio.sleep(5)
                 await msg.delete()
 
 
