@@ -1,5 +1,5 @@
 from discord.ext.commands import command, Cog, \
-    has_permissions
+    has_permissions, MissingPermissions
 import discord
 
 
@@ -51,6 +51,12 @@ class Settings(Cog):
         )
 
         await ctx.channel.send(embed=embed)
+
+    @remove_channel.error
+    @add_channel.error
+    async def missing_perm_error(self, ctx, error):
+        if isinstance(error, MissingPermissions):
+            await ctx.send("You are missing Administrator permission to run this command.")
 
 
 def setup(client):

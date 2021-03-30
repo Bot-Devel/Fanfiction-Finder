@@ -90,7 +90,7 @@ async def on_message(message):
         elif re.search(URL_VALIDATE, query) is not None:
 
             url_found = re.findall(URL_VALIDATE, query.lower(), re.MULTILINE)
-            url_found = url_found[:2]  # to limit the url to 2 only
+            url_found = url_found[:1]  # to limit the url to 1 only
 
             for i in url_found:
                 await message.channel.trigger_typing()
@@ -119,7 +119,20 @@ async def on_message(message):
                 for embed in embeds:
                     try:
                         author_id = embed.to_dict()['footer']['text']
-                    except KeyError:
+                        author_id = author_id.replace("User ID: ", "")
+                        if int(message.author.id) == int(author_id):
+                            await message_to_delete.delete()
+                            await message.delete()
+                        else:
+                            await message.delete()
+                            msg = await message.channel.send(
+                                embed=discord.Embed(
+                                    description="You are not allowed to delete someone else's message. \
+                                    Only the message author can delete this message."))
+                            await asyncio.sleep(5)
+                            await msg.delete()
+
+                    except (KeyError, ValueError):
                         await message.delete()
                         msg = await message.channel.send(
                             embed=discord.Embed(
@@ -127,21 +140,6 @@ async def on_message(message):
                                 message was created before the new `del` feature was added."))
                         await asyncio.sleep(5)
                         await msg.delete()
-
-                    author_id = author_id.replace("User ID: ", "")
-
-                    if int(message.author.id) == int(author_id):
-                        await message_to_delete.delete()
-                        await message.delete()
-                    else:
-                        await message.delete()
-                        msg = await message.channel.send(
-                            embed=discord.Embed(
-                                description="You are not allowed to delete someone else's message. \
-                                Only the message author can delete this message."))
-                        await asyncio.sleep(5)
-                        await msg.delete()
-
             else:
                 await message.delete()
                 msg = await message.channel.send(

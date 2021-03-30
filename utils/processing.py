@@ -5,23 +5,6 @@ import requests
 import re
 
 
-def ao3_story_chapter_clean(ao3_story_chapters):
-    pos_of_slash1 = []
-    ao3_chapter = []
-    ao3_chapter_list = list(ao3_story_chapters)
-
-    for i in range(len(ao3_chapter_list)):
-        if "/" in ao3_chapter_list[i]:
-            pos_of_slash1.append(i)
-
-    if pos_of_slash1 is not None:
-        for i in range(0, pos_of_slash1[0]):
-            ao3_chapter.append(ao3_chapter_list[i])
-
-    ao3_chapter = ''.join(ao3_chapter)
-    return ao3_chapter
-
-
 def story_last_up_clean(story_last_up, _type):
 
     curr_time = datetime.now()
