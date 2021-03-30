@@ -2,8 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import time
 import re
-from utils.processing import story_last_up_clean, ao3_story_chapter_clean, \
-    get_ao3_series_works_index
+from utils.processing import story_last_up_clean, get_ao3_series_works_index
 
 
 def ao3_metadata_works(ao3_url):
@@ -83,7 +82,7 @@ def ao3_metadata_works(ao3_url):
         ao3_story_characters = None
 
     ao3_story_length = "{:,}".format(int(ao3_story_length))
-    ao3_story_chapters = ao3_story_chapter_clean(ao3_story_chapters)
+    ao3_story_chapters = re.search(r"\d+", ao3_story_chapters).group(0)
     ao3_story_last_up = story_last_up_clean(ao3_story_last_up, 2)
     ao3_author_url = "https://archiveofourown.org"+ao3_author_url
 

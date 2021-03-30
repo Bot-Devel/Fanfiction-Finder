@@ -138,7 +138,7 @@ def ao3_metadata(query):
         other_info = other_info[:100] + "..."
 
     if other_info:
-        embed.add_field(name=f"➳ Rating: {ao3_story_rating}",
+        embed.add_field(name=f":bookmark: Rating: {ao3_story_rating}",
                         value=other_info, inline=False)
 
     embed.add_field(name="\u200b",  # zero-width whitespace character
@@ -186,7 +186,7 @@ def ffn_metadata(query):
             0].string.strip()
 
         ffn_author_name = ffn_soup.find_all(
-            'a', {'href': re.compile('^/u/\d+/.')})[0].string.strip()
+            'a', {'href': re.compile(r'^/u/\d+/.')})[0].string.strip()
 
         ffn_author_url = (ffn_soup.find(
             'div', attrs={'id': 'profile_top'}).find('a', href=True))['href']
@@ -248,7 +248,7 @@ def ffn_metadata(query):
             other_info = other_info[:100] + "..."
 
         if other_info:
-            embed.add_field(name=f"➳ Rating: {ffn_story_rating}",
+            embed.add_field(name=f":bookmark: Rating: {ffn_story_rating}",
                             value=other_info, inline=False)
 
         embed.add_field(name="\u200b",  # zero-width whitespace character
