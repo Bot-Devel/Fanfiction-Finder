@@ -1,5 +1,4 @@
-from discord.ext.commands import command, Cog, \
-    has_permissions, MissingPermissions
+from discord.ext.commands import command, Cog
 import discord
 
 
@@ -7,56 +6,121 @@ class Settings(Cog):
     def __init__(self, client):
         self.client = client
 
-    @has_permissions(administrator=True)
-    @command(aliases=['allow'], pass_context=True)
-    async def add_channel(self, ctx):
-        """Adds channels to the bot's settings"""
+    @command(pass_context=True)
+    async def allow_all(self, ctx):
+        """Adds send_message perm for all the channels."""
 
-        with open("data/live_channels.txt", "r") as f:
-            channels = f.read().splitlines()
+        if not ctx.author.guild_permissions.administrator:
+            try:
+                return await ctx.send(
+                    embed=discord.Embed(
+                        description="You are missing Administrator permission to run this command."))
+            except Exception:  # send a DM if send message perms is not enabled
+                return await ctx.author.send(
+                    embed=discord.Embed(
+                        description="You are missing Administrator permission to run this command."))
 
-        channels = [int(i) for i in channels]
-        with open("data/live_channels.txt", "a") as f:
+        bot_user = ctx.guild.get_member(779772534040166450)
+        channel_list = ctx.guild.channels
+        for channel in channel_list:
+            try:
+                await channel.set_permissions(bot_user, send_messages=True)
+            except Exception:
+                pass
 
-            if ctx.channel.id not in channels:
-                f.write(str(ctx.channel.id)+"\n")
-                embed = discord.Embed(
-                    description="The bot will now start responding to this channel."
-                )
-
-            else:
-                embed = discord.Embed(
-                    description="The channel is already registered!"
-                )
-
+        embed = discord.Embed(
+            description="The bot will now start responding to all the channels."
+        )
         await ctx.channel.send(embed=embed)
 
-    @has_permissions(administrator=True)
-    @command(aliases=['disallow'], pass_context=True)
-    async def remove_channel(self, ctx):
-        """Removes channels from the bot's settings"""
+    @command(pass_context=True)
+    async def disallow_all(self, ctx):
+        """Removes send_message perm for all the channels."""
 
-        with open("data/live_channels.txt", "r") as f:
-            channels = f.read().splitlines()
+        if not ctx.author.guild_permissions.administrator:
+            try:
+                return await ctx.send(
+                    embed=discord.Embed(
+                        description="You are missing Administrator permission to run this command."))
+            except Exception:  # send a DM if send message perms is not enabled
+                return await ctx.author.send(
+                    embed=discord.Embed(
+                        description="You are missing Administrator permission to run this command."))
 
-        if str(ctx.channel.id) in channels:
-            channels.remove(str(ctx.channel.id))
+        embed = discord.Embed(
+            description="The bot will now stop responding to all the channels."
+        )
 
-        with open("data/live_channels.txt", "w") as f:
-            for channel in channels:
-                f.write(str(channel)+"\n")
+        try:
+            await ctx.channel.send(embed=embed)
+        except Exception:
+            embed = discord.Embed(
+                description="The bot is not allowed to send messages in that channel. Ask one of the server admins to use the `,allow` command in that channel to enable it."
+            )
+            await ctx.author.send(embed=embed)
+
+        bot_user = ctx.guild.get_member(779772534040166450)
+        channel_list = ctx.guild.channels
+        for channel in channel_list:
+            try:
+                await channel.set_permissions(bot_user, send_messages=False)
+            except Exception:
+                pass
+
+    @command(pass_context=True)
+    async def allow(self, ctx):
+        """Adds send_message perm for the current channel."""
+
+        if not ctx.author.guild_permissions.administrator:
+            try:
+                return await ctx.send(
+                    embed=discord.Embed(
+                        description="You are missing Administrator permission to run this command."))
+            except Exception:  # send a DM if send message perms is not enabled
+                return await ctx.author.send(
+                    embed=discord.Embed(
+                        description="You are missing Administrator permission to run this command."))
+
+        bot_user = ctx.guild.get_member(779772534040166450)
+        await ctx.channel.set_permissions(
+            bot_user,
+            send_messages=True)
+
+        embed = discord.Embed(
+            description="The bot will now start responding to this channel."
+        )
+        await ctx.channel.send(embed=embed)
+
+    @command(pass_context=True)
+    async def disallow(self, ctx):
+        """Removes send_message perm for current channel."""
+
+        if not ctx.author.guild_permissions.administrator:
+            try:
+                return await ctx.send(
+                    embed=discord.Embed(
+                        description="You are missing Administrator permission to run this command."))
+            except Exception:  # send a DM if send message perms is not enabled
+                return await ctx.author.send(
+                    embed=discord.Embed(
+                        description="You are missing Administrator permission to run this command."))
 
         embed = discord.Embed(
             description="The bot won't respond to this channel anymore."
         )
 
-        await ctx.channel.send(embed=embed)
+        try:
+            await ctx.channel.send(embed=embed)
+        except Exception:
+            embed = discord.Embed(
+                description="The bot is not allowed to send messages in that channel. Ask one of the server admins to use the `,allow` command in that channel to enable it."
+            )
+            await ctx.author.send(embed=embed)
 
-    @remove_channel.error
-    @add_channel.error
-    async def missing_perm_error(self, ctx, error):
-        if isinstance(error, MissingPermissions):
-            await ctx.send("You are missing Administrator permission to run this command.")
+        bot_user = ctx.guild.get_member(779772534040166450)
+        await ctx.channel.set_permissions(
+            bot_user,
+            send_messages=False)
 
 
 def setup(client):
