@@ -3,12 +3,13 @@ import discord
 
 def get_embed(page=0):
 
-    page_limit = 3
+    page_limit = 4
 
     if page == 0:
         embed = discord.Embed(
             title="Bot Usage Instructions",
-            description="Only two search queries can be processed per message so to search multiple fanfiction, use multiple messages."
+            description="_**New Bot Maintenance Update, check Page 4. \
+            The bot needs to be re-invited to the server.**_"
         )
         embed.add_field(
             name="AO3 Searching:",
@@ -34,17 +35,25 @@ def get_embed(page=0):
     elif page == 1:
         embed = discord.Embed(
             title="Bot Configuration",
-            description="To use these commands, you need administrator permission. \
+            description="_**Do not give administrator permission to the bot.**_\nTo use these commands, you need administrator permission. \
             \nGo to the channel you want to add/remove and use the below commands."
         )
         embed.add_field(
+            name="To allow the bot to respond to all the channels",
+            value="`,allow_all`", inline=False
+        )
+        embed.add_field(
+            name="To disallow the bot from responding to all the channels",
+            value="`,disallow_all`", inline=False
+        )
+        embed.add_field(
             name="To allow the bot to respond to this channel",
-            value="`,allow`"
+            value="`,allow`", inline=False
         )
 
         embed.add_field(
             name="To disallow the bot from responding to this channel",
-            value="`,disallow`"
+            value="`,disallow`", inline=False
         )
 
     elif page == 2:
@@ -52,6 +61,18 @@ def get_embed(page=0):
             title="Bot Support",
             description="Join the Bot's Discord Support Server if you need any help in setting up the bot or want to suggest any new features." +
             "\n[Discord Support Server](https://discord.gg/bRzzr3EBqH)"
+        )
+
+    elif page == 3:
+        embed = discord.Embed(
+            title="Bot Maintenance Update",
+            description="_**Do not give administrator permission to the bot.**_\nThe bot underwent a maintenance update \
+            and it needs to be re-invited using this \
+            [invite link](https://discord.com/api/oauth2/authorize?client_id=779772534040166450&permissions=268526672&scope=bot). \
+            So kick the bot out and then use the invite link to invite it again.\n \
+            After inviting him again, use the `,disallow_all` to stop it from responding to all channels, then use `,allow` for \
+            each specific channel. Go through the `,help` menu for all the commands.\nIf you are having any issues, join the  \
+            [Discord Support Server](https://discord.gg/bRzzr3EBqH) and ping RogueOne or if you know RogueOne personally, just ping/DM him directly."
         )
 
     else:
