@@ -81,6 +81,9 @@ def ao3_metadata_works(ao3_url):
     except AttributeError:
         ao3_story_characters = None
 
+    ao3_story_fandom = (ao3_soup.find(
+        'dd', attrs={'class': 'fandom tags'}).find('a').contents[0]).strip()
+
     ao3_story_length = "{:,}".format(int(ao3_story_length))
     ao3_story_chapters = re.search(r"\d+", ao3_story_chapters).group(0)
     ao3_story_last_up = story_last_up_clean(ao3_story_last_up, 2)
@@ -97,8 +100,7 @@ def ao3_metadata_works(ao3_url):
     return ao3_story_name, ao3_author_name, ao3_author_url, \
         ao3_story_summary, ao3_story_status, ao3_story_last_up, \
         ao3_story_length, ao3_story_chapters, ao3_story_rating, \
-        ao3_story_relationships, ao3_story_characters \
-
+        ao3_story_relationships, ao3_story_characters, ao3_story_fandom
 
 
 def ao3_metadata_series(ao3_url):

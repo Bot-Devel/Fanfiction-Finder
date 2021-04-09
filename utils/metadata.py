@@ -34,14 +34,14 @@ def ao3_metadata(query):
         ao3_story_name, ao3_author_name, ao3_author_url, ao3_story_summary, \
             ao3_story_status, ao3_story_last_up, ao3_story_length, \
             ao3_story_chapters, ao3_story_rating, ao3_story_relationships, \
-            ao3_story_characters = ao3_metadata_works(
+            ao3_story_characters, ao3_story_fandom = ao3_metadata_works(
                 ao3_url)
 
     elif re.search(r"/works/\b", ao3_url) is not None:
         ao3_story_name, ao3_author_name, ao3_author_url, ao3_story_summary, \
             ao3_story_status, ao3_story_last_up, ao3_story_length, \
             ao3_story_chapters, ao3_story_rating, ao3_story_relationships, \
-            ao3_story_characters = ao3_metadata_works(
+            ao3_story_characters, ao3_story_fandom = ao3_metadata_works(
                 ao3_url)
 
     elif re.search(r"/series/\b", ao3_url) is not None:
@@ -127,7 +127,8 @@ def ao3_metadata(query):
         value=ao3_story_length +
         " words in "+ao3_story_chapters+" chapter(s)", inline=True)
 
-    other_info = []
+    other_info = [ao3_story_fandom, " **|** "]
+
     for var in [ao3_story_relationships, ao3_story_characters]:
         if var is not None:
             other_info.append(str(var))
@@ -195,6 +196,16 @@ def ffn_metadata(query):
             'style': 'margin-top:2px',
             'class': 'xcontrast_txt'})[0].string.strip()
 
+        ffn_story_fandom = ffn_soup.find(
+            'span', attrs={'class': 'lc-left'}).find(
+            'a', attrs={'class': 'xcontrast_txt'}).text
+
+        # if the fandom isnt crossover, then go to the next <a>
+        if not re.search(r"\bcrossover\b", ffn_story_fandom, re.IGNORECASE):
+            ffn_story_fandom = ffn_soup.find(
+                'span', attrs={'class': 'lc-left'}).find(
+                'a', attrs={'class': 'xcontrast_txt'}).findNext('a').text
+
         ffn_story_status, ffn_story_last_up, ffn_story_length, \
             ffn_story_chapters, ffn_story_rating, ffn_story_genre, \
             ffn_story_characters = ffn_process_details(
@@ -235,7 +246,8 @@ def ffn_metadata(query):
             value=str(ffn_story_length) +
             " words in "+str(ffn_story_chapters)+" chapter(s)", inline=True)
 
-        other_info = []
+        other_info = [ffn_story_fandom, " **|** "]
+
         for var in [ffn_story_genre,
                     ffn_story_characters]:
             if var is not None:

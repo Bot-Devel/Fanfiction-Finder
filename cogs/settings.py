@@ -1,5 +1,11 @@
+import os
+from dotenv import load_dotenv
+
 from discord.ext.commands import command, Cog
 import discord
+
+load_dotenv()
+BOT_ID = int(os.getenv('BOT_ID'))
 
 
 class Settings(Cog):
@@ -20,7 +26,7 @@ class Settings(Cog):
                     embed=discord.Embed(
                         description="You are missing Administrator permission to run this command."))
 
-        bot_user = ctx.guild.get_member(779772534040166450)
+        bot_user = ctx.guild.get_member(BOT_ID)
         channel_list = ctx.guild.channels
         for channel in channel_list:
             try:
@@ -59,7 +65,7 @@ class Settings(Cog):
             )
             await ctx.author.send(embed=embed)
 
-        bot_user = ctx.guild.get_member(779772534040166450)
+        bot_user = ctx.guild.get_member(BOT_ID)
         channel_list = ctx.guild.channels
         for channel in channel_list:
             try:
@@ -81,7 +87,7 @@ class Settings(Cog):
                     embed=discord.Embed(
                         description="You are missing Administrator permission to run this command."))
 
-        bot_user = ctx.guild.get_member(779772534040166450)
+        bot_user = ctx.guild.get_member(BOT_ID)
         await ctx.channel.set_permissions(
             bot_user,
             send_messages=True)
@@ -117,7 +123,7 @@ class Settings(Cog):
             )
             await ctx.author.send(embed=embed)
 
-        bot_user = ctx.guild.get_member(779772534040166450)
+        bot_user = ctx.guild.get_member(BOT_ID)
         await ctx.channel.set_permissions(
             bot_user,
             send_messages=False)

@@ -29,7 +29,9 @@ def get_embed(page=0):
         )
         embed.add_field(
             name="Search using code blocks:",
-            value="**Example:** \n\`cadmean victory\` will default to ffnet.\n\`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series."
+            value="This will search ffn first and if it can't find it in ffn, it will search in ao3. " +
+            "Use this when you are not sure if the fanfiction is from ffn or ao3.\n**Example:**\n" +
+            "\`cadmean victory\` will default to ffnet.\n\`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series."
         )
 
     elif page == 1:

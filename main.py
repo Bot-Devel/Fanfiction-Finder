@@ -76,7 +76,8 @@ async def on_message(message):
             await message.channel.trigger_typing()
             embed_pg = ffn_metadata(i)
 
-            if embed_pg is None:  # if not found in ffn, search in ao3
+            # if not found in ffn, search in ao3
+            if embed_pg is None or embed_pg.description.startswith("Fanfiction not found"):
                 msg2 = i.replace("ao3", "")
                 embed_pg = ao3_metadata(msg2)
 
@@ -84,11 +85,21 @@ async def on_message(message):
             await message.channel.send(embed=embed_pg)
 
     elif re.search(URL_VALIDATE, query) is not None:
-
         url_found = re.findall(URL_VALIDATE, query.lower(), re.MULTILINE)
-        url_found = url_found[:1]  # to limit the url to 1 only
 
+        supported_url = []
         for i in url_found:
+
+            # check if the url is ffn or ao3
+            if re.search(r"fanfiction.net\b",  i) or \
+                    re.search(r"archiveofourown.org\b", i):
+
+                supported_url.append(i)
+
+        # to limit the url to 1 only
+        supported_url = supported_url[:1]
+
+        for i in supported_url:
             await message.channel.trigger_typing()
             if re.search(r"fanfiction.net\b",  i) is not None:
                 embed_pg = ffn_metadata(i)

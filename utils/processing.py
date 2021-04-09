@@ -172,4 +172,5 @@ def get_ao3_series_works_index(ao3_soup):
             "["+tag.text+"](https://archiveofourown.org"+tag['href']+")")  # inline html tag for embed
 
     ao3_series_works_index = '\n'.join(ao3_series_works_index)
+
     return ao3_series_works_index
