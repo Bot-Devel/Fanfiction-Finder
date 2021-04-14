@@ -8,7 +8,6 @@ from utils.processing import story_last_up_clean, get_ao3_series_works_index
 def ao3_metadata_works(ao3_url):
 
     time.sleep(2)
-
     ao3_page = requests.get(ao3_url)
     ao3_soup = BeautifulSoup(ao3_page.content, 'html.parser')
 
@@ -21,9 +20,13 @@ def ao3_metadata_works(ao3_url):
     ao3_author_url = ao3_soup.find(
         'h3', attrs={'class': 'byline heading'}).find('a', href=True)['href']
 
-    ao3_story_summary = ao3_soup.find(
-        'div', attrs={'class': 'summary module'}).find(
-        'blockquote', attrs={'class': 'userstuff'}).text
+    try:
+        ao3_story_summary = ao3_soup.find(
+            'div', attrs={'class': 'summary module'}).find(
+            'blockquote', attrs={'class': 'userstuff'}).text
+
+    except AttributeError:  # if summary not found
+        ao3_story_summary = ""
 
     ao3_story_summary = re.sub(
         r'\s+', ' ', ao3_story_summary)  # removing whitespaces
@@ -84,6 +87,51 @@ def ao3_metadata_works(ao3_url):
     ao3_story_fandom = (ao3_soup.find(
         'dd', attrs={'class': 'fandom tags'}).find('a').contents[0]).strip()
 
+    try:
+        ao3_story_kudos = '**Kudos:** '
+        ao3_story_kudos += (ao3_soup.find(
+            'dl', attrs={'class': 'stats'}).find(
+            'dd', attrs={'class': 'kudos'}).contents[0]).strip()
+
+    except AttributeError:
+        ao3_story_bookmarks = None
+
+    try:
+        ao3_story_bookmarks = '**Bookmarks:** '
+        ao3_story_bookmarks += (ao3_soup.find(
+            'dl', attrs={'class': 'stats'}).find(
+            'dd', attrs={'class': 'bookmarks'}).find('a').contents[0]).strip()
+
+    except AttributeError:
+        ao3_story_bookmarks = None
+
+    try:
+        ao3_story_comments = '**Comments:** '
+        ao3_story_comments += (ao3_soup.find(
+            'dl', attrs={'class': 'stats'}).find(
+            'dd', attrs={'class': 'comments'}).contents[0]).strip()
+
+    except AttributeError:
+        ao3_story_bookmarks = None
+
+    try:
+        ao3_story_hits = '**Hits:** '
+        ao3_story_hits += (ao3_soup.find(
+            'dl', attrs={'class': 'stats'}).find(
+            'dd', attrs={'class': 'hits'}).contents[0]).strip()
+
+    except AttributeError:
+        ao3_story_bookmarks = None
+
+    ao3_meta_info = [ao3_story_comments, ao3_story_kudos,
+                     ao3_story_bookmarks, ao3_story_hits]
+    ao3_story_metainfo = ""
+    for m in range(len(ao3_meta_info)):
+        if ao3_meta_info[m]:
+            ao3_story_metainfo += ao3_meta_info[m]
+            if m < len(ao3_meta_info)-1:
+                ao3_story_metainfo += ' - '
+
     ao3_story_length = "{:,}".format(int(ao3_story_length))
     ao3_story_chapters = re.search(r"\d+", ao3_story_chapters).group(0)
     ao3_story_last_up = story_last_up_clean(ao3_story_last_up, 2)
@@ -100,7 +148,8 @@ def ao3_metadata_works(ao3_url):
     return ao3_story_name, ao3_author_name, ao3_author_url, \
         ao3_story_summary, ao3_story_status, ao3_story_last_up, \
         ao3_story_length, ao3_story_chapters, ao3_story_rating, \
-        ao3_story_relationships, ao3_story_characters, ao3_story_fandom
+        ao3_story_relationships, ao3_story_characters, ao3_story_fandom, \
+        ao3_story_metainfo
 
 
 def ao3_metadata_series(ao3_url):
@@ -117,9 +166,13 @@ def ao3_metadata_series(ao3_url):
     ao3_author_name_list = ao3_soup.find(
         'dl', attrs={'class': 'series meta group'}).find('dd').find_all('a')
 
-    ao3_series_summary = ao3_soup.find(
-        'div', attrs={'class': 'series-show region'}).find(
-        'blockquote', attrs={'class': 'userstuff'}).text
+    try:
+        ao3_series_summary = ao3_soup.find(
+            'div', attrs={'class': 'series-show region'}).find(
+            'blockquote', attrs={'class': 'userstuff'}).text
+
+    except AttributeError:  # if summary not found
+        ao3_series_summary = ""
 
     ao3_series_summary = re.sub(
         r'\s+', ' ', ao3_series_summary)  # removing whitespaces

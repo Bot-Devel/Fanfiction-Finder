@@ -69,10 +69,10 @@ async def on_message(message):
     # if in code blocks
     elif re.search(r"`(.*?)`", query) is not None:
 
-        url_found = re.findall(r"`(.*?)`", query.lower(), re.MULTILINE)
-        url_found = url_found[:2]  # to limit the url to 2 only
+        str_found = re.findall(r"`(.*?)`", query.lower(), re.MULTILINE)
+        str_found = str_found[:2]  # to limit the url to 2 only
 
-        for i in url_found:
+        for i in str_found:
             await message.channel.trigger_typing()
             embed_pg = ffn_metadata(i)
 
