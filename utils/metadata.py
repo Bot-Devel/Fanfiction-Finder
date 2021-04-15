@@ -140,7 +140,11 @@ def ao3_metadata(query):
 
     if other_info:
         embed.add_field(name=f":bookmark: Rating: {ao3_story_rating}",
-                        value=other_info+"\n"+ao3_story_metainfo, inline=False)
+                        value=other_info, inline=False)
+
+    if ao3_story_metainfo:
+        embed.add_field(name="📊 Stats",
+                        value=ao3_story_metainfo, inline=False)
 
     embed.add_field(name="\u200b",  # zero-width whitespace character
                     value="*If this content violates the server rules, reply to the bot message with `del` and it will be removed.*", inline=False)
@@ -261,7 +265,11 @@ def ffn_metadata(query):
 
         if other_info:
             embed.add_field(name=f":bookmark: Rating: {ffn_story_rating}",
-                            value=other_info+"\n"+ffn_story_metainfo, inline=False)
+                            value=other_info, inline=False)
+
+        if ffn_story_metainfo:
+            embed.add_field(name="📊 Stats",
+                            value=ffn_story_metainfo, inline=False)
 
         embed.add_field(name="\u200b",  # zero-width whitespace character
                         value="*If this content violates the server rules, reply to the bot message with `del` and it will be removed.*", inline=False)
