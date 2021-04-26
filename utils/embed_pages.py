@@ -67,7 +67,7 @@ def get_embed(page=0):
 
     elif page == 3:
         embed = discord.Embed(
-            title="Bot Maintenance Update",
+            title="Bot Maintenance Update - 4 Feb, 2021",
             description="_**Do not give administrator permission to the bot.**_\nThe bot underwent a maintenance update \
             and it needs to be re-invited using this \
             [invite link](https://discord.com/api/oauth2/authorize?client_id=779772534040166450&permissions=268526672&scope=bot). \

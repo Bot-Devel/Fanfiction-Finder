@@ -130,7 +130,7 @@ def ao3_metadata_works(ao3_url):
         if ao3_meta_info[m]:
             ao3_story_metainfo += ao3_meta_info[m]
             if m < len(ao3_meta_info)-1:
-                ao3_story_metainfo += ' - '
+                ao3_story_metainfo += " ☘︎ "
 
     ao3_story_length = "{:,}".format(int(ao3_story_length))
     ao3_story_chapters = re.search(r"\d+", ao3_story_chapters).group(0)

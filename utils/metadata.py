@@ -127,12 +127,12 @@ def ao3_metadata(query):
         value=ao3_story_length +
         " words in "+ao3_story_chapters+" chapter(s)", inline=True)
 
-    other_info = [ao3_story_fandom, " - "]
+    other_info = [ao3_story_fandom, " ☘︎ "]
 
     for var in [ao3_story_relationships, ao3_story_characters]:
         if var is not None:
             other_info.append(str(var))
-            other_info.append(" - ")
+            other_info.append(" ☘︎ ")
 
     other_info = ''.join(other_info[:len(other_info)-1])
     if len(list(other_info)) > 100:
@@ -250,13 +250,13 @@ def ffn_metadata(query):
             value=str(ffn_story_length) +
             " words in "+str(ffn_story_chapters)+" chapter(s)", inline=True)
 
-        other_info = [ffn_story_fandom, " - "]
+        other_info = [ffn_story_fandom, " ☘︎ "]
 
         for var in [ffn_story_genre,
                     ffn_story_characters]:
             if var is not None:
                 other_info.append(str(var))
-                other_info.append(" - ")
+                other_info.append(" ☘︎ ")
 
         other_info = ''.join(other_info[:len(other_info)-1])
 

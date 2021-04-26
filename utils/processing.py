@@ -8,49 +8,45 @@ import re
 def story_last_up_clean(story_last_up, _type):
 
     curr_time = datetime.now()
-
     if _type == 1:  # ffn last updated
         datetimeFormat = '%Y-%m-%d %H:%M:%S'
+        story_last_up = datetime.strptime(
+            story_last_up, datetimeFormat)
+        story_last_updated = story_last_up.strftime(r'%d %b, %Y ')
+
     elif _type == 2:  # ao3 last updated
         datetimeFormat = '%Y-%m-%d'
-
-    story_last_up = datetime.strptime(story_last_up, datetimeFormat)
+        story_last_up = datetime.strptime(
+            story_last_up, datetimeFormat)
+        story_last_updated = story_last_up.strftime(r'%d %b, %Y ')
 
     diff_in_time = relativedelta(curr_time, story_last_up)
 
+    # only amend hours & minutes diff
     if diff_in_time.years:
-
-        if diff_in_time.years == 1:
-            last_up = str(diff_in_time.years)+" year ago"
-        else:
-            last_up = str(diff_in_time.years)+" years ago"
+        pass
 
     elif diff_in_time.months:
-
-        if diff_in_time.months == 1:
-            last_up = str(diff_in_time.months)+" month ago"
-        else:
-            last_up = str(diff_in_time.months)+" months ago"
+        pass
 
     elif diff_in_time.days:
-        if diff_in_time.days == 1:
-            last_up = str(diff_in_time.days)+" day ago"
-        else:
-            last_up = str(diff_in_time.days)+" days ago"
+        pass
 
     elif diff_in_time.hours:
         if diff_in_time.hours == 1:
-            last_up = str(diff_in_time.hours)+" hour ago"
+            story_last_updated += "☘︎ " + str(diff_in_time.hours)+" hour ago"
         else:
-            last_up = str(diff_in_time.hours)+" hours ago"
+            story_last_updated += "☘︎ " + str(diff_in_time.hours)+" hours ago"
 
     elif diff_in_time.minutes:
         if diff_in_time.minutes == 1:
-            last_up = str(diff_in_time.minutes)+" minute ago"
+            story_last_updated += "☘︎ " + \
+                str(diff_in_time.minutes)+" minute ago"
         else:
-            last_up = str(diff_in_time.minutes)+" minutes ago"
+            story_last_updated += "☘︎ " + \
+                str(diff_in_time.minutes)+" minutes ago"
 
-    return str(last_up)
+    return str(story_last_updated)
 
 
 def ffn_process_details(ffn_soup):
@@ -85,12 +81,12 @@ def ffn_process_details(ffn_soup):
         if details[i].startswith('Reviews'):
             ffn_story_metainfo += details[i].replace(
                 'Reviews:', '**Reviews:**').strip()
-            ffn_story_metainfo += " - "
+            ffn_story_metainfo += " ☘︎ "
 
         if details[i].startswith('Favs'):
             ffn_story_metainfo += details[i].replace(
                 'Favs:', '**Favs:**').strip()
-            ffn_story_metainfo += " - "
+            ffn_story_metainfo += " ☘︎ "
 
         if details[i].startswith('Follows'):
             ffn_story_metainfo += details[i].replace(
