@@ -94,7 +94,7 @@ def ao3_metadata_works(ao3_url):
             'dd', attrs={'class': 'kudos'}).contents[0]).strip()
 
     except AttributeError:
-        ao3_story_bookmarks = None
+        ao3_story_kudos = '**Kudos:** 0 '
 
     try:
         ao3_story_bookmarks = '**Bookmarks:** '
@@ -103,7 +103,7 @@ def ao3_metadata_works(ao3_url):
             'dd', attrs={'class': 'bookmarks'}).find('a').contents[0]).strip()
 
     except AttributeError:
-        ao3_story_bookmarks = None
+        ao3_story_bookmarks = '**Bookmarks:** 0'
 
     try:
         ao3_story_comments = '**Comments:** '
@@ -112,7 +112,7 @@ def ao3_metadata_works(ao3_url):
             'dd', attrs={'class': 'comments'}).contents[0]).strip()
 
     except AttributeError:
-        ao3_story_bookmarks = None
+        ao3_story_comments = '**Comments:** 0 '
 
     try:
         ao3_story_hits = '**Hits:** '
@@ -121,10 +121,11 @@ def ao3_metadata_works(ao3_url):
             'dd', attrs={'class': 'hits'}).contents[0]).strip()
 
     except AttributeError:
-        ao3_story_bookmarks = None
+        ao3_story_hits = '**Hits:** 0 '
 
     ao3_meta_info = [ao3_story_comments, ao3_story_kudos,
                      ao3_story_bookmarks, ao3_story_hits]
+
     ao3_story_metainfo = ""
     for m in range(len(ao3_meta_info)):
         if ao3_meta_info[m]:

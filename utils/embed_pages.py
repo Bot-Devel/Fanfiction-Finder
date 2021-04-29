@@ -8,8 +8,7 @@ def get_embed(page=0):
     if page == 0:
         embed = discord.Embed(
             title="Bot Usage Instructions",
-            description="_**New Bot Maintenance Update, check Page 4. \
-            The bot needs to be re-invited to the server.**_"
+            description="_**New Bot Maintenance Update, check Page 4**_"
         )
         embed.add_field(
             name="AO3 Searching:",
@@ -23,8 +22,8 @@ def get_embed(page=0):
             \n **Example:**\n`ffn cadmean victory` "
         )
         embed.add_field(
-            name="Search using Urls:",
-            value="**Example:** \nSomething https://archiveofourown.org/series/1119027",
+            name="\u200b",
+            value="**Search using URLs is also allowed**",
             inline=False
         )
         embed.add_field(
@@ -56,6 +55,11 @@ def get_embed(page=0):
         embed.add_field(
             name="To disallow the bot from responding to this channel",
             value="`,disallow`", inline=False
+        )
+
+        embed.add_field(
+            name="To delete a bot message if it violates the server rules, the user who requested the bot to find the fanfiction can reply to the offending bot message by clicking on `Reply` and replying with `del`.",
+            value="\u200b", inline=False
         )
 
     elif page == 2:
