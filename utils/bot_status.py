@@ -11,8 +11,8 @@ def home():
 
 
 def run():
-    serve(app, host="0.0.0.0", port=8082)  # production server using waitress
-    # app.run(host='0.0.0.0',port=8080) #development server
+    # production server using waitress
+    serve(app, host="0.0.0.0", port=8082)
 
 
 def start_server():
