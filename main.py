@@ -99,22 +99,27 @@ async def on_message(message):
         # to limit the url to 1 only
         supported_url = supported_url[:1]
 
-        for i in supported_url:
+        for url in supported_url:
             await message.channel.trigger_typing()
-            if re.search(r"fanfiction.net\b",  i) is not None:
-                embed_pg = ffn_metadata(i)
+            if re.search(r"fanfiction.net\b",  url) is not None:
 
-                embed_pg.set_footer(
-                    text="User ID: "+str(message.author.id))
+                # ignore /u/ endpoint
+                if not re.search(r"/u/", url):
+                    embed_pg = ffn_metadata(url)
 
-                await message.channel.send(embed=embed_pg)
+                    embed_pg.set_footer(
+                        text="User ID: "+str(message.author.id))
 
-            if re.search(r"archiveofourown.org\b", i) is not None:
-                embed_pg = ao3_metadata(i)
+                    await message.channel.send(embed=embed_pg)
 
-                embed_pg.set_footer(
-                    text="User ID: "+str(message.author.id))
-                await message.channel.send(embed=embed_pg)
+            if re.search(r"archiveofourown.org\b", url) is not None:
+
+                # ignore /users/ endpoint
+                if not re.search(r"/users/", url):
+                    embed_pg = ao3_metadata(url)
+                    embed_pg.set_footer(
+                        text="User ID: "+str(message.author.id))
+                    await message.channel.send(embed=embed_pg)
 
     elif re.search(r"^del\b", query) and message.reference is not None:
 

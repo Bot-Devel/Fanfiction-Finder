@@ -5,8 +5,7 @@ from bs4 import BeautifulSoup
 import cloudscraper
 
 from utils.search import get_ao3_url, get_ffn_url
-from utils.processing import story_last_up_clean, ffn_process_details, \
-    ao3_convert_chapters_to_works
+from utils.processing import story_last_up_clean, ffn_process_details
 from utils.ao3_metadata_processing import ao3_metadata_works, \
     ao3_metadata_series
 
@@ -19,26 +18,21 @@ def ao3_metadata(query):
         query = query.replace(" ", "+")
         ao3_url = get_ao3_url(query)
 
-    else:  # clean the url if the query contains a url
+    else:  # extract the url from the query if it contains an url
         ao3_url = re.search(URL_VALIDATE, query).group(0)
 
     if ao3_url is None:
         embed = discord.Embed(
-            description="Fanfiction not found.",
+            description="Fanfiction not found",
             colour=discord.Colour(0x272b28))
         return embed
 
-    if re.search(r"/chapters/\b", ao3_url) is not None:
-        ao3_url = ao3_convert_chapters_to_works(
-            ao3_url)  # convert the url from /chapters/ to /works/
+    if re.search(r"/works/\b", ao3_url) is not None:
 
-        ao3_work_name, ao3_author_name, ao3_author_url, ao3_work_summary, \
-            ao3_work_status, ao3_work_last_up, ao3_work_length, \
-            ao3_work_chapters, ao3_work_rating, ao3_work_relationships, \
-            ao3_work_characters, ao3_work_fandom, ao3_work_metainfo = ao3_metadata_works(
-                ao3_url)
+        # extract work id from the url
+        ao3_work_id = str(re.search(r"\d+", ao3_url).group(0))
+        ao3_url = "https://archiveofourown.org/works/"+ao3_work_id
 
-    elif re.search(r"/works/\b", ao3_url) is not None:
         ao3_work_name, ao3_author_name, ao3_author_url, ao3_work_summary, \
             ao3_work_status, ao3_work_last_up, ao3_work_length, \
             ao3_work_chapters, ao3_work_rating, ao3_work_relationships, \
@@ -46,6 +40,11 @@ def ao3_metadata(query):
                 ao3_url)
 
     elif re.search(r"/series/\b", ao3_url) is not None:
+
+        # extract series id from the url
+        ao3_series_id = str(re.search(r"\d+", ao3_url).group(0))
+        ao3_url = "https://archiveofourown.org/series/"+ao3_series_id
+
         ao3_series_name, ao3_author_name, ao3_author_url, ao3_series_summary, \
             ao3_series_status, ao3_series_last_up, ao3_series_length, \
             ao3_series_works = ao3_metadata_series(
@@ -165,15 +164,19 @@ def ffn_metadata(query):
         query = query.replace(" ", "+")
         ffn_url = get_ffn_url(query)
 
-    else:  # clean the url if the query contains a url
+    else:  # extract the url from the query if it contains an url
         ffn_url = re.search(
             URL_VALIDATE, query).group(0)
 
     if ffn_url is None:
-        return None
+        embed = discord.Embed(
+            description="Fanfiction not found",
+            colour=discord.Colour(0x272b28))
+        return embed
 
-    # convert m.fanfiction.net to www.fanfiction.net
-    ffn_url = ffn_url.replace(r"/m.", r"/www.")
+    # extract story id from the url
+    ffn_story_id = str(re.search(r"\d+", ffn_url).group(0))
+    ffn_url = "https://www.fanfiction.net/s/"+ffn_story_id
 
     scraper = cloudscraper.CloudScraper(
         delay=2, browser={

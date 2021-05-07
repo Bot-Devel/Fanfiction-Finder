@@ -1,7 +1,6 @@
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from bs4 import BeautifulSoup
-import requests
 import re
 
 
@@ -12,13 +11,13 @@ def story_last_up_clean(story_last_up, _type):
         datetimeFormat = '%Y-%m-%d %H:%M:%S'
         story_last_up = datetime.strptime(
             story_last_up, datetimeFormat)
-        story_last_updated = story_last_up.strftime(r'%d %b, %Y ')
+        story_last_updated = story_last_up.strftime(r'%-d %b, %Y ')
 
     elif _type == 2:  # ao3 last updated
         datetimeFormat = '%Y-%m-%d'
         story_last_up = datetime.strptime(
             story_last_up, datetimeFormat)
-        story_last_updated = story_last_up.strftime(r'%d %b, %Y ')
+        story_last_updated = story_last_up.strftime(r'%-d %b, %Y ')
 
     diff_in_time = relativedelta(curr_time, story_last_up)
 
@@ -139,29 +138,6 @@ def get_ffn_chapters_cnt(details):
     if len(search) == 0:
         return 1  # 1 as the default chapter number
     return int(search[0][len("Chapters:"):].replace(',', ''))
-
-
-def ao3_convert_chapters_to_works(ao3_url):
-    ao3_id_cleaned = []
-    pos_of_slash1 = []
-    ao3_page = requests.get(ao3_url)
-    ao3_soup = BeautifulSoup(ao3_page.content, 'html.parser')
-
-    ao3_id = (ao3_soup.find(
-        'li', attrs={'class': 'share'}).find('a', href=True))['href']  # to scrape the /works/ url
-    ao3_id = list(ao3_id)
-
-    for i in range(len(ao3_id)):
-        if "/" in ao3_id[i]:
-            pos_of_slash1.append(i)
-
-    if pos_of_slash1 is not None:
-        for i in range(pos_of_slash1[1]+1, pos_of_slash1[2]):
-            ao3_id_cleaned.append(ao3_id[i])
-
-    ao3_id_cleaned = ''.join(ao3_id_cleaned)  # got id from the /works/ url
-    ao3_url_cleaned = "https://archiveofourown.org/works/" + ao3_id_cleaned
-    return ao3_url_cleaned
 
 
 def get_ao3_series_works_index(ao3_soup):

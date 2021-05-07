@@ -3,12 +3,11 @@ import discord
 
 def get_embed(page=0):
 
-    page_limit = 4
+    page_limit = 3
 
     if page == 0:
         embed = discord.Embed(
             title="Bot Usage Instructions",
-            description="_**New Bot Maintenance Update, check Page 4**_"
         )
         embed.add_field(
             name="AO3 Searching:",
@@ -67,18 +66,6 @@ def get_embed(page=0):
             title="Bot Support",
             description="Join the Bot's Discord Support Server if you need any help in setting up the bot or want to suggest any new features." +
             "\n[Discord Support Server](https://discord.gg/bRzzr3EBqH)"
-        )
-
-    elif page == 3:
-        embed = discord.Embed(
-            title="Bot Maintenance Update - 4 Feb, 2021",
-            description="_**Do not give administrator permission to the bot.**_\nThe bot underwent a maintenance update \
-            and it needs to be re-invited using this \
-            [invite link](https://discord.com/api/oauth2/authorize?client_id=779772534040166450&permissions=268526672&scope=bot). \
-            So kick the bot out and then use the invite link to invite it again.\n \
-            After inviting him again, use the `,disallow_all` to stop it from responding to all channels, then use `,allow` for \
-            each specific channel. Go through the `,help` menu for all the commands.\nIf you are having any issues, join the  \
-            [Discord Support Server](https://discord.gg/bRzzr3EBqH) and ping RogueOne or if you know RogueOne personally, just ping/DM him directly."
         )
 
     else:
