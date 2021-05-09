@@ -12,7 +12,7 @@ class Settings(Cog):
     def __init__(self, client):
         self.client = client
 
-    @command(pass_context=True)
+    @command(pass_context=True, aliases=['allowAll'])
     async def allow_all(self, ctx):
         """Adds send_message perm for all the channels."""
 
@@ -39,7 +39,7 @@ class Settings(Cog):
         )
         await ctx.channel.send(embed=embed)
 
-    @command(pass_context=True)
+    @command(pass_context=True, aliases=['disallowAll'])
     async def disallow_all(self, ctx):
         """Removes send_message perm for all the channels."""
 

@@ -40,11 +40,11 @@ def get_embed(page=0):
         )
         embed.add_field(
             name="To allow the bot to respond to all the channels",
-            value="`,allow_all`", inline=False
+            value="`,allow_all` or `,allowAll`", inline=False
         )
         embed.add_field(
             name="To disallow the bot from responding to all the channels",
-            value="`,disallow_all`", inline=False
+            value="`,disallow_all` or `,disallowAll`", inline=False
         )
         embed.add_field(
             name="To allow the bot to respond to this channel",
