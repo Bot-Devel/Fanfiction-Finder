@@ -24,4 +24,4 @@ You can also use the url of the fanfiction for searching. <br>
 The query string is not case-sensitive so either uppercase, lowercase or combination of both can be used to search.<br>
 The following is an example on how the bot works in realtime-<br>
 
-![](https://raw.githubusercontent.com/arzkar/Fanfiction-Finder-Bot/main/img/bot_output.gif)
+![](https://raw.githubusercontent.com/arzkar/Fanfiction-Finder-Bot/main/data/img/bot_output.gif)

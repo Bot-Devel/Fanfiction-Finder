@@ -12,19 +12,28 @@ from utils.ao3_metadata_processing import ao3_metadata_works, \
 URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"
 
 
-def ao3_metadata(query):
-    if re.search(URL_VALIDATE, query) is None:
+def ao3_metadata(query, log):
 
+    query = query.strip()
+    log.info(f"QUERY: {query}")
+
+    if re.search(URL_VALIDATE, query) is None:
         query = query.replace(" ", "+")
-        ao3_url = get_ao3_url(query)
+
+        log.info("query not an URL. Calling get_ao3_url()")
+        ao3_url = get_ao3_url(query, log)
 
     else:  # extract the url from the query if it contains an url
+        log.info("query is an URL")
         ao3_url = re.search(URL_VALIDATE, query).group(0)
 
     if ao3_url is None:
+        log.info("Fanfiction not found")
         return Embed(
             description="Fanfiction not found",
             colour=Colour.red())
+
+    log.info(f"Processing {ao3_url}")
 
     if re.search(r"/works/\b", ao3_url) is not None:
 
@@ -32,7 +41,7 @@ def ao3_metadata(query):
         ao3_work_id = str(re.search(r"\d+", ao3_url).group(0))
         ao3_url = "https://archiveofourown.org/works/"+ao3_work_id
 
-        embed = ao3_metadata_works(ao3_url)
+        embed = ao3_metadata_works(ao3_url, log)
 
     elif re.search(r"/series/\b", ao3_url) is not None:
 
@@ -40,28 +49,40 @@ def ao3_metadata(query):
         ao3_series_id = str(re.search(r"\d+", ao3_url).group(0))
         ao3_url = "https://archiveofourown.org/series/"+ao3_series_id
 
-        embed = ao3_metadata_series(ao3_url)
+        embed = ao3_metadata_series(ao3_url, log)
 
     return embed
 
 
-def ffn_metadata(query):
+def ffn_metadata(query, log):
+
+    query = query.strip()
+    log.info(f"QUERY: {query}")
+
     if re.search(URL_VALIDATE, query) is None:
-        if re.search(r"ao3\b", query):
+
+        if re.search(r"ao3", query):
             embed = None
             return embed
+
         query = query.replace(" ", "+")
-        ffn_url = get_ffn_url(query)
+
+        log.info("query not an URL. Calling get_ffn_url()")
+        ffn_url = get_ffn_url(query, log)
 
     else:  # extract the url from the query if it contains an url
+        log.info("query is an URL")
         ffn_url = re.search(
             URL_VALIDATE, query).group(0)
 
     if ffn_url is None:
+        log.info("Fanfiction not found")
         embed = Embed(
             description="Fanfiction not found",
             colour=Colour.red())
         return embed
+
+    log.info(f"Processing {ffn_url}")
 
     # extract story id from the url
     ffn_story_id = str(re.search(r"\d+", ffn_url).group(0))
@@ -75,15 +96,19 @@ def ffn_metadata(query):
             'desktop': True,
         }
     )
+
     time.sleep(2)
-    ffn_page = scraper.get(ffn_url).text
-    ffn_soup = BeautifulSoup(ffn_page, 'html.parser')
+
+    ffn_page = scraper.get(ffn_url)
+    log.info(f"GET: {ffn_page.status_code}: {ffn_url}")
+    ffn_soup = BeautifulSoup(ffn_page.content, 'html.parser')
 
     try:
         ffn_story_name = ffn_soup.find_all('b', 'xcontrast_txt')[
             0].string.strip()
 
     except IndexError:  # Story Not Found
+        log.info("ffn_story_name is missing. Fanfiction not found")
         return Embed(
             description="Fanfiction not found",
             colour=Colour.red())
