@@ -7,7 +7,9 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from utils.metadata import ao3_metadata, ffn_metadata
-from utils.bot_status import start_server
+
+# to use repl+uptimerobot website monitor
+from utils.bot_uptime import start_server
 
 client = commands.Bot(command_prefix=',', help_command=None)
 
@@ -39,13 +41,61 @@ async def on_message(message):
 
     msg = list(message.content.lower())
 
-    query = message.content.lower().splitlines()
-    query = ' '.join(query)
+    query = message.content.lower()
 
-    if re.search(r"^ao3\b", query) is not None:
+    if re.search(r"^del\b", query) and message.reference is not None:
+
+        message_ref = message.reference  # message id of reply
+        message_to_delete = await message.channel.fetch_message(message_ref.message_id)
+
+        # if the messsage was created by a bot
+        if message_to_delete.author.bot:
+            embeds = message_to_delete.embeds
+            for embed in embeds:
+                try:
+                    footer = embed.to_dict()['footer']['text']
+
+                    author_id = (re.search(r"(User ID:)(.*)",
+                                           footer)).group(2).strip()
+
+                    # only server admins & user of the message to be deleted can use this command
+                    if int(message.author.id) == int(author_id) or message.author.guild_permissions.administrator:
+                        await message_to_delete.delete()
+                        await message.delete()
+
+                    else:
+                        await message.delete()
+                        msg = await message.channel.send(
+                            embed=discord.Embed(
+                                description="You are not allowed to delete someone else's message. \
+                                Only the message author can delete this message."))
+                        await asyncio.sleep(5)
+                        await msg.delete()
+
+                except (KeyError, ValueError):
+                    await message.delete()
+                    msg = await message.channel.send(
+                        embed=discord.Embed(
+                            description="This message cannot be deleted because the  \
+                            message doesn't contain the User id at the footer. Can't verify messsage author."))
+                    await asyncio.sleep(5)
+                    await msg.delete()
+        else:
+            await message.delete()
+            msg = await message.channel.send(
+                embed=discord.Embed(
+                    description="I am not allowed to do that. I can only delete my messages."))
+            await asyncio.sleep(5)
+            await msg.delete()
+
+    if message.guild is None:
+        return  # Do not reply to DMs
+
+    elif re.search(r"^linkao3\b", query) is not None:
+
         await message.channel.trigger_typing()
-        msg = query.replace("ao3", "")
-        msg = msg.replace("ffn", "")
+        msg = query.replace("linkao3", "")
+        msg = msg.replace("linkffn", "")
         embed_pg = ao3_metadata(msg)
 
         if embed_pg is None:  # if not found in ao3, search in ffn
@@ -54,10 +104,11 @@ async def on_message(message):
         embed_pg.set_footer(text="User ID: "+str(message.author.id))
         await message.channel.send(embed=embed_pg)
 
-    elif re.search(r"^ffn\b", query) is not None:
+    elif re.search(r"^linkffn\b", query) is not None:
+
         await message.channel.trigger_typing()
-        msg = query.replace("ffn", "")
-        msg = msg.replace("ao3", "")
+        msg = query.replace("linkffn", "")
+        msg = msg.replace("linkao3", "")
         embed_pg = ffn_metadata(msg)
 
         if embed_pg is None:  # if not found in ffn, search in ao3
@@ -85,6 +136,7 @@ async def on_message(message):
             await message.channel.send(embed=embed_pg)
 
     elif re.search(URL_VALIDATE, query) is not None:
+
         url_found = re.findall(URL_VALIDATE, query.lower(), re.MULTILINE)
 
         supported_url = []
@@ -120,49 +172,6 @@ async def on_message(message):
                     embed_pg.set_footer(
                         text="User ID: "+str(message.author.id))
                     await message.channel.send(embed=embed_pg)
-
-    elif re.search(r"^del\b", query) and message.reference is not None:
-
-        message_ref = message.reference  # message id of reply
-        message_to_delete = await message.channel.fetch_message(message_ref.message_id)
-
-        # if the messsage was created by a bot
-        if message_to_delete.author.bot:
-            embeds = message_to_delete.embeds
-            for embed in embeds:
-                try:
-                    author_id = embed.to_dict()['footer']['text']
-                    author_id = author_id.replace("User ID: ", "")
-
-                    # only server admins & user of the message to be deleted can use this command
-                    if int(message.author.id) == int(author_id) or message.author.guild_permissions.administrator:
-                        await message_to_delete.delete()
-                        await message.delete()
-
-                    else:
-                        await message.delete()
-                        msg = await message.channel.send(
-                            embed=discord.Embed(
-                                description="You are not allowed to delete someone else's message. \
-                                Only the message author can delete this message."))
-                        await asyncio.sleep(5)
-                        await msg.delete()
-
-                except (KeyError, ValueError):
-                    await message.delete()
-                    msg = await message.channel.send(
-                        embed=discord.Embed(
-                            description="This message cannot be deleted because the  \
-                            message was created before the new `del` feature was added."))
-                    await asyncio.sleep(5)
-                    await msg.delete()
-        else:
-            await message.delete()
-            msg = await message.channel.send(
-                embed=discord.Embed(
-                    description="I am not allowed to do that. I can only delete my messages."))
-            await asyncio.sleep(5)
-            await msg.delete()
 
 
 start_server()

@@ -30,7 +30,9 @@ class Settings(Cog):
         channel_list = ctx.guild.channels
         for channel in channel_list:
             try:
-                await channel.set_permissions(bot_user, send_messages=True)
+                await channel.set_permissions(
+                    bot_user,
+                    send_messages=True, manage_permissions=True)
             except Exception:
                 pass
 
@@ -45,7 +47,7 @@ class Settings(Cog):
 
         if not ctx.author.guild_permissions.administrator:
             try:
-                return await ctx.send(
+                return await ctx.send(  # send message in channel
                     embed=discord.Embed(
                         description="You are missing Administrator permission to run this command."))
             except Exception:  # send a DM if send message perms is not enabled
@@ -69,7 +71,9 @@ class Settings(Cog):
         channel_list = ctx.guild.channels
         for channel in channel_list:
             try:
-                await channel.set_permissions(bot_user, send_messages=False)
+                await channel.set_permissions(
+                    bot_user,
+                    send_messages=False, manage_permissions=True)
             except Exception:
                 pass
 
@@ -90,7 +94,7 @@ class Settings(Cog):
         bot_user = ctx.guild.get_member(BOT_ID)
         await ctx.channel.set_permissions(
             bot_user,
-            send_messages=True)
+            send_messages=True, manage_permissions=True)
 
         embed = discord.Embed(
             description="The bot will now start responding to this channel."
@@ -126,7 +130,78 @@ class Settings(Cog):
         bot_user = ctx.guild.get_member(BOT_ID)
         await ctx.channel.set_permissions(
             bot_user,
-            send_messages=False)
+            send_messages=False, manage_permissions=True)
+
+    @command(pass_context=True, aliases=['getChannels'])
+    async def get_channels(self, ctx):
+        """Gets all the channels in which the bot has send_messages=True"""
+
+        if not ctx.author.guild_permissions.administrator:
+            try:
+                return await ctx.send(
+                    embed=discord.Embed(
+                        description="You are missing Administrator permission to run this command."))
+            except Exception:  # send a DM if send message perms is not enabled
+                return await ctx.author.send(
+                    embed=discord.Embed(
+                        description="You are missing Administrator permission to run this command."))
+
+        bot_user = ctx.guild.get_member(BOT_ID)
+        channel_list = ctx.guild.channels
+        channels = []
+        for channel in channel_list:
+
+            perms = bot_user.permissions_in(channel)
+
+            if perms.send_messages:
+                channels.append(str(channel.id))
+            else:
+                pass
+
+        channels = ", ".join(channels)
+        embed = discord.Embed(
+            title="The list of channels in which the bot has send_messages=True perms",
+            description=channels
+        )
+        await ctx.author.send(embed=embed)
+
+    @command(pass_context=True, aliases=['refreshPerms'])
+    async def refresh_perms(self, ctx, *, channels=0):
+        """Gives the manage_perms=True in all the channels"""
+
+        if not ctx.author.guild_permissions.administrator:
+            try:
+                return await ctx.send(
+                    embed=discord.Embed(
+                        description="You are missing Administrator permission to run this command."))
+            except Exception:  # send a DM if send message perms is not enabled
+                return await ctx.author.send(
+                    embed=discord.Embed(
+                        description="You are missing Administrator permission to run this command."))
+
+        overwrite = discord.PermissionOverwrite()
+        overwrite.manage_permissions = True
+
+        bot_user = ctx.guild.get_member(BOT_ID)
+        channel_list = ctx.guild.channels
+        channels = [x.strip() for x in channels.split(',')]
+
+        for channel in channel_list:
+            if str(channel.id) in channels:
+                overwrite.send_messages = True
+            else:
+                overwrite.send_messages = False
+
+            try:
+                await channel.set_permissions(
+                    bot_user, overwrite=overwrite)
+            except Exception:
+                pass
+
+        embed = discord.Embed(
+            description="The bot's channel perms were refreshed successfully"
+        )
+        await ctx.channel.send(embed=embed)
 
 
 def setup(client):

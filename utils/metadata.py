@@ -1,4 +1,4 @@
-import discord
+from discord import Embed, Colour
 import re
 import time
 from bs4 import BeautifulSoup
@@ -22,10 +22,9 @@ def ao3_metadata(query):
         ao3_url = re.search(URL_VALIDATE, query).group(0)
 
     if ao3_url is None:
-        embed = discord.Embed(
+        return Embed(
             description="Fanfiction not found",
-            colour=discord.Colour(0x272b28))
-        return embed
+            colour=Colour.red())
 
     if re.search(r"/works/\b", ao3_url) is not None:
 
@@ -33,11 +32,7 @@ def ao3_metadata(query):
         ao3_work_id = str(re.search(r"\d+", ao3_url).group(0))
         ao3_url = "https://archiveofourown.org/works/"+ao3_work_id
 
-        ao3_work_name, ao3_author_name, ao3_author_url, ao3_work_summary, \
-            ao3_work_status, ao3_work_last_up, ao3_work_length, \
-            ao3_work_chapters, ao3_work_rating, ao3_work_relationships, \
-            ao3_work_characters, ao3_work_fandom, ao3_work_metainfo = ao3_metadata_works(
-                ao3_url)
+        embed = ao3_metadata_works(ao3_url)
 
     elif re.search(r"/series/\b", ao3_url) is not None:
 
@@ -45,113 +40,7 @@ def ao3_metadata(query):
         ao3_series_id = str(re.search(r"\d+", ao3_url).group(0))
         ao3_url = "https://archiveofourown.org/series/"+ao3_series_id
 
-        ao3_series_name, ao3_author_name, ao3_author_url, ao3_series_summary, \
-            ao3_series_status, ao3_series_last_up, ao3_series_length, \
-            ao3_series_works = ao3_metadata_series(
-                ao3_url)
-
-        # remove everything after &sa from the url
-        if re.search(r"^(.*?)&", ao3_url) is not None:
-            ao3_url = re.search(
-                r"^(.*?)&", ao3_url).group(1)
-
-        embed = discord.Embed(
-            title=ao3_series_name,
-            url=ao3_url,
-            description=ao3_series_summary,
-            colour=discord.Colour(0x272b28))
-
-        if ao3_series_status == "Completed":
-
-            embed.add_field(
-                name='📜 Last Updated',
-                value=ao3_series_last_up +
-                " ✓Complete", inline=True)
-
-        elif ao3_series_status == "Updated":
-
-            embed.add_field(
-                name='📜 Last Updated',
-                value=ao3_series_last_up, inline=True)
-
-        elif ao3_series_status is None:
-            embed.add_field(
-                name='📜 Last Updated',
-                value=ao3_series_last_up, inline=True)
-
-        embed.add_field(
-            name='📖 Length',
-            value=ao3_series_length +
-            " words in "+ao3_series_works+" work(s)", inline=True)
-
-        embed.add_field(name="\u200b",  # zero-width whitespace character
-                        value="*If this content violates the server rules, reply to the bot message with `del` and it will be removed. Check `,help`.*", inline=False)
-
-        embed.set_author(
-            name=ao3_author_name, url=ao3_author_url,
-            icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
-
-        return embed
-
-    # remove everything after &sa from the url
-    if re.search(r"^(.*?)&", ao3_url) is not None:
-        ao3_url = re.search(
-            r"^(.*?)&", ao3_url).group(1)
-
-    embed = discord.Embed(
-        title=ao3_work_name,
-        url=ao3_url,
-        description=ao3_work_summary,
-        colour=discord.Colour(0x272b28))
-
-    if ao3_work_status == "Completed":
-
-        embed.add_field(
-            name='📜 Last Updated',
-            value=ao3_work_last_up +
-            " ✓Complete", inline=True)
-
-    elif ao3_work_status == "Updated":
-
-        embed.add_field(
-            name='📜 Last Updated',
-            value=ao3_work_last_up, inline=True)
-
-    elif ao3_work_status is None:
-        embed.add_field(
-            name='📜 Last Updated',
-            value=ao3_work_last_up, inline=True)
-
-    embed.add_field(
-        name='📖 Length',
-        value=ao3_work_length +
-        " words in "+ao3_work_chapters+" chapter(s)", inline=True)
-
-    other_info = [ao3_work_fandom, " ☘︎ "]
-
-    for var in [ao3_work_relationships, ao3_work_characters]:
-        if var is not None:
-            other_info.append(str(var))
-            other_info.append(" ☘︎ ")
-
-    other_info = ''.join(other_info[:len(other_info)-1])
-    if len(list(other_info)) > 100:
-        other_info = other_info[:100] + "..."
-
-    if other_info:
-        embed.add_field(name=f":bookmark: Rating: {ao3_work_rating}",
-                        value=other_info, inline=False)
-
-    if ao3_work_metainfo:
-        embed.add_field(name="📊 Stats",
-                        value=ao3_work_metainfo, inline=False)
-
-    embed.add_field(name="\u200b",  # zero-width whitespace character
-                    value="*If this content violates the server rules, reply to the bot message with `del` and it will be removed. Check `,help`.*", inline=False)
-
-    embed.set_author(
-        name=ao3_author_name, url=ao3_author_url,
-        icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
+        embed = ao3_metadata_series(ao3_url)
 
     return embed
 
@@ -169,9 +58,9 @@ def ffn_metadata(query):
             URL_VALIDATE, query).group(0)
 
     if ffn_url is None:
-        embed = discord.Embed(
+        embed = Embed(
             description="Fanfiction not found",
-            colour=discord.Colour(0x272b28))
+            colour=Colour.red())
         return embed
 
     # extract story id from the url
@@ -191,100 +80,117 @@ def ffn_metadata(query):
     ffn_soup = BeautifulSoup(ffn_page, 'html.parser')
 
     try:
-        ffn_work_name = ffn_soup.find_all('b', 'xcontrast_txt')[
+        ffn_story_name = ffn_soup.find_all('b', 'xcontrast_txt')[
             0].string.strip()
 
-        ffn_author_name = ffn_soup.find_all(
-            'a', {'href': re.compile(r'^/u/\d+/.')})[0].string.strip()
+    except IndexError:  # Story Not Found
+        return Embed(
+            description="Fanfiction not found",
+            colour=Colour.red())
 
-        ffn_author_url = (ffn_soup.find(
-            'div', attrs={'id': 'profile_top'}).find('a', href=True))['href']
+    ffn_author_name = ffn_soup.find_all(
+        'a', {'href': re.compile(r'^/u/\d+/.')})[0].string.strip()
 
-        ffn_work_summary = ffn_soup.find_all('div', {
+    ffn_author_url = (ffn_soup.find(
+        'div', attrs={'id': 'profile_top'}).find('a', href=True))['href']
+
+    try:
+        ffn_story_summary = ffn_soup.find_all('div', {
             'style': 'margin-top:2px',
             'class': 'xcontrast_txt'})[0].string.strip()
 
-        ffn_work_fandom = ffn_soup.find(
+    except IndexError:  # Missing summary
+        ffn_story_summary = ""
+
+    ffn_story_fandom = ffn_soup.find(
+        'span', attrs={'class': 'lc-left'}).find(
+        'a', attrs={'class': 'xcontrast_txt'}).text
+
+    has_img = False
+    try:
+        has_img = True
+        ffn_story_image = (ffn_soup.find(
+            'div', attrs={'id': 'profile_top'}).find(
+            'img', attrs={'class': 'cimage'}))['src']
+
+    except TypeError:
+        has_img = False
+
+    # if the fandom isnt crossover, then go to the next <a>
+    if not re.search(r"\bcrossover\b", ffn_story_fandom, re.IGNORECASE):
+        ffn_story_fandom = ffn_soup.find(
             'span', attrs={'class': 'lc-left'}).find(
-            'a', attrs={'class': 'xcontrast_txt'}).text
+            'a', attrs={'class': 'xcontrast_txt'}).findNext('a').text
 
-        # if the fandom isnt crossover, then go to the next <a>
-        if not re.search(r"\bcrossover\b", ffn_work_fandom, re.IGNORECASE):
-            ffn_work_fandom = ffn_soup.find(
-                'span', attrs={'class': 'lc-left'}).find(
-                'a', attrs={'class': 'xcontrast_txt'}).findNext('a').text
+    ffn_story_status, ffn_story_last_up, ffn_story_length, \
+        ffn_story_chapters, ffn_story_rating, ffn_story_genre, \
+        ffn_story_characters, ffn_story_metainfo = ffn_process_details(
+            ffn_soup)
 
-        ffn_work_status, ffn_work_last_up, ffn_work_length, \
-            ffn_work_chapters, ffn_work_rating, ffn_work_genre, \
-            ffn_work_characters, ffn_work_metainfo = ffn_process_details(
-                ffn_soup)
+    ffn_story_last_up = story_last_up_clean(ffn_story_last_up, 1)
+    ffn_author_url = "https://www.fanfiction.net"+ffn_author_url
 
-        ffn_work_last_up = story_last_up_clean(ffn_work_last_up, 1)
-        ffn_author_url = "https://www.fanfiction.net"+ffn_author_url
+    # remove everything after &sa from the url
+    if re.search(r"^(.*?)&", ffn_url) is not None:
+        ffn_url = re.search(
+            r"^(.*?)&", ffn_url).group(1)
 
-        # remove everything after &sa from the url
-        if re.search(r"^(.*?)&", ffn_url) is not None:
-            ffn_url = re.search(
-                r"^(.*?)&", ffn_url).group(1)
+    if len(list(ffn_story_summary)) > 2048:
+        ffn_story_summary = ffn_story_summary[:2030] + "..."
 
-        if len(list(ffn_work_summary)) > 2048:
-            ffn_work_summary = ffn_work_summary[:2030] + "..."
+    embed = Embed(
+        title=ffn_story_name,
+        url=ffn_url,
+        description=ffn_story_summary,
+        colour=Colour(0x272b28))
 
-        embed = discord.Embed(
-            title=ffn_work_name,
-            url=ffn_url,
-            description=ffn_work_summary,
-            colour=discord.Colour(0x272b28))
-
-        if ffn_work_status == "Complete":
-
-            embed.add_field(
-                name='**📜 Last Updated**',
-                value=ffn_work_last_up +
-                " ✓"+ffn_work_status, inline=True)
-
-        elif ffn_work_status == "Updated":
-
-            embed.add_field(
-                name='📜 Last Updated',
-                value=ffn_work_last_up, inline=True)
+    if ffn_story_status == "Complete":
 
         embed.add_field(
-            name='📖 Length',
-            value=str(ffn_work_length) +
-            " words in "+str(ffn_work_chapters)+" chapter(s)", inline=True)
+            name='**📜 Last Updated**',
+            value=ffn_story_last_up +
+            " ✓"+ffn_story_status, inline=True)
 
-        other_info = [ffn_work_fandom, " ☘︎ "]
+    elif ffn_story_status == "Updated":
 
-        for var in [ffn_work_genre,
-                    ffn_work_characters]:
-            if var is not None:
-                other_info.append(str(var))
-                other_info.append(" ☘︎ ")
+        embed.add_field(
+            name='📜 Last Updated',
+            value=ffn_story_last_up, inline=True)
 
-        other_info = ''.join(other_info[:len(other_info)-1])
+    embed.add_field(
+        name='📖 Length',
+        value=str(ffn_story_length) +
+        " words in "+str(ffn_story_chapters)+" chapter(s)", inline=True)
 
-        if len(list(other_info)) > 100:
-            other_info = other_info[:100] + "..."
+    other_info = [ffn_story_fandom, " ☘︎ "]
 
-        if other_info:
-            embed.add_field(name=f":bookmark: Rating: {ffn_work_rating}",
-                            value=other_info, inline=False)
+    for var in [ffn_story_genre,
+                ffn_story_characters]:
+        if var is not None:
+            other_info.append(str(var))
+            other_info.append(" ☘︎ ")
 
-        if ffn_work_metainfo:
-            embed.add_field(name="📊 Stats",
-                            value=ffn_work_metainfo, inline=False)
+    other_info = ''.join(other_info[:len(other_info)-1])
 
-        embed.add_field(name="\u200b",  # zero-width whitespace character
-                        value="*If this content violates the server rules, reply to the bot message with `del` and it will be removed. Check `,help`.*", inline=False)
+    if len(list(other_info)) > 100:
+        other_info = other_info[:100] + "..."
 
-        embed.set_author(
-            name=ffn_author_name, url=ffn_author_url,
-            icon_url="https://pbs.twimg.com/profile_images/843841615122784256/WXbuqyjo_bigger.jpg")
+    if other_info:
+        embed.add_field(name=f":bookmark: Rating: {ffn_story_rating}",
+                        value=other_info, inline=False)
 
-    except IndexError:
-        embed = discord.Embed(
-            description="Fanfiction not found.",
-            colour=discord.Colour(0x272b28))
+    if ffn_story_metainfo:
+        embed.add_field(name="📊 Stats",
+                        value=ffn_story_metainfo, inline=False)
+
+    embed.add_field(name="\u200b",  # zero-width whitespace character
+                    value="*If this content violates the server rules, reply to the bot message with `del` and it will be removed. Check `,help`.*", inline=False)
+
+    embed.set_author(
+        name=ffn_author_name, url=ffn_author_url,
+        icon_url="https://pbs.twimg.com/profile_images/843841615122784256/WXbuqyjo_bigger.jpg")
+
+    if has_img:
+        embed.set_thumbnail(url=f"https://www.fanfiction.net{ffn_story_image}")
 
     return embed

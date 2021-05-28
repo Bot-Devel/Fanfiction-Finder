@@ -11,8 +11,9 @@ class Help(Cog):
 
     @command()
     async def help(self, ctx):
+
         try:
-            embed_pg, page_limit = get_embed(0)
+            embed_pg, page_limit = get_embed(ctx.author.id, 0)
             message = await ctx.send(embed=embed_pg)
             await message.add_reaction('⏮')
             await message.add_reaction('◀')
@@ -27,22 +28,23 @@ class Help(Cog):
             while True:
                 if str(reaction) == '⏮':
                     page = 0
-                    embed_pg, page_limit = get_embed(page)
+                    embed_pg, page_limit = get_embed(ctx.author.id, page)
                     await message.edit(embed=embed_pg)
                 elif str(reaction) == '◀':
                     if page > 0:
                         page -= 1
-                        embed_pg, page_limit = get_embed(page)
+                        embed_pg, page_limit = get_embed(ctx.author.id, page)
                         await message.edit(embed=embed_pg)
                 elif str(reaction) == '▶':
                     if page < page_limit:
                         page += 1
-                        embed_pg, page_limit = get_embed(page)
+                        embed_pg, page_limit = get_embed(ctx.author.id, page)
                         await message.edit(embed=embed_pg)
                 elif str(reaction) == '⏭':
                     page = page_limit-1
-                    embed_pg, page_limit = get_embed(page)
+                    embed_pg, page_limit = get_embed(ctx.author.id, page)
                     await message.edit(embed=embed_pg)
+
                 reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
                 await message.remove_reaction(reaction, user)
         except Exception as error:

@@ -1,24 +1,26 @@
-import discord
+from discord import Embed
 
 
-def get_embed(page=0):
-
-    page_limit = 3
+def get_embed(author_id, page=0):
+    page_limit = 4
 
     if page == 0:
-        embed = discord.Embed(
+        embed = Embed(
             title="Bot Usage Instructions",
+            description="**Bugfix for the broken config commands, check Page 4**"
         )
         embed.add_field(
             name="AO3 Searching:",
-            value="`ao3 [fic name]` or `ao3 [fic name] series` \
-            \n **Example:**\n1) `ao3 rogue knight` \n2) `ao3 prince of slytherin series`"
+            value="`linkao3 [fic name]` or `linkao3 [fic name] series` \
+            \n **Example:**\n1) `linkao3 rogue knight` \n2) `linkao3 prince of slytherin series`",
+            inline=False
         )
 
         embed.add_field(
             name="FFN Searching:",
-            value="`ffn [fic name]` \
-            \n **Example:**\n`ffn cadmean victory` "
+            value="`linkffn [fic name]` \
+            \n **Example:**\n`linkffn cadmean victory`",
+            inline=False
         )
         embed.add_field(
             name="\u200b",
@@ -26,16 +28,16 @@ def get_embed(page=0):
             inline=False
         )
         embed.add_field(
-            name="Search using code blocks:",
+            name="Search using single-lined code blocks or backquote:",
             value="This will search ffn first and if it can't find it in ffn, it will search in ao3. " +
-            "Use this when you are not sure if the fanfiction is from ffn or ao3.\n**Example:**\n" +
-            "\`cadmean victory\` will default to ffnet.\n\`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series."
+            "Use this when you are not sure if the fanfiction is from ffn or ao3.\n**Example:**\n \
+            \`cadmean victory\` will default to ffnet.\n\`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series."
         )
 
     elif page == 1:
-        embed = discord.Embed(
+        embed = Embed(
             title="Bot Configuration",
-            description="_**Do not give administrator permission to the bot.**_\nTo use these commands, you need administrator permission. \
+            description="**Do not give administrator permission to the bot.**\nTo use these commands, you need administrator permission. \
             \nGo to the channel you want to add/remove and use the below commands."
         )
         embed.add_field(
@@ -58,22 +60,28 @@ def get_embed(page=0):
 
         embed.add_field(
             name="To delete a bot message if it violates the server rules, the user who requested the bot to find the fanfiction can reply to the offending bot message by clicking on `Reply` and replying with `del`.",
-            value="\u200b", inline=False
+            value="**Note:** Help menu messages can also be deleted using this command.", inline=False
         )
 
     elif page == 2:
-        embed = discord.Embed(
+        embed = Embed(
             title="Bot Support",
-            description="Join the Bot's Discord Support Server if you need any help in setting up the bot or want to suggest any new features." +
+            description="Join the Bot's Discord Support Server if you want to report any bugs or want to suggest new features." +
             "\n[Discord Support Server](https://discord.gg/bRzzr3EBqH)"
         )
 
-    else:
-        embed = discord.Embed(
-            description="No more configuration options found!"
+    elif page == 3:
+        embed = Embed(
+            title="Bugfix for the broken config commands - 22nd May, 2021",
+            description="Few weeks back, the config commands i.e. `,allow`, `,disallow` etc were broken due to a Discord API change.\nTo fix the bug, the bot needs to have `manage_permissions=True` in all the channel settings.\nTwo temporary commands have been added: `,getChannels` & `,refreshPerms` to make the fix easier.\n Use `,getChannels` first, the bot will DM you a comma separated list of channels in which the bot has `send_messages=True` perms.\n Then give the bot admin perm, and use the `,refreshPerms channel_ids`, where channel_ids is the comma separated list of channels.\nEg: `,refreshPerms 752196383066554535, 852196383066554538, 751199383066554538`\nAfter you receive the success message, remove the admin perms from the bot.\n\n**It is not necessary to apply this fix unless you need to use the config commands since this bug doesn't stop the bot from functioning.**",
         )
 
-    page_footer = "Page: "+str(page+1)+"/"+str(page_limit)
+    else:
+        embed = Embed(
+            description="No more pages found!"
+        )
+
+    page_footer = f"Page: {str(page+1)}/{str(page_limit)} | User ID: {str(author_id)}"
     embed.set_footer(text=page_footer)
 
     return embed, page_limit
