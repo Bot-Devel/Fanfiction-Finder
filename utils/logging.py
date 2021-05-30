@@ -22,12 +22,12 @@ def create_logger(log_flag, request_id):
         log.addHandler(file_handler)
         log.setLevel(logging.INFO)
 
-    else:
+    # else:
         # adding console handler
-        console_handler = logging.StreamHandler()
-        console_handler_format = '%(asctime)s | %(levelname)s | %(filename)s: L%(lineno)d: %(funcName)s: %(message)s'
-        console_handler.setFormatter(logging.Formatter(console_handler_format))
-        log.addHandler(console_handler)
-        log.setLevel(logging.ERROR)
+        # console_handler = logging.StreamHandler()
+        # console_handler_format = '%(asctime)s | %(levelname)s | %(filename)s: L%(lineno)d: %(funcName)s: %(message)s'
+        # console_handler.setFormatter(logging.Formatter(console_handler_format))
+        # log.addHandler(console_handler)
+        # log.setLevel(logging.ERROR)
 
     return log

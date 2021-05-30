@@ -4,7 +4,6 @@ import asyncio
 import random
 import string
 import requests
-from datetime import datetime
 
 import discord
 from discord.ext import commands, tasks
@@ -14,12 +13,12 @@ from utils.metadata import ao3_metadata, ffn_metadata
 from utils.logging import create_logger
 
 # to use repl+uptime monitor
-# from utils.bot_uptime import start_server
+from utils.bot_uptime import start_server
 
-client = commands.Bot(command_prefix='-', help_command=None)
+client = commands.Bot(command_prefix=',', help_command=None)
 
 load_dotenv()
-TOKEN = os.getenv('DISCORD_CANARY_TOKEN')
+TOKEN = os.getenv('DISCORD_TOKEN')
 OWNER_ID = os.getenv('OWNER_ID')
 URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"
 
@@ -38,11 +37,8 @@ async def bot_uptime():
 
     while not client.is_closed():
 
-        resp = requests.get("https://fanfiction-finder-bot.roguedev1.repl.co/")
-        print(
-            f'{datetime.utcnow()} : {resp.status_code} : {resp.content}')
-
-        await asyncio.sleep(20)
+        requests.get("https://fanfiction-finder-bot.roguedev1.repl.co/")
+        await asyncio.sleep(30)
 
 
 @client.event
@@ -138,7 +134,6 @@ async def on_message(message):
         msg = msg.replace("linkffn", "")
         msg = msg.replace("-log", "")
 
-        await asyncio.sleep(2)
         embed_pg = ao3_metadata(msg, log)
 
         if embed_pg is None:  # if not found in ao3, search in ffn
@@ -159,7 +154,6 @@ async def on_message(message):
         msg = msg.replace("linkao3", "")
         msg = msg.replace("-log", "")
 
-        await asyncio.sleep(2)
         embed_pg = ffn_metadata(msg, log)
 
         if embed_pg is None:  # if not found in ffn, search in ao3
@@ -182,7 +176,6 @@ async def on_message(message):
             log.info("The backquote search was used. Searching ffn")
             i = i.replace("-log", "")
 
-            await asyncio.sleep(2)
             embed_pg = ffn_metadata(i, log)
 
             # if not found in ffn, search in ao3
@@ -223,7 +216,6 @@ async def on_message(message):
 
                     log.info("fanfiction.net URL was passed. Searching ffn")
 
-                    await asyncio.sleep(2)
                     embed_pg = ffn_metadata(url, log)
 
                     embed_pg.set_footer(
@@ -239,7 +231,6 @@ async def on_message(message):
                 if not re.search(r"/users/", url):
                     log.info("archiveofourown.org URL was passed. Searching ao3")
 
-                    await asyncio.sleep(2)
                     embed_pg = ao3_metadata(url, log)
 
                     embed_pg.set_footer(
@@ -257,7 +248,7 @@ async def on_message(message):
         os.remove(f"data/logs/{request_id}.log")
 
 bot_uptime.start()
-# start_server()
+start_server()
 client.load_extension("cogs.settings")
 client.load_extension("cogs.help")
 client.run(TOKEN)
