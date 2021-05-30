@@ -143,7 +143,10 @@ async def on_message(message):
         embed_pg.set_footer(text="User ID: "+str(message.author.id))
 
         log.info(f"Sending embed to Channel: {message.channel.name}")
-        await message.reply(embed=embed_pg, mention_author=False)
+        try:
+            await message.reply(embed=embed_pg, mention_author=False)
+        except Exception:
+            await message.channel.send(embed=embed_pg)
 
     elif re.search(r"^linkffn\b", query) is not None:
 
@@ -163,7 +166,10 @@ async def on_message(message):
         embed_pg.set_footer(text="User ID: "+str(message.author.id))
 
         log.info(f"Sending embed to Channel: {message.channel.name}")
-        await message.reply(embed=embed_pg, mention_author=False)
+        try:
+            await message.reply(embed=embed_pg, mention_author=False)
+        except Exception:
+            await message.channel.send(embed=embed_pg)
 
     # if in code blocks
     elif re.search(r"`(.*?)`", query) is not None:
@@ -190,7 +196,10 @@ async def on_message(message):
             embed_pg.set_footer(text="User ID: "+str(message.author.id))
 
             log.info(f"Sending embed to Channel: {message.channel.name}")
-            await message.reply(embed=embed_pg, mention_author=False)
+            try:
+                await message.reply(embed=embed_pg, mention_author=False)
+            except Exception:
+                await message.channel.send(embed=embed_pg)
 
     elif re.search(URL_VALIDATE, query) is not None:
 
@@ -209,13 +218,14 @@ async def on_message(message):
 
         for url in supported_url:
             await message.channel.trigger_typing()
+            await asyncio.sleep(2)
+
             if re.search(r"fanfiction.net\b",  url) is not None:
 
                 # ignore /u/ endpoint
                 if not re.search(r"/u/", url):
 
                     log.info("fanfiction.net URL was passed. Searching ffn")
-
                     embed_pg = ffn_metadata(url, log)
 
                     embed_pg.set_footer(
@@ -223,7 +233,10 @@ async def on_message(message):
 
                     log.info(
                         f"Sending embed to Channel: {message.channel.name}")
-                    await message.reply(embed=embed_pg, mention_author=False)
+                    try:
+                        await message.reply(embed=embed_pg, mention_author=False)
+                    except Exception:
+                        await message.channel.send(embed=embed_pg)
 
             if re.search(r"archiveofourown.org\b", url) is not None:
 
@@ -238,7 +251,10 @@ async def on_message(message):
 
                     log.info(
                         f"Sending embed to Channel: {message.channel.name}")
-                    await message.reply(embed=embed_pg, mention_author=False)
+                    try:
+                        await message.reply(embed=embed_pg, mention_author=False)
+                    except Exception:
+                        await message.channel.send(embed=embed_pg)
 
     if log_flag:
         await message.reply(file=discord.File(
