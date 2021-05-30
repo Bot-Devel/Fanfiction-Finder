@@ -1,8 +1,12 @@
 import logging
+import os
 from time import gmtime
 
 
 def create_logger(log_flag, request_id):
+
+    if not os.path.exists('data/logs'):
+        os.makedirs('data/logs')
 
     logging.Formatter.converter = gmtime
     logging.Formatter.default_time_format = '%Y-%m-%d %H:%M:%S %Z%z'
@@ -18,12 +22,12 @@ def create_logger(log_flag, request_id):
         log.addHandler(file_handler)
         log.setLevel(logging.INFO)
 
-    else:
+    # else:
         # adding console handler
-        console_handler = logging.StreamHandler()
-        console_handler_format = '%(asctime)s | %(levelname)s | %(filename)s: L%(lineno)d: %(funcName)s: %(message)s'
-        console_handler.setFormatter(logging.Formatter(console_handler_format))
-        log.addHandler(console_handler)
-        log.setLevel(logging.ERROR)
+        # console_handler = logging.StreamHandler()
+        # console_handler_format = '%(asctime)s | %(levelname)s | %(filename)s: L%(lineno)d: %(funcName)s: %(message)s'
+        # console_handler.setFormatter(logging.Formatter(console_handler_format))
+        # log.addHandler(console_handler)
+        # log.setLevel(logging.ERROR)
 
     return log
