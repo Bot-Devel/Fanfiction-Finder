@@ -1,15 +1,12 @@
 from bs4 import BeautifulSoup
 from discord import Embed, Colour
 import requests
-import time
 import re
 
 from utils.processing import story_last_up_clean, get_ao3_series_works_index
 
 
 def ao3_metadata_works(ao3_url, log):
-
-    time.sleep(2)
 
     ao3_page = requests.get(ao3_url)
     log.info(f"GET: {ao3_page.status_code}: {ao3_url}")
@@ -229,8 +226,6 @@ def ao3_metadata_works(ao3_url, log):
 
 
 def ao3_metadata_series(ao3_url, log):
-
-    time.sleep(2)
 
     ao3_page = requests.get(ao3_url)
     log.info(f"GET: {ao3_page.status_code}: {ao3_url}")

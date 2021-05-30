@@ -1,8 +1,12 @@
 import logging
+import os
 from time import gmtime
 
 
 def create_logger(log_flag, request_id):
+
+    if not os.path.exists('data/logs'):
+        os.makedirs('data/logs')
 
     logging.Formatter.converter = gmtime
     logging.Formatter.default_time_format = '%Y-%m-%d %H:%M:%S %Z%z'

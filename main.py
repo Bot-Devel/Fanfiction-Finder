@@ -13,8 +13,8 @@ from dotenv import load_dotenv
 from utils.metadata import ao3_metadata, ffn_metadata
 from utils.logging import create_logger
 
-# to use repl+uptime website monitor
-from utils.bot_uptime import start_server
+# to use repl+uptime monitor
+# from utils.bot_uptime import start_server
 
 client = commands.Bot(command_prefix='-', help_command=None)
 
@@ -138,6 +138,7 @@ async def on_message(message):
         msg = msg.replace("linkffn", "")
         msg = msg.replace("-log", "")
 
+        await asyncio.sleep(2)
         embed_pg = ao3_metadata(msg, log)
 
         if embed_pg is None:  # if not found in ao3, search in ffn
@@ -158,6 +159,7 @@ async def on_message(message):
         msg = msg.replace("linkao3", "")
         msg = msg.replace("-log", "")
 
+        await asyncio.sleep(2)
         embed_pg = ffn_metadata(msg, log)
 
         if embed_pg is None:  # if not found in ffn, search in ao3
@@ -179,6 +181,8 @@ async def on_message(message):
             await message.channel.trigger_typing()
             log.info("The backquote search was used. Searching ffn")
             i = i.replace("-log", "")
+
+            await asyncio.sleep(2)
             embed_pg = ffn_metadata(i, log)
 
             # if not found in ffn, search in ao3
@@ -218,6 +222,8 @@ async def on_message(message):
                 if not re.search(r"/u/", url):
 
                     log.info("fanfiction.net URL was passed. Searching ffn")
+
+                    await asyncio.sleep(2)
                     embed_pg = ffn_metadata(url, log)
 
                     embed_pg.set_footer(
@@ -232,6 +238,8 @@ async def on_message(message):
                 # ignore /users/ endpoint
                 if not re.search(r"/users/", url):
                     log.info("archiveofourown.org URL was passed. Searching ao3")
+
+                    await asyncio.sleep(2)
                     embed_pg = ao3_metadata(url, log)
 
                     embed_pg.set_footer(
@@ -249,7 +257,7 @@ async def on_message(message):
         os.remove(f"data/logs/{request_id}.log")
 
 bot_uptime.start()
-start_server()
+# start_server()
 client.load_extension("cogs.settings")
 client.load_extension("cogs.help")
 client.run(TOKEN)

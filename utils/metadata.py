@@ -1,6 +1,5 @@
 from discord import Embed, Colour
 import re
-import time
 from bs4 import BeautifulSoup
 import cloudscraper
 
@@ -96,8 +95,6 @@ def ffn_metadata(query, log):
             'desktop': True,
         }
     )
-
-    time.sleep(2)
 
     ffn_page = scraper.get(ffn_url)
     log.info(f"GET: {ffn_page.status_code}: {ffn_url}")
