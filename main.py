@@ -3,21 +3,23 @@ import re
 import asyncio
 import random
 import string
+import requests
+from datetime import datetime
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 from utils.metadata import ao3_metadata, ffn_metadata
 from utils.logging import create_logger
 
-# to use repl+uptimerobot website monitor
+# to use repl+uptime website monitor
 from utils.bot_uptime import start_server
 
-client = commands.Bot(command_prefix=',', help_command=None)
+client = commands.Bot(command_prefix='-', help_command=None)
 
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN = os.getenv('DISCORD_CANARY_TOKEN')
 OWNER_ID = os.getenv('OWNER_ID')
 URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"
 
@@ -27,6 +29,20 @@ async def on_ready():
     await client.change_presence(
         activity=discord.Game(name=",help")
     )
+
+
+@tasks.loop(seconds=10.0)
+async def bot_uptime():
+
+    await client.wait_until_ready()
+
+    while not client.is_closed():
+
+        resp = requests.get("https://fanfiction-finder-bot.roguedev1.repl.co/")
+        print(
+            f'{datetime.utcnow()} : {resp.status_code} : {resp.content}')
+
+        await asyncio.sleep(20)
 
 
 @client.event
@@ -83,10 +99,10 @@ async def on_message(message):
                     else:
                         log.info("User not authorized to delete the message")
                         await message.delete()
-                        msg = await message.channel.send(
+                        msg = await message.reply(
                             embed=discord.Embed(
                                 description="You are not allowed to delete someone else's message. \
-                                Only the message author can delete this message."))
+                                Only the message author can delete this message."), mention_author=False)
                         await asyncio.sleep(5)
                         await msg.delete()
 
@@ -94,18 +110,18 @@ async def on_message(message):
                     log.info(
                         "Message cannot be deleted since it doesn't contain the User ID in the footer. Can't verify messsage author.")
                     await message.delete()
-                    msg = await message.channel.send(
+                    msg = await message.reply(
                         embed=discord.Embed(
                             description="This message cannot be deleted because the  \
-                            message doesn't contain the User id at the footer. Can't verify messsage author."))
+                            message doesn't contain the User id at the footer. Can't verify messsage author."), mention_author=False)
                     await asyncio.sleep(5)
                     await msg.delete()
         else:
             log.info("Bot is only allowed to delete its own messages.")
             await message.delete()
-            msg = await message.channel.send(
+            msg = await message.reply(
                 embed=discord.Embed(
-                    description="I am not allowed to do that. I can only delete my messages."))
+                    description="I am not allowed to do that. I can only delete my messages."), mention_author=False)
             await asyncio.sleep(5)
             await msg.delete()
 
@@ -131,7 +147,7 @@ async def on_message(message):
         embed_pg.set_footer(text="User ID: "+str(message.author.id))
 
         log.info(f"Sending embed to Channel: {message.channel.name}")
-        await message.channel.send(embed=embed_pg)
+        await message.reply(embed=embed_pg, mention_author=False)
 
     elif re.search(r"^linkffn\b", query) is not None:
 
@@ -151,7 +167,7 @@ async def on_message(message):
         embed_pg.set_footer(text="User ID: "+str(message.author.id))
 
         log.info(f"Sending embed to Channel: {message.channel.name}")
-        await message.channel.send(embed=embed_pg)
+        await message.reply(embed=embed_pg, mention_author=False)
 
     # if in code blocks
     elif re.search(r"`(.*?)`", query) is not None:
@@ -177,7 +193,7 @@ async def on_message(message):
             embed_pg.set_footer(text="User ID: "+str(message.author.id))
 
             log.info(f"Sending embed to Channel: {message.channel.name}")
-            await message.channel.send(embed=embed_pg)
+            await message.reply(embed=embed_pg, mention_author=False)
 
     elif re.search(URL_VALIDATE, query) is not None:
 
@@ -209,7 +225,7 @@ async def on_message(message):
 
                     log.info(
                         f"Sending embed to Channel: {message.channel.name}")
-                    await message.channel.send(embed=embed_pg)
+                    await message.reply(embed=embed_pg, mention_author=False)
 
             if re.search(r"archiveofourown.org\b", url) is not None:
 
@@ -223,15 +239,16 @@ async def on_message(message):
 
                     log.info(
                         f"Sending embed to Channel: {message.channel.name}")
-                    await message.channel.send(embed=embed_pg)
+                    await message.reply(embed=embed_pg, mention_author=False)
 
     if log_flag:
-        await message.channel.send(file=discord.File(
+        await message.reply(file=discord.File(
             f"data/logs/{request_id}.log"
-        ))
+        ), mention_author=False)
         # delete the log
         os.remove(f"data/logs/{request_id}.log")
 
+bot_uptime.start()
 start_server()
 client.load_extension("cogs.settings")
 client.load_extension("cogs.help")
