@@ -59,6 +59,11 @@ def get_embed(author_id, page=0):
         )
 
         embed.add_field(
+            name="To delete all non-bot messages from the channel i.e. all the users except the bot. Useful for archive channels.",
+            value="`,clr-msgs`", inline=False
+        )
+
+        embed.add_field(
             name="To delete a bot message if it violates the server rules, the user who requested the bot to find the fanfiction can reply to the offending bot message by clicking on `Reply` and replying with `del`.",
             value="**Note:** Help menu messages can also be deleted using this command.", inline=False
         )

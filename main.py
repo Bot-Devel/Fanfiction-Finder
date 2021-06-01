@@ -257,9 +257,17 @@ async def on_message(message):
                         await message.channel.send(embed=embed_pg)
 
     if log_flag:
-        await message.reply(file=discord.File(
-            f"data/logs/{request_id}.log"
-        ), mention_author=False)
+
+        try:
+            await message.reply(file=discord.File(
+                f"data/logs/{request_id}.log"
+            ), mention_author=False)
+
+        except Exception:
+            await message.channel.send(file=discord.File(
+                f"data/logs/{request_id}.log"
+            ))
+
         # delete the log
         os.remove(f"data/logs/{request_id}.log")
 

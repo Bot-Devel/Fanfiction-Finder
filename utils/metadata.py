@@ -49,6 +49,10 @@ def ao3_metadata(query, log):
         ao3_url = "https://archiveofourown.org/series/"+ao3_series_id
 
         embed = ao3_metadata_series(ao3_url, log)
+    else:
+        embed = Embed(
+            description="Fanfiction not found",
+            colour=Colour.red())
 
     return embed
 
