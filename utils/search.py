@@ -20,19 +20,27 @@ def get_ao3_url(query, log):
     for link in found:
         href.append(link['href'])
 
-    if re.search(r"\bseries\b", url) is not None:  # if the query has series
+    if re.search(r"\bseries\b", url):  # if the query has series
         for i in range(len(href)):
             if re.search(r"\barchiveofourown.org/series/\b", href[i]) is not None:
                 log.info(f"URL FOUND: {href[i]}")
                 ao3_list.append(href[i])
 
-    else:
+    else:  # if query is unspecified
         for i in range(len(href)):
+
+            # append /works/ first
             if re.search(r"\barchiveofourown.org/works/\b", href[i]) is not None:
                 log.info(f"URL FOUND: {href[i]}")
                 ao3_list.append(href[i])
 
+            # append /chapters/ next
             if re.search(r"\barchiveofourown.org/chapters/\b", href[i]) is not None:
+                log.info(f"URL FOUND: {href[i]}")
+                ao3_list.append(href[i])
+
+            # append /series/ next
+            if re.search(r"\barchiveofourown.org/series/\b", href[i]) is not None:
                 log.info(f"URL FOUND: {href[i]}")
                 ao3_list.append(href[i])
 
