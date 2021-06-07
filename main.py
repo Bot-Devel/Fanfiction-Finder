@@ -180,6 +180,7 @@ async def on_message(message):
         for i in str_found:
             await message.channel.trigger_typing()
             log.info("The backquote search was used. Searching ffn")
+
             i = i.replace("-log", "")
 
             embed_pg = ffn_metadata(i, log)
@@ -203,6 +204,7 @@ async def on_message(message):
 
     elif re.search(URL_VALIDATE, query) is not None:
 
+        log.info("URL was passed. Verifying if URL is supported")
         url_found = re.findall(URL_VALIDATE, query.lower(), re.MULTILINE)
 
         supported_url = []
