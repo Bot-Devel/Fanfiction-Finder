@@ -1,7 +1,7 @@
-import requests
 import re
 from datetime import datetime
 from bs4 import BeautifulSoup
+import cloudscraper
 
 from utils.processing import story_last_up_clean
 
@@ -17,12 +17,19 @@ class FanFictionNet:
 
         if re.search(URL_VALIDATE, self.BaseUrl):
 
-            self.session = requests.Session()
-
             self.log.info(
                 f"Processing {self.BaseUrl} ")
 
-            response = self.session.get(self.BaseUrl)
+            self.scraper = cloudscraper.CloudScraper(
+                delay=2, browser={
+                    'browser': 'chrome',
+                    'platform': 'windows',
+                    'mobile': False,
+                    'desktop': True,
+                }
+            )
+
+            response = self.scraper.get(self.BaseUrl)
             # response = self.session.get(
             #     f"https://cloudscraper-proxy.roguedev1.repl.co/v1?q={self.BaseUrl}")
 

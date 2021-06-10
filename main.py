@@ -1,9 +1,10 @@
 import os
 import re
-import asyncio
 import random
 import string
-import requests
+
+import asyncio
+import aiohttp
 
 import discord
 from discord.ext import commands, tasks
@@ -36,9 +37,11 @@ async def bot_uptime():
     await client.wait_until_ready()
 
     while not client.is_closed():
+        async with aiohttp.ClientSession() as session:
+            async with session \
+                    .get("https://fanfiction-finder-bot.roguedev1.repl.co/") as response:
 
-        requests.get("https://fanfiction-finder-bot.roguedev1.repl.co/")
-        await asyncio.sleep(30)
+                await asyncio.sleep(20)
 
 
 @client.event
@@ -129,6 +132,7 @@ async def on_message(message):
 
         log.info("linkao3 command was used. Searching ao3")
         await message.channel.trigger_typing()
+        await asyncio.sleep(1)
 
         msg = query.replace("linkao3", "")
         msg = msg.replace("linkffn", "")
@@ -152,6 +156,7 @@ async def on_message(message):
 
         log.info("linkffn command was used. Searching ffn")
         await message.channel.trigger_typing()
+        await asyncio.sleep(1)
 
         msg = query.replace("linkffn", "")
         msg = msg.replace("linkao3", "")
@@ -174,15 +179,15 @@ async def on_message(message):
     # if in code blocks
     elif re.search(r"`(.*?)`", query) is not None:
 
+        log.info("The backquote search was used. Searching ffn")
         str_found = re.findall(r"`(.*?)`", query.lower(), re.MULTILINE)
         str_found = str_found[:2]  # to limit the search query to 2 only
 
         for i in str_found:
             await message.channel.trigger_typing()
-            log.info("The backquote search was used. Searching ffn")
+            await asyncio.sleep(1)
 
             i = i.replace("-log", "")
-
             embed_pg = ffn_metadata(i, log)
 
             # if not found in ffn, search in ao3
