@@ -2,9 +2,8 @@ import os
 import re
 import random
 import string
-
 import asyncio
-import aiohttp
+from itertools import cycle
 
 import discord
 from discord.ext import commands, tasks
@@ -23,25 +22,23 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 OWNER_ID = os.getenv('OWNER_ID')
 URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"
 
-
-@client.event
-async def on_ready():
-    await client.change_presence(
-        activity=discord.Game(name=",help")
-    )
+with open("data/status_quotes.txt", "r") as file:
+    quotes = cycle(file.readlines())
 
 
-@tasks.loop(seconds=10.0)
-async def bot_uptime():
+@tasks.loop(seconds=1)
+async def bot_status():
 
     await client.wait_until_ready()
 
-    while not client.is_closed():
-        async with aiohttp.ClientSession() as session:
-            async with session \
-                    .get("https://fanfiction-finder-bot.roguedev1.repl.co/") as response:
+    await client.change_presence(
+        activity=discord.Activity(
+            type=discord.ActivityType.watching,
+            name=(next(quotes)).strip()
+        )
+    )
 
-                await asyncio.sleep(20)
+    await asyncio.sleep(15)
 
 
 @client.event
@@ -278,7 +275,7 @@ async def on_message(message):
         # delete the log
         os.remove(f"data/logs/{request_id}.log")
 
-bot_uptime.start()
+bot_status.start()
 start_server()
 client.load_extension("cogs.settings")
 client.load_extension("cogs.help")
