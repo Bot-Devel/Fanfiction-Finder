@@ -28,6 +28,10 @@ with open("data/status_quotes.txt", "r") as file:
 
 @tasks.loop(seconds=1)
 async def bot_status():
+    """
+    An activity status which cycles through the
+    status_quotes.txt every 15s
+    """
 
     await client.wait_until_ready()
 
@@ -129,6 +133,7 @@ async def on_message(message):
 
         log.info("linkao3 command was used. Searching ao3")
         await message.channel.trigger_typing()
+        log.info("Sleeping for 1s to avoid ratelimit")
         await asyncio.sleep(1)
 
         msg = query.replace("linkao3", "")
@@ -153,6 +158,7 @@ async def on_message(message):
 
         log.info("linkffn command was used. Searching ffn")
         await message.channel.trigger_typing()
+        log.info("Sleeping for 1s to avoid ratelimit")
         await asyncio.sleep(1)
 
         msg = query.replace("linkffn", "")
@@ -182,6 +188,7 @@ async def on_message(message):
 
         for i in str_found:
             await message.channel.trigger_typing()
+            log.info("Sleeping for 1s to avoid ratelimit")
             await asyncio.sleep(1)
 
             i = i.replace("-log", "")
@@ -222,6 +229,7 @@ async def on_message(message):
 
         for url in supported_url:
             await message.channel.trigger_typing()
+            log.info("Sleeping for 2s to avoid ratelimit")
             await asyncio.sleep(2)
 
             if re.search(r"fanfiction.net\b",  url) is not None:

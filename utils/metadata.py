@@ -40,6 +40,7 @@ def ao3_metadata(query, log):
 
         fic = ArchiveOfOurOwn(ao3_url, log)
         fic.get_ao3_works_metadata()
+        fic.get_author_profile_image()
 
         if fic.ao3_works_name is None:
             return Embed(description="Fanfiction not found",
@@ -108,6 +109,7 @@ def ao3_metadata(query, log):
 
         fic = ArchiveOfOurOwn(ao3_url, log)
         fic.get_ao3_series_metadata()
+        fic.get_author_profile_image()
 
         if fic.ao3_series_name is None:
             return Embed(description="Fanfiction not found",
@@ -153,6 +155,10 @@ def ao3_metadata(query, log):
         embed = Embed(
             description="Fanfiction not found",
             colour=Colour.red())
+
+    if fic.has_img:
+        embed.set_thumbnail(
+            url=fic.ao3_author_img)
 
     return embed
 

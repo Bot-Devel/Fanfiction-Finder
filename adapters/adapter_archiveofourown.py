@@ -313,3 +313,23 @@ class ArchiveOfOurOwn:
 
         else:
             self.log.error("BaseUrl is invalid")
+
+    def get_author_profile_image(self):
+
+        self.has_img = False
+        author_profile_url = f"https://archiveofourown.org/users/{self.ao3_author_name}/profile"
+        response = self.session.get(author_profile_url)
+
+        self.log.info(f"GET: {response.status_code}: {author_profile_url}")
+        profile_soup = BeautifulSoup(response.content, 'html.parser')
+
+        try:
+            self.ao3_author_img = (profile_soup.find(
+                'p', attrs={'class': 'icon'}).find('img'))['src']
+            self.has_img = True
+
+        except AttributeError:
+            self.has_img = False
+            self.log.info(
+                "ao3_works_name is missing. Fanfiction not found")
+            self.ao3_works_name = None
