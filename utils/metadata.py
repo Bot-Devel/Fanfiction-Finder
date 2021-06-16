@@ -156,7 +156,7 @@ def ao3_metadata(query, log):
             description="Fanfiction not found",
             colour=Colour.red())
 
-    if fic.has_img:
+    if fic.ao3_author_img:
         embed.set_thumbnail(
             url=fic.ao3_author_img)
 
@@ -256,7 +256,7 @@ def ffn_metadata(query, log):
         name=fic.ffn_author_name, url=fic.ffn_author_url,
         icon_url="https://pbs.twimg.com/profile_images/843841615122784256/WXbuqyjo_bigger.jpg")
 
-    if fic.has_img:
+    if fic.ffn_story_image:
         embed.set_thumbnail(
             url=f"https://www.fanfiction.net{fic.ffn_story_image}")
 

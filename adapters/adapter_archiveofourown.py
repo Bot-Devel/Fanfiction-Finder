@@ -12,12 +12,11 @@ class ArchiveOfOurOwn:
     def __init__(self, BaseUrl, log):
         self.BaseUrl = BaseUrl
         self.log = log
+        self.session = requests.Session()
 
     def get_ao3_works_metadata(self):
 
         if re.search(URL_VALIDATE, self.BaseUrl):
-
-            self.session = requests.Session()
 
             self.log.info(
                 f"Processing {self.BaseUrl} ")
@@ -198,8 +197,6 @@ class ArchiveOfOurOwn:
 
         if re.search(URL_VALIDATE, self.BaseUrl):
 
-            self.session = requests.Session()
-
             response = self.session.get(self.BaseUrl)
 
             self.log.info(
@@ -326,10 +323,16 @@ class ArchiveOfOurOwn:
         try:
             self.ao3_author_img = (profile_soup.find(
                 'p', attrs={'class': 'icon'}).find('img'))['src']
-            self.has_img = True
 
         except AttributeError:
-            self.has_img = False
             self.log.info(
-                "ao3_works_name is missing. Fanfiction not found")
-            self.ao3_works_name = None
+                "ao3_author_img is missing.")
+            self.ao3_author_img = None
+
+        try:
+            # if author image not found
+            if not self.ao3_author_img.startswith("http"):
+                self.ao3_author_img = None
+
+        except AttributeError:  # if None
+            pass

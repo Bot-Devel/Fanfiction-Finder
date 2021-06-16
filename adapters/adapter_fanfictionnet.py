@@ -71,15 +71,15 @@ class FanFictionNet:
                 'span', attrs={'class': 'lc-left'}).find(
                 'a', attrs={'class': 'xcontrast_txt'}).text
 
-            self.has_img = False
             try:
-                self.has_img = True
                 self.ffn_story_image = (ffn_soup.find(
                     'div', attrs={'id': 'profile_top'}).find(
                     'img', attrs={'class': 'cimage'}))['src']
 
-            except TypeError:
-                self.has_img = False
+            except (TypeError, AttributeError):
+                self.log.info(
+                    "ffn_story_image is missing")
+                self.ffn_story_image = None
 
             # if the fandom isnt crossover, then go to the next <a>
             if not re.search(r"\bcrossover\b", self.ffn_story_fandom, re.IGNORECASE):
