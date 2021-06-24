@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 from bs4 import BeautifulSoup
+from loguru import logger
 import cloudscraper
 
 from utils.processing import story_last_up_clean
@@ -9,15 +10,14 @@ URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[0
 
 
 class FanFictionNet:
-    def __init__(self, BaseUrl, log):
+    def __init__(self, BaseUrl):
         self.BaseUrl = BaseUrl
-        self.log = log
 
     def get_ffn_story_metadata(self):
 
         if re.search(URL_VALIDATE, self.BaseUrl):
 
-            self.log.info(
+            logger.info(
                 f"Processing {self.BaseUrl} ")
 
             self.scraper = cloudscraper.CloudScraper(
@@ -33,7 +33,7 @@ class FanFictionNet:
             # response = self.session.get(
             #     f"https://cloudscraper-proxy.roguedev1.repl.co/v1?q={self.BaseUrl}")
 
-            self.log.info(f"GET: {response.status_code}: {self.BaseUrl}")
+            logger.debug(f"GET: {response.status_code}: {self.BaseUrl}")
 
             ffn_soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -42,7 +42,7 @@ class FanFictionNet:
                     0].string.strip()
 
             except IndexError:  # Story Not Found
-                self.log.error(
+                logger.error(
                     "ffn_story_name is missing. Fanfiction not found")
                 self.ffn_story_name = None
                 return
@@ -64,7 +64,7 @@ class FanFictionNet:
                     'class': 'xcontrast_txt'})[0].string.strip()
 
             except IndexError:  # Missing summary
-                self.log.error("ffn_story_summary is missing.")
+                logger.error("ffn_story_summary is missing.")
                 self.ffn_story_summary = ""
 
             self.ffn_story_fandom = ffn_soup.find(
@@ -77,7 +77,7 @@ class FanFictionNet:
                     'img', attrs={'class': 'cimage'}))['src']
 
             except (TypeError, AttributeError):
-                self.log.info(
+                logger.error(
                     "ffn_story_image is missing")
                 self.ffn_story_image = None
 
@@ -232,4 +232,4 @@ class FanFictionNet:
                     r"^(.*?)&", self.BaseUrl).group(1)
 
         else:
-            self.log.error("BaseUrl is invalid")
+            logger.error("BaseUrl is invalid")
