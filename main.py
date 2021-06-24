@@ -4,13 +4,13 @@ import random
 import string
 import asyncio
 from itertools import cycle
+from loguru import logger
 
 import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 from utils.metadata import ao3_metadata, ffn_metadata
-from utils.logging import create_logger
 
 # to use repl+uptime monitor
 from utils.bot_uptime import start_server
@@ -62,7 +62,13 @@ async def on_message(message):
     request_id = ''.join(random.choice(string.ascii_lowercase)
                          for i in range(10))
 
-    log = create_logger(log_flag, request_id)
+    # create log directory
+    if not os.path.exists('data/logs'):
+        os.makedirs('data/logs')
+
+    logger.add(
+        f"data/logs/{request_id}.log", enqueue=True,
+        format="{time:YYYY-MM-DD HH:mm:ss!UTC} | {level} | {file}:{function}:{line} - {message}")
 
     # To run client.commands & client.event simultaneously
     await client.process_commands(message)
@@ -77,7 +83,7 @@ async def on_message(message):
 
     if re.search(r"^del\b", query) and message.reference is not None:
 
-        log.info("del command was used!")
+        logger.info("del command was used")
         message_ref = message.reference  # message id of reply
         message_to_delete = await message.channel.fetch_message(message_ref.message_id)
 
@@ -97,7 +103,8 @@ async def on_message(message):
                         await message.delete()
 
                     else:
-                        log.info("User not authorized to delete the message")
+                        logger.info(
+                            "User not authorized to delete the message")
                         await message.delete()
                         msg = await message.reply(
                             embed=discord.Embed(
@@ -107,7 +114,7 @@ async def on_message(message):
                         await msg.delete()
 
                 except (KeyError, ValueError):
-                    log.info(
+                    logger.info(
                         "Message cannot be deleted since it doesn't contain the User ID in the footer. Can't verify messsage author.")
                     await message.delete()
                     msg = await message.reply(
@@ -117,7 +124,7 @@ async def on_message(message):
                     await asyncio.sleep(5)
                     await msg.delete()
         else:
-            log.info("Bot is only allowed to delete its own messages.")
+            logger.info("Bot is only allowed to delete its own messages.")
             await message.delete()
             msg = await message.reply(
                 embed=discord.Embed(
@@ -126,29 +133,29 @@ async def on_message(message):
             await msg.delete()
 
     if message.guild is None:
-        log.info("Not allowed to reply to DMs.")
+        logger.info("Not allowed to reply to DMs.")
         return  # Do not reply to DMs
 
     elif re.search(r"^linkao3\b", query) is not None:
 
-        log.info("linkao3 command was used. Searching ao3")
+        logger.info("linkao3 command was used. Searching ao3")
         await message.channel.trigger_typing()
-        log.info("Sleeping for 1s to avoid ratelimit")
+        logger.info("Sleeping for 1s to avoid ratelimit")
         await asyncio.sleep(1)
 
         msg = query.replace("linkao3", "")
         msg = msg.replace("linkffn", "")
         msg = msg.replace("-log", "")
 
-        embed_pg = ao3_metadata(msg, log)
+        embed_pg = ao3_metadata(msg)
 
         if embed_pg is None:  # if not found in ao3, search in ffn
-            log.info("Fanfiction not found in ao3, trying to search ffn")
-            embed_pg = ffn_metadata(msg, log)
+            logger.info("Fanfiction not found in ao3, trying to search ffn")
+            embed_pg = ffn_metadata(msg)
 
         embed_pg.set_footer(text="User ID: "+str(message.author.id))
 
-        log.info(f"Sending embed to Channel: {message.channel.name}")
+        logger.info(f"Sending embed to Channel: {message.channel.name}")
         try:
             await message.reply(embed=embed_pg, mention_author=False)
         except Exception:
@@ -156,24 +163,24 @@ async def on_message(message):
 
     elif re.search(r"^linkffn\b", query) is not None:
 
-        log.info("linkffn command was used. Searching ffn")
+        logger.info("linkffn command was used. Searching ffn")
         await message.channel.trigger_typing()
-        log.info("Sleeping for 1s to avoid ratelimit")
+        logger.info("Sleeping for 1s to avoid ratelimit")
         await asyncio.sleep(1)
 
         msg = query.replace("linkffn", "")
         msg = msg.replace("linkao3", "")
         msg = msg.replace("-log", "")
 
-        embed_pg = ffn_metadata(msg, log)
+        embed_pg = ffn_metadata(msg)
 
         if embed_pg is None:  # if not found in ffn, search in ao3
-            log.info("Fanfiction not found in ffn, trying to search ao3")
-            embed_pg = ao3_metadata(msg, log)
+            logger.info("Fanfiction not found in ffn, trying to search ao3")
+            embed_pg = ao3_metadata(msg)
 
         embed_pg.set_footer(text="User ID: "+str(message.author.id))
 
-        log.info(f"Sending embed to Channel: {message.channel.name}")
+        logger.info(f"Sending embed to Channel: {message.channel.name}")
         try:
             await message.reply(embed=embed_pg, mention_author=False)
         except Exception:
@@ -182,30 +189,31 @@ async def on_message(message):
     # if in code blocks
     elif re.search(r"`(.*?)`", query) is not None:
 
-        log.info("The backquote search was used. Searching ffn")
+        logger.info("The backquote search was used. Searching ffn")
         str_found = re.findall(r"`(.*?)`", query.lower(), re.MULTILINE)
         str_found = str_found[:2]  # to limit the search query to 2 only
 
         for i in str_found:
             await message.channel.trigger_typing()
-            log.info("Sleeping for 1s to avoid ratelimit")
+            logger.info("Sleeping for 1s to avoid ratelimit")
             await asyncio.sleep(1)
 
             i = i.replace("-log", "")
-            embed_pg = ffn_metadata(i, log)
+            embed_pg = ffn_metadata(i)
 
             # if not found in ffn, search in ao3
             if embed_pg is None or embed_pg.description.startswith("Fanfiction not found"):
-                log.info("Fanfiction not found on ao3. Trying to search ao3")
+                logger.info(
+                    "Fanfiction not found on ao3. Trying to search ao3")
 
                 msg = i.replace("ao3", "")
                 msg = msg.replace("-log", "")
 
-                embed_pg = ao3_metadata(msg, log)
+                embed_pg = ao3_metadata(msg)
 
             embed_pg.set_footer(text="User ID: "+str(message.author.id))
 
-            log.info(f"Sending embed to Channel: {message.channel.name}")
+            logger.info(f"Sending embed to Channel: {message.channel.name}")
             try:
                 await message.reply(embed=embed_pg, mention_author=False)
             except Exception:
@@ -213,7 +221,7 @@ async def on_message(message):
 
     elif re.search(URL_VALIDATE, query) is not None:
 
-        log.info("URL was passed. Verifying if URL is supported")
+        logger.info("URL was passed. Verifying if URL is supported")
         url_found = re.findall(URL_VALIDATE, query.lower(), re.MULTILINE)
 
         supported_url = []
@@ -229,7 +237,7 @@ async def on_message(message):
 
         for url in supported_url:
             await message.channel.trigger_typing()
-            log.info("Sleeping for 2s to avoid ratelimit")
+            logger.info("Sleeping for 2s to avoid ratelimit")
             await asyncio.sleep(2)
 
             if re.search(r"fanfiction.net\b",  url) is not None:
@@ -237,13 +245,13 @@ async def on_message(message):
                 # ignore /u/ endpoint
                 if not re.search(r"/u/", url):
 
-                    log.info("fanfiction.net URL was passed. Searching ffn")
-                    embed_pg = ffn_metadata(url, log)
+                    logger.info("fanfiction.net URL was passed. Searching ffn")
+                    embed_pg = ffn_metadata(url)
 
                     embed_pg.set_footer(
                         text="User ID: "+str(message.author.id))
 
-                    log.info(
+                    logger.info(
                         f"Sending embed to Channel: {message.channel.name}")
                     try:
                         await message.reply(embed=embed_pg, mention_author=False)
@@ -254,14 +262,15 @@ async def on_message(message):
 
                 # ignore /users/ endpoint
                 if not re.search(r"/users/", url):
-                    log.info("archiveofourown.org URL was passed. Searching ao3")
+                    logger.info(
+                        "archiveofourown.org URL was passed. Searching ao3")
 
-                    embed_pg = ao3_metadata(url, log)
+                    embed_pg = ao3_metadata(url)
 
                     embed_pg.set_footer(
                         text="User ID: "+str(message.author.id))
 
-                    log.info(
+                    logger.info(
                         f"Sending embed to Channel: {message.channel.name}")
                     try:
                         await message.reply(embed=embed_pg, mention_author=False)

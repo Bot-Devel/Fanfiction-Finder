@@ -1,5 +1,7 @@
-from discord import Embed, Colour
 import re
+from discord import Embed, Colour
+from loguru import logger
+
 
 from utils.search import get_ao3_url, get_ffn_url
 from adapters.adapter_archiveofourown import ArchiveOfOurOwn
@@ -9,28 +11,28 @@ from adapters.adapter_fanfictionnet import FanFictionNet
 URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"
 
 
-def ao3_metadata(query, log):
+def ao3_metadata(query):
 
     query = query.strip()
-    log.info(f"QUERY: {query}")
+    logger.info(f"QUERY: {query}")
 
     if re.search(URL_VALIDATE, query) is None:
         query = query.replace(" ", "+")
 
-        log.info("query not an URL. Calling get_ao3_url()")
-        ao3_url = get_ao3_url(query, log)
+        logger.info("Query not an URL. Calling get_ao3_url()")
+        ao3_url = get_ao3_url(query)
 
     else:  # extract the url from the query if it contains an url
-        log.info("query is an URL")
+        logger.info("Query is an URL")
         ao3_url = re.search(URL_VALIDATE, query).group(0)
 
     if ao3_url is None:
-        log.info("Fanfiction not found")
+        logger.info("Fanfiction not found")
         return Embed(
             description="Fanfiction not found",
             colour=Colour.red())
 
-    log.info(f"Processing {ao3_url}")
+    logger.info(f"Processing {ao3_url}")
 
     if re.search(r"/works/\b", ao3_url) is not None:
 
@@ -38,7 +40,7 @@ def ao3_metadata(query, log):
         ao3_works_id = str(re.search(r"\d+", ao3_url).group(0))
         ao3_url = "https://archiveofourown.org/works/"+ao3_works_id
 
-        fic = ArchiveOfOurOwn(ao3_url, log)
+        fic = ArchiveOfOurOwn(ao3_url)
         fic.get_ao3_works_metadata()
         fic.get_author_profile_image()
 
@@ -107,7 +109,7 @@ def ao3_metadata(query, log):
         ao3_series_id = str(re.search(r"\d+", ao3_url).group(0))
         ao3_url = "https://archiveofourown.org/series/"+ao3_series_id
 
-        fic = ArchiveOfOurOwn(ao3_url, log)
+        fic = ArchiveOfOurOwn(ao3_url)
         fic.get_ao3_series_metadata()
         fic.get_author_profile_image()
 
@@ -163,10 +165,10 @@ def ao3_metadata(query, log):
     return embed
 
 
-def ffn_metadata(query, log):
+def ffn_metadata(query):
 
     query = query.strip()
-    log.info(f"QUERY: {query}")
+    logger.info(f"QUERY: {query}")
 
     if re.search(URL_VALIDATE, query) is None:
 
@@ -176,28 +178,28 @@ def ffn_metadata(query, log):
 
         query = query.replace(" ", "+")
 
-        log.info("query not an URL. Calling get_ffn_url()")
-        ffn_url = get_ffn_url(query, log)
+        logger.info("Query not an URL. Calling get_ffn_url()")
+        ffn_url = get_ffn_url(query)
 
     else:  # extract the url from the query if it contains an url
-        log.info("query is an URL")
+        logger.info("Query is an URL")
         ffn_url = re.search(
             URL_VALIDATE, query).group(0)
 
     if ffn_url is None:
-        log.info("Fanfiction not found")
+        logger.info("Fanfiction not found")
         embed = Embed(
             description="Fanfiction not found",
             colour=Colour.red())
         return embed
 
-    log.info(f"Processing {ffn_url}")
+    logger.info(f"Processing {ffn_url}")
 
     # extract story id from the url
     ffn_story_id = str(re.search(r"\d+", ffn_url).group(0))
     ffn_url = "https://www.fanfiction.net/s/"+ffn_story_id
 
-    fic = FanFictionNet(ffn_url, log)
+    fic = FanFictionNet(ffn_url)
     fic.get_ffn_story_metadata()
 
     if fic.ffn_story_name is None:

@@ -1,6 +1,7 @@
 import requests
 import re
 from bs4 import BeautifulSoup
+from loguru import logger
 
 from utils.processing import story_last_up_clean, get_ao3_series_works_index
 
@@ -9,21 +10,20 @@ URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[0
 
 
 class ArchiveOfOurOwn:
-    def __init__(self, BaseUrl, log):
+    def __init__(self, BaseUrl):
         self.BaseUrl = BaseUrl
-        self.log = log
         self.session = requests.Session()
 
     def get_ao3_works_metadata(self):
 
         if re.search(URL_VALIDATE, self.BaseUrl):
 
-            self.log.info(
+            logger.info(
                 f"Processing {self.BaseUrl} ")
 
             response = self.session.get(self.BaseUrl)
 
-            self.log.info(f"GET: {response.status_code}: {self.BaseUrl}")
+            logger.debug(f"GET: {response.status_code}: {self.BaseUrl}")
 
             ao3_soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -32,7 +32,7 @@ class ArchiveOfOurOwn:
                     'h2', attrs={'class': 'title heading'}).contents[0]).strip()
 
             except AttributeError:
-                self.log.info(
+                logger.error(
                     "ao3_works_name is missing. Fanfiction not found")
                 self.ao3_works_name = None
                 return
@@ -191,7 +191,7 @@ class ArchiveOfOurOwn:
                     r"^(.*?)&", self.BaseUrl).group(1)
 
         else:
-            self.log.error("BaseUrl is invalid")
+            logger.error("BaseUrl is invalid")
 
     def get_ao3_series_metadata(self):
 
@@ -199,10 +199,10 @@ class ArchiveOfOurOwn:
 
             response = self.session.get(self.BaseUrl)
 
-            self.log.info(
+            logger.info(
                 f"Processing {self.BaseUrl} ")
 
-            self.log.info(f"GET: {response.status_code}: {self.BaseUrl}")
+            logger.debug(f"GET: {response.status_code}: {self.BaseUrl}")
             ao3_soup = BeautifulSoup(response.content, 'html.parser')
 
             try:
@@ -211,7 +211,7 @@ class ArchiveOfOurOwn:
                     'h2', attrs={'class': 'heading'}).contents[0]).strip()
 
             except AttributeError:
-                self.log.info(
+                logger.error(
                     "ao3_series_name is missing. Fanfiction not found")
                 self.ao3_series_name = None
                 return
@@ -309,7 +309,7 @@ class ArchiveOfOurOwn:
                     r"^(.*?)&", self.BaseUrl).group(1)
 
         else:
-            self.log.error("BaseUrl is invalid")
+            logger.error("BaseUrl is invalid")
 
     def get_author_profile_image(self):
 
@@ -317,7 +317,7 @@ class ArchiveOfOurOwn:
         author_profile_url = f"https://archiveofourown.org/users/{self.ao3_author_name}/profile"
         response = self.session.get(author_profile_url)
 
-        self.log.info(f"GET: {response.status_code}: {author_profile_url}")
+        logger.debug(f"GET: {response.status_code}: {author_profile_url}")
         profile_soup = BeautifulSoup(response.content, 'html.parser')
 
         try:
@@ -325,7 +325,7 @@ class ArchiveOfOurOwn:
                 'p', attrs={'class': 'icon'}).find('img'))['src']
 
         except AttributeError:
-            self.log.info(
+            logger.error(
                 "ao3_author_img is missing.")
             self.ao3_author_img = None
 
