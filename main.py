@@ -83,57 +83,6 @@ async def on_message(message):
 
         msg = list(message.content.lower())
 
-        if re.search(r"^del\b", query) and message.reference is not None:
-
-            logger.info("del command was used")
-            message_ref = message.reference  # message id of reply
-            message_to_delete = await message.channel.fetch_message(message_ref.message_id)
-
-            # if the messsage was created by a bot
-            if message_to_delete.author.bot:
-                embeds = message_to_delete.embeds
-                for embed in embeds:
-                    try:
-                        footer = embed.to_dict()['footer']['text']
-
-                        author_id = (re.search(r"(User ID:)(.*)",
-                                               footer)).group(2).strip()
-
-                        # only server admins & user of the message to be deleted can use this command
-                        if int(message.author.id) == int(author_id) or message.author.guild_permissions.administrator:
-                            await message_to_delete.delete()
-                            await message.delete()
-
-                        else:
-                            logger.info(
-                                "User not authorized to delete the message")
-                            await message.delete()
-                            msg = await message.reply(
-                                embed=discord.Embed(
-                                    description="You are not allowed to delete someone else's message. \
-                                    Only the message author can delete this message."), mention_author=False)
-                            await asyncio.sleep(5)
-                            await msg.delete()
-
-                    except (KeyError, ValueError):
-                        logger.info(
-                            "Message cannot be deleted since it doesn't contain the User ID in the footer. Can't verify messsage author.")
-                        await message.delete()
-                        msg = await message.reply(
-                            embed=discord.Embed(
-                                description="This message cannot be deleted because the  \
-                                message doesn't contain the User id at the footer. Can't verify messsage author."), mention_author=False)
-                        await asyncio.sleep(5)
-                        await msg.delete()
-            else:
-                logger.info("Bot is only allowed to delete its own messages.")
-                await message.delete()
-                msg = await message.reply(
-                    embed=discord.Embed(
-                        description="I am not allowed to do that. I can only delete my messages."), mention_author=False)
-                await asyncio.sleep(5)
-                await msg.delete()
-
         if message.guild is None:
             logger.info("Not allowed to reply to DMs.")
             return  # Do not reply to DMs
@@ -156,13 +105,11 @@ async def on_message(message):
                     "Fanfiction not found in ao3, trying to search ffn")
                 embed_pg = ffn_metadata(msg)
 
-            embed_pg.set_footer(text="User ID: "+str(message.author.id))
-
             logger.info(f"Sending embed to Channel: {message.channel.name}")
             try:
-                await message.reply(embed=embed_pg, mention_author=False)
+                sent_msg = await message.reply(embed=embed_pg, mention_author=False)
             except Exception:
-                await message.channel.send(embed=embed_pg)
+                sent_msg = await message.channel.send(embed=embed_pg)
 
         elif re.search(r"^linkffn\b", query) is not None:
 
@@ -182,20 +129,18 @@ async def on_message(message):
                     "Fanfiction not found in ffn, trying to search ao3")
                 embed_pg = ao3_metadata(msg)
 
-            embed_pg.set_footer(text="User ID: "+str(message.author.id))
-
             logger.info(f"Sending embed to Channel: {message.channel.name}")
             try:
-                await message.reply(embed=embed_pg, mention_author=False)
+                sent_msg = await message.reply(embed=embed_pg, mention_author=False)
             except Exception:
-                await message.channel.send(embed=embed_pg)
+                sent_msg = await message.channel.send(embed=embed_pg)
 
         # if in code blocks
         elif re.search(r"`(.*?)`", query) is not None:
 
             logger.info("The backquote search was used. Searching ffn")
             str_found = re.findall(r"`(.*?)`", query.lower(), re.MULTILINE)
-            str_found = str_found[:2]  # to limit the search query to 2 only
+            str_found = str_found[:1]  # to limit the search query to 1 only
 
             for i in str_found:
                 await message.channel.trigger_typing()
@@ -215,14 +160,12 @@ async def on_message(message):
 
                     embed_pg = ao3_metadata(msg)
 
-                embed_pg.set_footer(text="User ID: "+str(message.author.id))
-
                 logger.info(
                     f"Sending embed to Channel: {message.channel.name}")
                 try:
-                    await message.reply(embed=embed_pg, mention_author=False)
+                    sent_msg = await message.reply(embed=embed_pg, mention_author=False)
                 except Exception:
-                    await message.channel.send(embed=embed_pg)
+                    sent_msg = await message.channel.send(embed=embed_pg)
 
         elif re.search(URL_VALIDATE, query) is not None:
 
@@ -254,15 +197,12 @@ async def on_message(message):
                             "fanfiction.net URL was passed. Searching ffn")
                         embed_pg = ffn_metadata(url)
 
-                        embed_pg.set_footer(
-                            text="User ID: "+str(message.author.id))
-
                         logger.info(
                             f"Sending embed to Channel: {message.channel.name}")
                         try:
-                            await message.reply(embed=embed_pg, mention_author=False)
+                            sent_msg = await message.reply(embed=embed_pg, mention_author=False)
                         except Exception:
-                            await message.channel.send(embed=embed_pg)
+                            sent_msg = await message.channel.send(embed=embed_pg)
 
                 if re.search(r"archiveofourown.org\b", url) is not None:
 
@@ -273,18 +213,14 @@ async def on_message(message):
 
                         embed_pg = ao3_metadata(url)
 
-                        embed_pg.set_footer(
-                            text="User ID: "+str(message.author.id))
-
                         logger.info(
                             f"Sending embed to Channel: {message.channel.name}")
                         try:
-                            await message.reply(embed=embed_pg, mention_author=False)
+                            sent_msg = await message.reply(embed=embed_pg, mention_author=False)
                         except Exception:
-                            await message.channel.send(embed=embed_pg)
+                            sent_msg = await message.channel.send(embed=embed_pg)
 
         if log_flag:
-
             try:
                 await message.reply(file=discord.File(
                     f"data/logs/{request_id}.log"
@@ -299,8 +235,23 @@ async def on_message(message):
             os.remove(f"data/logs/{request_id}.log")
 
     except Exception:
-        # remove log if the bot is not allowed to send msgs to this channel
-        os.remove(f"data/logs/{request_id}.log")
+        if log_flag:
+            # remove log if the bot is not allowed to send msgs to this channel
+            os.remove(f"data/logs/{request_id}.log")
+
+    finally:
+        try:
+            def check(reaction, user):
+                return str(reaction.emoji) == '👎' and \
+                    not user.bot and reaction.message.id == sent_msg.id and \
+                    user.id == message.author.id
+
+            await client.wait_for('reaction_add',
+                                  check=check, timeout=30.0)
+            await sent_msg.delete()
+
+        except Exception:
+            pass
 
 bot_status.start()
 start_server()
