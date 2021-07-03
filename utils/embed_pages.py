@@ -29,16 +29,16 @@ def get_embed(author_id, page=0):
         )
         embed.add_field(
             name="Search using single-lined code blocks or backquote:",
-            value="This will search ffn first and if it can't find it in ffn, it will search in ao3. " +
-            "Use this when you are not sure if the fanfiction is from ffn or ao3.\n**Example:**\n \
-            \`cadmean victory\` will default to ffnet.\n\`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series."
+            value="This will search ffn first and if it can't find it in ffn, it will search in ao3. "
+            "Use this when you are not sure if the fanfiction is from ffn or ao3.\n**Example:**\n"
+            "\`cadmean victory\` will default to ffnet.\n\`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series."
         )
 
     elif page == 1:
         embed = Embed(
             title="Bot Configuration",
-            description="**Do not give administrator permission to the bot.**\nTo use these commands, you need administrator permission. \
-            \nGo to the channel you want to add/remove and use the below commands."
+            description="**Do not give administrator permission to the bot.**\nTo use these commands, you need administrator permission."
+            "\nGo to the channel you want to add/remove and use the below commands."
         )
         embed.add_field(
             name="To allow the bot to respond to all the channels",
@@ -64,8 +64,9 @@ def get_embed(author_id, page=0):
         )
 
         embed.add_field(
-            name="To delete a bot message if it violates the server rules, the user who requested the bot to find the fanfiction can reply to the offending bot message by clicking on `Reply` and replying with `del`.",
-            value="**Note:** Help menu messages can also be deleted using this command.", inline=False
+            name="To delete a bot message if it violates the server rules, the user who requested the bot to find the fanfiction can react with 👎."
+            "It's only possible to delete a message if it's done before 30s after the bot has replied.",
+            value="\u200b", inline=False
         )
 
     elif page == 2:
@@ -86,7 +87,7 @@ def get_embed(author_id, page=0):
             description="No more pages found!"
         )
 
-    page_footer = f"Page: {str(page+1)}/{str(page_limit)} | User ID: {str(author_id)}"
+    page_footer = f"Page: {str(page+1)}/{str(page_limit)}"
     embed.set_footer(text=page_footer)
 
     return embed, page_limit

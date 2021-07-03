@@ -33,7 +33,7 @@ class FanFictionNet:
             # response = self.session.get(
             #     f"https://cloudscraper-proxy.roguedev1.repl.co/v1?q={self.BaseUrl}")
 
-            logger.debug(f"GET: {response.status_code}: {self.BaseUrl}")
+            logger.debug(f"GET: {response.status_code}: {response.url}")
 
             ffn_soup = BeautifulSoup(response.content, 'html.parser')
 
