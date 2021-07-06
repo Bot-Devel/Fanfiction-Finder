@@ -25,3 +25,34 @@ The query string is not case-sensitive so either uppercase, lowercase or combina
 The following is an example on how the bot works in realtime-<br>
 
 ![](https://raw.githubusercontent.com/arzkar/Fanfiction-Finder-Bot/main/data/img/bot_output.gif)
+
+# Development & Hosting
+
+Clone the repository in one of the directories in your system using:
+
+```
+git clone https://github.com/Bot-Devel/Fanfiction-Finder.git
+```
+
+## Python
+
+- Install Python v3.8.5
+
+- Create a virtual environment for the bot using venv, virtualenv etc. (Optional but Recommended)
+
+- Install the dependencies using pip:
+
+  - For development: `pip install -r requirements_dev.txt`
+  - For production: `pip install -r requirements_prod.txt`
+
+## Discord
+
+- Create a `.env` file which should contain the `DISCORD_TOKEN` for your testing bot as shown in the `.env.ex` file.
+
+- Create a bot from the [Discord Developer Portal](https://discord.com/developers/applications) and copy the bot token to the `.env` file.
+
+- Run the bot using `python main.py` in the root directory.
+
+## Hosting
+
+Use any cloud hosting provider of your choice like Heroku, DigitalOcean etc and follow the steps as above.
