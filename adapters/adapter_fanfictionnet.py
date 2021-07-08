@@ -132,6 +132,7 @@ class FanFictionNet:
 
                     self.ffn_story_published = self.ffn_story_published.strftime(
                         r'%-d %b, %Y ')
+                    break
 
             for i in range(0, len(self.details)):
 
@@ -177,6 +178,12 @@ class FanFictionNet:
 
                 else:
                     self.ffn_story_rating = 'Not found'
+
+            for i in range(0, len(self.details)):
+                if self.details[i].startswith('Status:'):
+                    self.ffn_story_status = self.details[i].replace(
+                        'Status:', '').strip()
+                    break
 
             self.ffn_story_lang = self.details[1]
             self.ffn_story_genre = self.details[2]

@@ -105,7 +105,8 @@ async def on_message(message):
                     "Fanfiction not found in ao3, trying to search ffn")
                 embed_pg = ffn_metadata(msg)
 
-            logger.info(f"Sending embed to Channel: {message.channel.name}")
+            logger.info(
+                f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}")
             try:
                 sent_msg = await message.reply(embed=embed_pg, mention_author=False)
             except Exception:
@@ -129,7 +130,8 @@ async def on_message(message):
                     "Fanfiction not found in ffn, trying to search ao3")
                 embed_pg = ao3_metadata(msg)
 
-            logger.info(f"Sending embed to Channel: {message.channel.name}")
+            logger.info(
+                f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}")
             try:
                 sent_msg = await message.reply(embed=embed_pg, mention_author=False)
             except Exception:
@@ -161,9 +163,10 @@ async def on_message(message):
                     embed_pg = ao3_metadata(msg)
 
                 logger.info(
-                    f"Sending embed to Channel: {message.channel.name}")
+                    f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}")
                 try:
-                    sent_msg = await message.reply(embed=embed_pg, mention_author=False)
+                    sent_msg = await message.reply(
+                        embed=embed_pg, mention_author=False)
                 except Exception:
                     sent_msg = await message.channel.send(embed=embed_pg)
 
@@ -198,9 +201,10 @@ async def on_message(message):
                         embed_pg = ffn_metadata(url)
 
                         logger.info(
-                            f"Sending embed to Channel: {message.channel.name}")
+                            f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}")
                         try:
-                            sent_msg = await message.reply(embed=embed_pg, mention_author=False)
+                            sent_msg = await message.reply(
+                                embed=embed_pg, mention_author=False)
                         except Exception:
                             sent_msg = await message.channel.send(embed=embed_pg)
 
@@ -214,9 +218,10 @@ async def on_message(message):
                         embed_pg = ao3_metadata(url)
 
                         logger.info(
-                            f"Sending embed to Channel: {message.channel.name}")
+                            f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}")
                         try:
-                            sent_msg = await message.reply(embed=embed_pg, mention_author=False)
+                            sent_msg = await message.reply(
+                                embed=embed_pg, mention_author=False)
                         except Exception:
                             sent_msg = await message.channel.send(embed=embed_pg)
 
