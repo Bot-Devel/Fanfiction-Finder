@@ -97,7 +97,7 @@ def ao3_metadata(query):
                             value=fic.ao3_works_metainfo, inline=False)
 
         embed.add_field(name="\u200b",  # zero-width whitespace character
-                        value="*If this content violates the server rules, react with 👎 to the bot message and it will be removed.*", inline=False)
+                        value="*If this content violates the server rules, react with 👎 and it will be removed.*", inline=False)
 
         embed.set_author(
             name=fic.ao3_author_name, url=fic.ao3_author_url,
@@ -147,7 +147,7 @@ def ao3_metadata(query):
             " words in "+fic.ao3_series_works+" work(s)", inline=True)
 
         embed.add_field(name="\u200b",  # zero-width whitespace character
-                        value="*If this content violates the server rules, react with 👎 to the bot message and it will be removed.*", inline=False)
+                        value="*If this content violates the server rules, react with 👎 and it will be removed.*", inline=False)
 
         embed.set_author(
             name=fic.ao3_author_name, url=fic.ao3_author_url,
@@ -252,7 +252,7 @@ def ffn_metadata(query):
                         value=fic.ffn_story_metainfo, inline=False)
 
     embed.add_field(name="\u200b",  # zero-width whitespace character
-                    value="*If this content violates the server rules, react with 👎 to the bot message and it will be removed.*", inline=False)
+                    value="*If this content violates the server rules, react with 👎 and it will be removed.*", inline=False)
 
     embed.set_author(
         name=fic.ffn_author_name, url=fic.ffn_author_url,
