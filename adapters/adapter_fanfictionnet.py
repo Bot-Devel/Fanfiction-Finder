@@ -117,7 +117,7 @@ class FanFictionNet:
 
                 elif self.details[i].startswith('Published:'):
 
-                    self.ffn_story_status = "Complete"
+                    self.ffn_story_status = "Updated"
 
                     # if Updated not found, pub & last_up will be same
                     self.ffn_story_last_updated = str(datetime.fromtimestamp(

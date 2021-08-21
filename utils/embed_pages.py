@@ -1,7 +1,7 @@
 from discord import Embed
 
 
-def get_embed(author_id, page=0):
+def get_embed(page=0):
     page_limit = 4
 
     if page == 0:

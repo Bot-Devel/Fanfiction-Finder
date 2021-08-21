@@ -28,21 +28,21 @@ class Help(Cog):
             while True:
                 if str(reaction) == '⏮':
                     page = 0
-                    embed_pg, page_limit = get_embed(ctx.author.id, page)
+                    embed_pg, page_limit = get_embed(page)
                     await message.edit(embed=embed_pg)
                 elif str(reaction) == '◀':
                     if page > 0:
                         page -= 1
-                        embed_pg, page_limit = get_embed(ctx.author.id, page)
+                        embed_pg, page_limit = get_embed(page)
                         await message.edit(embed=embed_pg)
                 elif str(reaction) == '▶':
                     if page < page_limit:
                         page += 1
-                        embed_pg, page_limit = get_embed(ctx.author.id, page)
+                        embed_pg, page_limit = get_embed(page)
                         await message.edit(embed=embed_pg)
                 elif str(reaction) == '⏭':
                     page = page_limit-1
-                    embed_pg, page_limit = get_embed(ctx.author.id, page)
+                    embed_pg, page_limit = get_embed(page)
                     await message.edit(embed=embed_pg)
 
                 reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)

@@ -100,9 +100,9 @@ async def on_message(message):
 
             embed_pg = ao3_metadata(msg)
 
-            if embed_pg is None:  # if not found in ao3, search in ffn
+            if embed_pg is None:  # if not found in AO3, search in FFN
                 logger.info(
-                    "Fanfiction not found in ao3, trying to search ffn")
+                    "Fanfiction not found in AO3, trying to search FFN")
                 embed_pg = ffn_metadata(msg)
 
             logger.info(
@@ -125,9 +125,9 @@ async def on_message(message):
 
             embed_pg = ffn_metadata(msg)
 
-            if embed_pg is None:  # if not found in ffn, search in ao3
+            if embed_pg is None:  # if not found in FFN, search in AO3
                 logger.info(
-                    "Fanfiction not found in ffn, trying to search ao3")
+                    "Fanfiction not found in FFN, trying to search AO3")
                 embed_pg = ao3_metadata(msg)
 
             logger.info(
@@ -152,10 +152,10 @@ async def on_message(message):
                 i = i.replace("-log", "")
                 embed_pg = ffn_metadata(i)
 
-                # if not found in ffn, search in ao3
+                # if not found in FFN, search in AO3
                 if embed_pg is None or embed_pg.description.startswith("Fanfiction not found"):
                     logger.info(
-                        "Fanfiction not found on ao3. Trying to search ao3")
+                        "Fanfiction not found on FFN. Trying to search AO3")
 
                     msg = i.replace("ao3", "")
                     msg = msg.replace("-log", "")
