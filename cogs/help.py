@@ -13,7 +13,7 @@ class Help(Cog):
     async def help(self, ctx):
 
         try:
-            embed_pg, page_limit = get_embed(ctx.author.id, 0)
+            embed_pg, page_limit = get_embed(0)
             message = await ctx.send(embed=embed_pg)
             await message.add_reaction('⏮')
             await message.add_reaction('◀')
