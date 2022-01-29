@@ -13,10 +13,11 @@ Flask==2.0.1
 idna==2.10
 itsdangerous==2.0.1
 Jinja2==3.0.1
-loguru==0.5.3
+loguru==0.6.0
 MarkupSafe==2.0.1
 mccabe==0.6.1
 multidict==5.1.0
+pip==21.1.2
 pip-autoremove==0.9.1
 pipdeptree==2.0.0
 pycodestyle==2.7.0
@@ -26,6 +27,7 @@ python-dateutil==2.8.1
 python-dotenv==0.17.1
 requests==2.25.1
 requests-toolbelt==0.9.1
+setuptools==57.0.0
 six==1.16.0
 soupsieve==2.2.1
 toml==0.10.2
@@ -33,4 +35,5 @@ typing-extensions==3.10.0.0
 urllib3==1.26.5
 waitress==2.0.0
 Werkzeug==2.0.1
+wheel==0.36.2
 yarl==1.6.3
