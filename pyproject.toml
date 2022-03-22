@@ -25,7 +25,7 @@ soupsieve = "^2.2.1"
 typing-extensions = "^3.10.0"
 urllib3 = "^1.26.5"
 yarl = "^1.6.3"
-waitress = "^2.0.0"
+waitress = "^2.1.1"
 requests = "^2.25.1"
 
 
