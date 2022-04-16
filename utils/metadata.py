@@ -46,7 +46,7 @@ def ao3_metadata(query):
 
         if fic.ao3_works_name is None:
             return Embed(description="Fanfiction not found",
-                         colour=Colour(0x272b28))
+                         colour=Colour.red())
 
         embed = Embed(
             title=fic.ao3_works_name,
@@ -115,7 +115,7 @@ def ao3_metadata(query):
 
         if fic.ao3_series_name is None:
             return Embed(description="Fanfiction not found",
-                         colour=Colour(0x272b28))
+                         colour=Colour.red())
 
         embed = Embed(
             title=fic.ao3_series_name,
@@ -204,7 +204,7 @@ def ffn_metadata(query):
 
     if fic.ffn_story_name is None:
         return Embed(description="Fanfiction not found",
-                     colour=Colour(0x272b28))
+                     colour=Colour.red())
 
     embed = Embed(
         title=fic.ffn_story_name,
