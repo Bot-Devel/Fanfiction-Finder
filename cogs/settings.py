@@ -1,4 +1,5 @@
 import os
+from loguru import logger
 from dotenv import load_dotenv
 
 from discord.ext.commands import command, Cog
@@ -21,7 +22,8 @@ class Settings(Cog):
                 return await ctx.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
-            except Exception:  # send a DM if send message perms is not enabled
+            except Exception as err:  # send a DM if send message perms is not enabled
+                logger.error(err)
                 return await ctx.author.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
@@ -33,8 +35,8 @@ class Settings(Cog):
                 await channel.set_permissions(
                     bot_user,
                     send_messages=True, manage_permissions=True)
-            except Exception:
-                pass
+            except Exception as err:
+                logger.error(err)
 
         embed = Embed(
             description="The bot will now start responding to all the channels."
@@ -50,7 +52,8 @@ class Settings(Cog):
                 return await ctx.send(  # send message in channel
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
-            except Exception:  # send a DM if send message perms is not enabled
+            except Exception as err:  # send a DM if send message perms is not enabled
+                logger.error(err)
                 return await ctx.author.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
@@ -61,7 +64,8 @@ class Settings(Cog):
 
         try:
             await ctx.channel.send(embed=embed)
-        except Exception:
+        except Exception as err:
+            logger.error(err)
             embed = Embed(
                 description="The bot is not allowed to send messages in that channel. Ask one of the server admins to use the `,allow` command in that channel to enable it."
             )
@@ -74,8 +78,8 @@ class Settings(Cog):
                 await channel.set_permissions(
                     bot_user,
                     send_messages=False, manage_permissions=True)
-            except Exception:
-                pass
+            except Exception as err:
+                logger.error(err)
 
     @command(pass_context=True)
     async def allow(self, ctx):
@@ -86,7 +90,8 @@ class Settings(Cog):
                 return await ctx.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
-            except Exception:  # send a DM if send message perms is not enabled
+            except Exception as err:  # send a DM if send message perms is not enabled
+                logger.error(err)
                 return await ctx.author.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
@@ -110,7 +115,8 @@ class Settings(Cog):
                 return await ctx.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
-            except Exception:  # send a DM if send message perms is not enabled
+            except Exception as err:  # send a DM if send message perms is not enabled
+                logger.error(err)
                 return await ctx.author.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
@@ -121,7 +127,8 @@ class Settings(Cog):
 
         try:
             await ctx.channel.send(embed=embed)
-        except Exception:
+        except Exception as err:
+            logger.error(err)
             embed = Embed(
                 description="The bot is not allowed to send messages in that channel. Ask one of the server admins to use the `,allow` command in that channel to enable it."
             )
@@ -141,7 +148,8 @@ class Settings(Cog):
                 return await ctx.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
-            except Exception:  # send a DM if send message perms is not enabled
+            except Exception as err:  # send a DM if send message perms is not enabled
+                logger.error(err)
                 return await ctx.author.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
@@ -174,7 +182,8 @@ class Settings(Cog):
                 return await ctx.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
-            except Exception:  # send a DM if send message perms is not enabled
+            except Exception as err:  # send a DM if send message perms is not enabled
+                logger.error(err)
                 return await ctx.author.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
@@ -195,8 +204,8 @@ class Settings(Cog):
             try:
                 await channel.set_permissions(
                     bot_user, overwrite=overwrite)
-            except Exception:
-                pass
+            except Exception as err:
+                logger.error(err)
 
         embed = Embed(
             description="The bot's channel perms were refreshed successfully"
@@ -212,7 +221,8 @@ class Settings(Cog):
                 return await ctx.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))
-            except Exception:  # send a DM if send message perms is not enabled
+            except Exception as err:  # send a DM if send message perms is not enabled
+                logger.error(err)
                 return await ctx.author.send(
                     embed=Embed(
                         description="You are missing Administrator permission to run this command."))

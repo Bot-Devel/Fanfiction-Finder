@@ -109,7 +109,8 @@ async def on_message(message):
                 f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}")
             try:
                 sent_msg = await message.reply(embed=embed_pg, mention_author=False)
-            except Exception:
+            except Exception as err:
+                logger.error(err)
                 sent_msg = await message.channel.send(embed=embed_pg)
 
         elif re.search(r"^linkffn\b", query) is not None:
@@ -134,7 +135,8 @@ async def on_message(message):
                 f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}")
             try:
                 sent_msg = await message.reply(embed=embed_pg, mention_author=False)
-            except Exception:
+            except Exception as err:
+                logger.error(err)
                 sent_msg = await message.channel.send(embed=embed_pg)
 
         # if in code blocks
@@ -167,7 +169,8 @@ async def on_message(message):
                 try:
                     sent_msg = await message.reply(
                         embed=embed_pg, mention_author=False)
-                except Exception:
+                except Exception as err:
+                    logger.error(err)
                     sent_msg = await message.channel.send(embed=embed_pg)
 
         elif re.search(URL_VALIDATE, query) is not None:
@@ -205,7 +208,9 @@ async def on_message(message):
                         try:
                             sent_msg = await message.reply(
                                 embed=embed_pg, mention_author=False)
-                        except Exception:
+                        except Exception as err:
+                            logger.error(err)
+                            sent_msg = await message.channel.send(embed=embed_pg)
                             sent_msg = await message.channel.send(embed=embed_pg)
 
                 if re.search(r"archiveofourown.org\b", url) is not None:
@@ -219,10 +224,12 @@ async def on_message(message):
 
                         logger.info(
                             f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}")
+
                         try:
                             sent_msg = await message.reply(
                                 embed=embed_pg, mention_author=False)
-                        except Exception:
+                        except Exception as err:
+                            logger.error(err)
                             sent_msg = await message.channel.send(embed=embed_pg)
 
         if log_flag:
@@ -231,7 +238,8 @@ async def on_message(message):
                     f"data/logs/{request_id}.log"
                 ), mention_author=False)
 
-            except Exception:
+            except Exception as err:
+                logger.error(err)
                 await message.channel.send(file=discord.File(
                     f"data/logs/{request_id}.log"
                 ))
@@ -239,7 +247,8 @@ async def on_message(message):
             # delete the log
             os.remove(f"data/logs/{request_id}.log")
 
-    except Exception:
+    except Exception as err:
+        logger.error(err)
         if log_flag:
             # remove log if the bot is not allowed to send msgs to this channel
             os.remove(f"data/logs/{request_id}.log")

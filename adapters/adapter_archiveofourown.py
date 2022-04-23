@@ -45,9 +45,13 @@ class ArchiveOfOurOwn:
             self.ao3_author_name_list = ao3_soup.find(
                 'h3', attrs={'class': 'byline heading'}).find_all('a')
 
-            self.ao3_author_url = ao3_soup.find(
-                'h3', attrs={'class': 'byline heading'}) \
-                .find('a', href=True)['href']
+            try:
+                self.ao3_author_url = ao3_soup.find(
+                    'h3', attrs={'class': 'byline heading'}) \
+                    .find('a', href=True)['href']
+            except Exception:  # anon users
+                logger.error("Author URL not found! Anonymous user")
+                self.ao3_author_url = "/collections/anonymous"
 
             try:
                 self.ao3_works_summary = ao3_soup.find(
@@ -91,7 +95,6 @@ class ArchiveOfOurOwn:
             self.ao3_works_chapters = (ao3_soup.find(
                 'dl', attrs={'class': 'stats'}).find(
                 'dd', attrs={'class': 'chapters'}).contents[0]).strip()
-
             try:
                 self.ao3_works_rating = (ao3_soup.find(
                     'dd', attrs={'class': 'rating tags'}).find('a').contents[0]).strip()
@@ -182,10 +185,13 @@ class ArchiveOfOurOwn:
             self.ao3_author_url = "https://archiveofourown.org" \
                 + self.ao3_author_url
 
-            self.ao3_author_name = []
-            for author in self.ao3_author_name_list:
-                self.ao3_author_name.append(author.string.strip())
-            self.ao3_author_name = ", ".join(self.ao3_author_name)
+            if self.ao3_author_name_list:
+                self.ao3_author_name = []
+                for author in self.ao3_author_name_list:
+                    self.ao3_author_name.append(author.string.strip())
+                self.ao3_author_name = ", ".join(self.ao3_author_name)
+            else:  # username not found
+                self.ao3_author_name = "Anonymous"
 
             if len(list(self.ao3_works_summary)) > 2048:
                 self.ao3_works_summary = self.ao3_works_summary[:2030] + "..."
@@ -318,7 +324,6 @@ class ArchiveOfOurOwn:
 
     def get_author_profile_image(self):
 
-        self.has_img = False
         author_profile_url = f"https://archiveofourown.org/users/{self.ao3_author_name}/profile"
         response = self.session.get(author_profile_url)
 

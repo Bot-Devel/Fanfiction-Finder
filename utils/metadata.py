@@ -39,11 +39,9 @@ def ao3_metadata(query):
         # extract work id from the url
         ao3_works_id = str(re.search(r"\d+", ao3_url).group(0))
         ao3_url = "https://archiveofourown.org/works/"+ao3_works_id
-
         fic = ArchiveOfOurOwn(ao3_url)
         fic.get_ao3_works_metadata()
         fic.get_author_profile_image()
-
         if fic.ao3_works_name is None:
             return Embed(description="Fanfiction not found",
                          colour=Colour.red())
