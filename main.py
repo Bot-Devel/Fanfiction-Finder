@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from utils.metadata import ao3_metadata, ffn_metadata
 
 # to use repl+uptime monitor
-from utils.bot_uptime import start_server
+# from utils.bot_uptime import start_server
 
 client = commands.Bot(command_prefix=',', help_command=None)
 
@@ -268,7 +268,7 @@ async def on_message(message):
             pass
 
 bot_status.start()
-start_server()
+# start_server()
 client.load_extension("cogs.settings")
 client.load_extension("cogs.help")
 client.run(TOKEN)
