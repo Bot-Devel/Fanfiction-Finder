@@ -1,0 +1,14 @@
+[Unit]
+Description=Fanfiction Finder Bot Service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=arbaaz
+ExecStart=/bin/bash /home/arbaaz/Projects/Fanfiction-Finder/run.sh
+
+[Install]
+WantedBy=multi-user.target
