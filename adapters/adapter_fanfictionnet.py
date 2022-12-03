@@ -1,8 +1,8 @@
 import re
+import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
 from loguru import logger
-import cloudscraper
 
 from utils.processing import story_last_up_clean
 
@@ -12,6 +12,7 @@ URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[0
 class FanFictionNet:
     def __init__(self, BaseUrl):
         self.BaseUrl = BaseUrl
+        self.session = requests.Session()
 
     def get_ffn_story_metadata(self):
 
@@ -20,18 +21,7 @@ class FanFictionNet:
             logger.info(
                 f"Processing {self.BaseUrl} ")
 
-            self.scraper = cloudscraper.CloudScraper(
-                delay=2, browser={
-                    'browser': 'chrome',
-                    'platform': 'windows',
-                    'mobile': False,
-                    'desktop': True,
-                }
-            )
-
-            response = self.scraper.get(self.BaseUrl)
-            # response = self.session.get(
-            #     f"https://cloudscraper-proxy.roguedev1.repl.co/v1?q={self.BaseUrl}")
+            response = self.session.get(self.BaseUrl)
 
             logger.debug(f"GET: {response.status_code}: {response.url}")
 
