@@ -4,6 +4,7 @@ import random
 import string
 import asyncio
 from itertools import cycle
+import traceback
 from loguru import logger
 
 import discord
@@ -43,7 +44,6 @@ async def bot_status():
     )
 
     await asyncio.sleep(15)
-
 
 @client.event
 async def on_message(message):
@@ -248,7 +248,7 @@ async def on_message(message):
             os.remove(f"data/logs/{request_id}.log")
 
     except Exception as err:
-        logger.error(err)
+        logger.error(traceback.format_exc())
         if log_flag:
             # remove log if the bot is not allowed to send msgs to this channel
             os.remove(f"data/logs/{request_id}.log")
