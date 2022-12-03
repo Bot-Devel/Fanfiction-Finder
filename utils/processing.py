@@ -11,13 +11,13 @@ def story_last_up_clean(story_last_up, _type):
         datetimeFormat = '%Y-%m-%d %H:%M:%S'
         story_last_up = datetime.strptime(
             str(story_last_up), datetimeFormat)
-        story_last_updated = story_last_up.strftime(r'%-d %b, %Y ')
+        story_last_updated = story_last_up.strftime(r'%d %b, %Y').lstrip('0')
 
     elif _type == 2:  # ao3 last updated
         datetimeFormat = '%Y-%m-%d'
         story_last_up = datetime.strptime(
             str(story_last_up), datetimeFormat)
-        story_last_updated = story_last_up.strftime(r'%-d %b, %Y ')
+        story_last_updated = story_last_up.strftime(r'%d %b, %Y').lstrip('0')
 
     diff_in_time = relativedelta(curr_time, story_last_up)
 
