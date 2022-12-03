@@ -65,30 +65,35 @@ def get_ao3_url(query):
 def get_ffn_url(query):
     ffn_list = []
     href = []
-    for engine in search_engines:
-        url = f'https://www.{engine}.com/search?q={query}+fanfiction'
-        page = requests.get(url)
-        logger.debug(f"GET: {page.status_code}: {url}")
+    try:
+        for engine in search_engines:
+            url = f'https://www.{engine}.com/search?q={query}+fanfiction'
+            page = requests.get(url)
+            logger.debug(f"GET: {page.status_code}: {url}")
 
-        if page.status_code == 200:
-            soup = BeautifulSoup(page.content, 'html.parser')
-            found = soup.findAll('a')
+            if page.status_code == 200:
+                soup = BeautifulSoup(page.content, 'html.parser')
+                found = soup.findAll('a')
 
-            for link in found:
-                href.append(link['href'])
+                for link in found:
+                    href.append(link['href'])
 
-            for i in range(len(href)):
-                if re.search(r"fanfiction.net/s/", href[i]) is not None:
-                    logger.info(f"URL FOUND: {href[i]}")
-                    ffn_list.append(href[i])
-            if not ffn_list:
-                logger.error(f"URL NOT FOUND using {engine}")
-                continue
+                for i in range(len(href)):
+                    if re.search(r"fanfiction.net/s/", href[i]) is not None:
+                        logger.info(f"URL FOUND: {href[i]}")
+                        ffn_list.append(href[i])
+                if not ffn_list:
+                    logger.error(f"URL NOT FOUND using {engine}")
+                    continue
+                else:
+                    break
             else:
-                break
-        else:
-            continue
-
-    ffn_url = re.search(URL_VALIDATE, ffn_list[0])
-
-    return ffn_url.group(0)
+                continue
+    except Exception:
+        pass
+    
+    if ffn_list:
+        ffn_url = re.search(URL_VALIDATE, ffn_list[0])
+        return ffn_url.group(0)
+    else:
+        return None
