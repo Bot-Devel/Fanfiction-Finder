@@ -177,7 +177,7 @@ class ArchiveOfOurOwn:
                     if m < len(self.ao3_meta_info)-1:
                         self.ao3_works_metainfo += " ☘︎ "
 
-            self.ao3_works_length = "{:,}".format(int(self.ao3_works_length))
+            self.ao3_works_length = "{:,}".format(int(str(self.ao3_works_length).replace(",","")))
             self.ao3_works_chapters = re.search(
                 r"\d+", self.ao3_works_chapters).group(0)
             self.ao3_works_last_up = story_last_up_clean(

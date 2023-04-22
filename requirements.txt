@@ -3,10 +3,10 @@ attrs==21.4.0
 beautifulsoup4==4.10.0
 certifi==2021.5.30
 chardet==4.0.0
-cloudscraper==1.2.60
+cloudscraper==1.2.69
 Flask==2.0.1
 idna==3.3
-loguru==0.5.3
+loguru==0.7.0
 multidict==6.0.2
 discord.py==1.7.3
 pyparsing==2.4.7
