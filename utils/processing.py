@@ -1,49 +1,40 @@
-from dateutil.relativedelta import relativedelta
+from __future__ import annotations
+
 from datetime import datetime
-from bs4 import BeautifulSoup
+
 import re
+
+from bs4 import BeautifulSoup
 
 
 def story_last_up_clean(story_last_up, _type):
-
     curr_time = datetime.now()
     if _type == 1:  # ffn last updated
         datetimeFormat = '%Y-%m-%d %H:%M:%S'
-        story_last_up = datetime.strptime(
-            str(story_last_up), datetimeFormat)
+        story_last_up = datetime.strptime(str(story_last_up), datetimeFormat)
         story_last_updated = story_last_up.strftime(r'%d %b, %Y').lstrip('0')
 
     elif _type == 2:  # ao3 last updated
         datetimeFormat = '%Y-%m-%d'
-        story_last_up = datetime.strptime(
-            str(story_last_up), datetimeFormat)
+        story_last_up = datetime.strptime(str(story_last_up), datetimeFormat)
         story_last_updated = story_last_up.strftime(r'%d %b, %Y').lstrip('0')
 
-    diff_in_time = relativedelta(curr_time, story_last_up)
+    diff_in_time = curr_time - story_last_up
 
     # only amend hours & minutes diff
-    if diff_in_time.years:
+    if diff_in_time.days:
         pass
-
-    elif diff_in_time.months:
-        pass
-
-    elif diff_in_time.days:
-        pass
-
-    elif diff_in_time.hours:
-        if diff_in_time.hours == 1:
-            story_last_updated += "☘︎ " + str(diff_in_time.hours)+" hour ago"
+    elif hours := (diff_in_time.seconds // 3600):
+        if hours == 1:
+            story_last_updated += f"☘︎ {hours} hour ago"
         else:
-            story_last_updated += "☘︎ " + str(diff_in_time.hours)+" hours ago"
+            story_last_updated += f"☘︎ {hours} hours ago"
 
-    elif diff_in_time.minutes:
-        if diff_in_time.minutes == 1:
-            story_last_updated += "☘︎ " + \
-                str(diff_in_time.minutes)+" minute ago"
+    elif minutes := (diff_in_time.seconds // 60):
+        if minutes == 1:
+            story_last_updated += f"☘︎ {minutes} minute ago"
         else:
-            story_last_updated += "☘︎ " + \
-                str(diff_in_time.minutes)+" minutes ago"
+            story_last_updated += f"☘︎ {minutes} minutes ago"
 
     return str(story_last_updated)
 

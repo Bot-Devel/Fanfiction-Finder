@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 import re
+
 from discord import Embed, Colour
 from loguru import logger
-from utils.processing import timestamp_unix_to_local
 
-
-from utils.search import get_ao3_url, get_fic_url
 from adapters.adapter_archiveofourown import ArchiveOfOurOwn
 from adapters.adapter_fichub import FicHub
+from utils.processing import timestamp_unix_to_local
+from utils.search import get_ao3_url, get_fic_url
 
 
 URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"

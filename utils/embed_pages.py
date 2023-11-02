@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from discord import Embed
+import discord
 
-PAGE0_EMBED = (
-    Embed(
+
+PAGE0 = (
+    discord.Embed(
         title="Bot Usage Instructions",
         description="**Bugfix for the broken config commands, check Page 4**",
     )
@@ -30,8 +31,8 @@ PAGE0_EMBED = (
     )
 )
 
-PAGE1_EMBED = (
-    Embed(
+PAGE1 = (
+    discord.Embed(
         title="Bot Configuration",
         description="**Do not give administrator permission to the bot.**\nTo use these commands, you need administrator permission."
         "\nGo to the channel you want to add/remove and use the below commands.",
@@ -69,7 +70,7 @@ PAGE1_EMBED = (
     )
 )
 
-PAGE2_EMBED = Embed(
+PAGE2 = discord.Embed(
     title="Bot Support",
     description=(
         "Join the Bot's Discord Support Server if you want to report any bugs or want to suggest new features."
@@ -77,16 +78,100 @@ PAGE2_EMBED = Embed(
     ),
 )
 
-PAGE_LOOKUP = {
-    0: PAGE0_EMBED,
-    1: PAGE1_EMBED,
-    2: PAGE2_EMBED,
-}
+HELP_PAGE_LOOKUP = [PAGE0, PAGE1, PAGE2]
+
+
+class HelpView(discord.ui.View):
+    message: discord.Message
+
+    def __init__(self, *, timeout: float | None = 30):
+        super().__init__(timeout=timeout)
+        self.pages = HELP_PAGE_LOOKUP
+        self.page_index = 0
+
+    async def on_timeout(self) -> None:
+        """Deletes all buttons when the view times out."""
+
+        self.clear_items()
+        await self.message.edit(view=self)
+        self.stop()
+
+    def format_page(self) -> discord.Embed:
+        """Makes the embed 'page' that the user will see.
+
+        This is a distinct method to separate formatting logic if the pages aren't already embeds.
+        """
+
+        embed = self.pages[self.page_index]
+        embed.set_footer(text=f"Page: {self.page_index + 1}/{len(self.pages)}")
+        return embed
+
+    def disable_page_buttons(self) -> None:
+        """Enables and disables page-turning buttons based on current position."""
+
+        self.turn_to_previous.disabled = self.turn_to_first.disabled = (
+            self.page_index == 0
+        )
+        self.turn_to_next.disabled = self.turn_to_last.disabled = self.page_index == (
+            len(self.pages) - 1
+        )
+
+    def get_first_page(self) -> discord.Embed:
+        """Get the embed of the first page."""
+
+        return self.pages[0]
+
+    async def update_page(self, interaction: discord.Interaction) -> None:
+        """Update and display the view for the given page."""
+
+        embed_page = self.pages[self.page_index]
+        self.disable_page_buttons()
+        await interaction.response.edit_message(embed=embed_page, view=self)
+
+    @discord.ui.button(label="\N{MUCH LESS-THAN}")
+    async def turn_to_first(
+        self, interaction: discord.Interaction, _: discord.ui.Button
+    ):
+        """Skips to the first page of the view."""
+
+        self.page_index = 0
+        await self.update_page(interaction)
+
+    @discord.ui.button(label="<")
+    async def turn_to_previous(
+        self, interaction: discord.Interaction, _: discord.ui.Button
+    ) -> None:
+        """Turns to the previous page of the view."""
+
+        self.page_index -= 1
+        await self.update_page(interaction)
+
+    @discord.ui.button(label=">")
+    async def turn_to_next(
+        self, interaction: discord.Interaction, _: discord.ui.Button
+    ) -> None:
+        """Turns to the next page of the view."""
+
+        self.page_index += 1
+        await self.update_page(interaction)
+
+    @discord.ui.button(label="\N{MUCH GREATER-THAN}")
+    async def turn_to_last(
+        self, interaction: discord.Interaction, _: discord.ui.Button
+    ) -> None:
+        """Skips to the last page of the view."""
+
+        self.page_index = len(self.pages) - 1
+        await self.update_page(interaction)
 
 
 def get_embed(page: int = 0):
     page_limit = 3
-    embed = PAGE_LOOKUP.get(page, Embed(description="No more pages found!"))
+    try:
+        embed = HELP_PAGE_LOOKUP[page]
+    except IndexError:
+        embed = discord.Embed(description="No more pages found!")
+
     page_footer = f"Page: {page+1}/{page_limit}"
     embed.set_footer(text=page_footer)
 
