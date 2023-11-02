@@ -1,19 +1,22 @@
+from __future__ import annotations
+
 import os
+
 from loguru import logger
+from discord import Embed, PermissionOverwrite
+from discord.ext import commands
 from dotenv import load_dotenv
 
-from discord.ext.commands import command, Cog
-from discord import Embed, PermissionOverwrite
 
 load_dotenv()
 BOT_ID = int(os.getenv('BOT_ID'))
 
 
-class Settings(Cog):
+class Settings(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @command(pass_context=True, aliases=['allowAll'])
+    @commands.command(aliases=['allowAll'])
     async def allow_all(self, ctx):
         """Adds send_message perm for all the channels."""
 
@@ -43,7 +46,7 @@ class Settings(Cog):
         )
         await ctx.channel.send(embed=embed)
 
-    @command(pass_context=True, aliases=['disallowAll'])
+    @commands.command(aliases=['disallowAll'])
     async def disallow_all(self, ctx):
         """Removes send_message perm for all the channels."""
 
@@ -81,7 +84,7 @@ class Settings(Cog):
             except Exception as err:
                 logger.error(err)
 
-    @command(pass_context=True)
+    @commands.command()
     async def allow(self, ctx):
         """Adds send_message perm for the current channel."""
 
@@ -106,7 +109,7 @@ class Settings(Cog):
         )
         await ctx.channel.send(embed=embed)
 
-    @command(pass_context=True)
+    @commands.command()
     async def disallow(self, ctx):
         """Removes send_message perm for current channel."""
 
@@ -139,7 +142,7 @@ class Settings(Cog):
             bot_user,
             send_messages=False, manage_permissions=True)
 
-    @command(pass_context=True, aliases=['getChannels'])
+    @commands.command(aliases=['getChannels'])
     async def get_channels(self, ctx):
         """Gets all the channels in which the bot has send_messages=True"""
 
@@ -173,7 +176,7 @@ class Settings(Cog):
         )
         await ctx.author.send(embed=embed)
 
-    @command(pass_context=True, aliases=['refreshPerms'])
+    @commands.command(aliases=['refreshPerms'])
     async def refresh_perms(self, ctx, *, channels=0):
         """Gives the manage_perms=True in all the channels"""
 
@@ -212,7 +215,7 @@ class Settings(Cog):
         )
         await ctx.channel.send(embed=embed)
 
-    @command(pass_context=True, aliases=['clr-msgs'])
+    @commands.command(aliases=['clr-msgs'])
     async def clear_messages(self, ctx):
         """Clears all non-bot messages"""
 
@@ -243,5 +246,5 @@ class Settings(Cog):
         await msg.delete(delay=3)  # Delete the bot's message
 
 
-def setup(client):
-    client.add_cog(Settings(client))
+async def setup(client: commands.Bot):
+    await client.add_cog(Settings(client))
