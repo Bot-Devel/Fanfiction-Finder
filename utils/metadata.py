@@ -210,13 +210,13 @@ def fichub_metadata(query):
         colour=Colour(0x272b28))
 
     if fic.response['meta']["status"] == "complete":
-        fic_last_update = timestamp_unix_to_local(fic.response['meta']['rawExtendedMeta']['updated']) if fic.response['meta']['rawExtendedMeta'] else ""
+        fic_last_update = timestamp_unix_to_local(fic.response['meta']['rawExtendedMeta']['updated']) if 'updated' in fic.response['meta']['rawExtendedMeta'] else ""
         embed.add_field(
             name='📜 Last Updated',
             value= fic_last_update + "✓" + fic.response['meta']["status"], inline=True)
 
     elif fic.response['meta']["status"] == "ongoing":
-        fic_last_update = timestamp_unix_to_local(fic.response['meta']['rawExtendedMeta']['updated']) if fic.response['meta']['rawExtendedMeta'] else ""
+        fic_last_update = timestamp_unix_to_local(fic.response['meta']['rawExtendedMeta']['updated']) if 'updated' in fic.response['meta']['rawExtendedMeta'] else ""
         embed.add_field(
             name='📜 Last Updated',
             value= fic_last_update + "✓" + fic.response['meta']["status"], inline=True)
