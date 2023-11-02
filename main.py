@@ -3,18 +3,14 @@ import re
 import random
 import string
 import asyncio
-from itertools import cycle
 import traceback
 from loguru import logger
 
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 from dotenv import load_dotenv
 
 from utils.metadata import ao3_metadata, fichub_metadata
-
-# to use repl+uptime monitor
-# from utils.bot_uptime import start_server
 
 client = commands.Bot(command_prefix=',', help_command=None)
 
@@ -24,33 +20,11 @@ OWNER_ID = os.getenv('OWNER_ID')
 FICHUB_SITES = os.getenv('FICHUB_SITES').split(',')
 URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"
 
-with open("data/status_quotes.txt", "r") as file:
-    quotes = cycle(file.readlines())
-
-
-@tasks.loop(seconds=1)
-async def bot_status():
-    """
-    An activity status which cycles through the
-    status_quotes.txt every 15s
-    """
-
-    await client.wait_until_ready()
-
-    await client.change_presence(
-        activity=discord.Activity(
-            type=discord.ActivityType.watching,
-            name=(next(quotes)).strip()
-        )
-    )
-
-    await asyncio.sleep(15)
 
 @client.event
 async def on_message(message):
     """ Command to search and find the fanfiction by scraping google
     """
-
     try:
         query = message.content.lower()
 
@@ -260,8 +234,7 @@ async def on_message(message):
         except Exception:
             pass
 
-bot_status.start()
-# start_server()
+
 client.load_extension("cogs.settings")
 client.load_extension("cogs.help")
 client.run(TOKEN)
