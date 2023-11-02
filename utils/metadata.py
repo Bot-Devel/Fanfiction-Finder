@@ -1,11 +1,12 @@
 import re
 from discord import Embed, Colour
 from loguru import logger
+from utils.processing import timestamp_unix_to_local
 
 
-from utils.search import get_ao3_url, get_ffn_url
+from utils.search import get_ao3_url, get_fic_url
 from adapters.adapter_archiveofourown import ArchiveOfOurOwn
-from adapters.adapter_fanfictionnet import FanFictionNet
+from adapters.adapter_fichub import FicHub
 
 
 URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"
@@ -75,12 +76,12 @@ def ao3_metadata(query):
             value=fic.ao3_works_length +
             " words in "+fic.ao3_works_chapters+" chapter(s)", inline=True)
 
-        other_info = [fic.ao3_works_fandom, " ☘︎ "]
+        other_info = [fic.ao3_works_fandom, "  ☘︎  "]
 
         for var in [fic.ao3_works_relationships, fic.ao3_works_characters]:
             if var is not None:
                 other_info.append(str(var))
-                other_info.append(" ☘︎ ")
+                other_info.append("  ☘︎  ")
 
         other_info = ''.join(other_info[:len(other_info)-1])
         if len(list(other_info)) > 100:
@@ -163,7 +164,7 @@ def ao3_metadata(query):
     return embed
 
 
-def ffn_metadata(query):
+def fichub_metadata(query):
 
     query = query.strip()
     logger.info(f"QUERY: {query}")
@@ -176,88 +177,84 @@ def ffn_metadata(query):
 
         query = query.replace(" ", "+")
 
-        logger.info("Query not an URL. Calling get_ffn_url()")
-        ffn_url = get_ffn_url(query)
+        logger.info("Query not an URL. Calling get_fic_url()")
+        fic_url = get_fic_url(query)
 
     else:  # extract the url from the query if it contains an url
         logger.info("Query is an URL")
-        ffn_url = re.search(
+        fic_url = re.search(
             URL_VALIDATE, query).group(0)
 
-    if ffn_url is None:
+    if fic_url is None:
         logger.info("Fanfiction not found")
         embed = Embed(
             description="Fanfiction not found",
             colour=Colour.red())
         return embed
 
-    logger.info(f"Processing {ffn_url}")
+    logger.info(f"Processing {fic_url}")
 
-    # extract story id from the url
-    ffn_story_id = str(re.search(r"\d+", ffn_url).group(0))
-    ffn_url = "https://www.fanfiction.net/s/"+ffn_story_id
+    fic = FicHub()
+    fic.get_fic_metadata(fic_url)
 
-    fic = FanFictionNet(ffn_url)
-    fic.get_ffn_story_metadata()
-
-    if fic.ffn_story_name is None:
+    if str(fic.response['err']).strip() != "0":
+        print("h1")
         return Embed(description="Fanfiction not found",
                      colour=Colour.red())
 
     embed = Embed(
-        title=fic.ffn_story_name,
-        url=fic.BaseUrl,
-        description=fic.ffn_story_summary,
+        title=fic.response['meta']['title'],
+        url=fic.response['meta']['source'],
+        description=fic.response['meta']['description']
+        .replace("<p>","").replace("</p>","").replace("<hr />","\n\n"),
         colour=Colour(0x272b28))
 
-    if fic.ffn_story_status == "Complete":
-
+    if fic.response['meta']["status"] == "complete":
+        fic_last_update = timestamp_unix_to_local(fic.response['meta']['rawExtendedMeta']['updated']) if fic.response['meta']['rawExtendedMeta'] else ""
         embed.add_field(
             name='📜 Last Updated',
-            value=fic.ffn_story_last_updated +
-            " ✓"+fic.ffn_story_status, inline=True)
+            value= fic_last_update + "✓" + fic.response['meta']["status"], inline=True)
 
-    elif fic.ffn_story_status == "Updated":
-
+    elif fic.response['meta']["status"] == "ongoing":
+        fic_last_update = timestamp_unix_to_local(fic.response['meta']['rawExtendedMeta']['updated']) if fic.response['meta']['rawExtendedMeta'] else ""
         embed.add_field(
             name='📜 Last Updated',
-            value=fic.ffn_story_last_updated, inline=True)
+            value= fic_last_update + "✓" + fic.response['meta']["status"], inline=True)
 
     embed.add_field(
         name='📖 Length',
-        value=str(fic.ffn_story_length) +
-        " words in "+str(fic.ffn_story_chapters)+" chapter(s)", inline=True)
+        value=str(fic.response['meta']['words']) +
+        " words in "+str(fic.response['meta']['chapters'])+" chapter(s)", inline=True)
+    if fic.response['meta']['rawExtendedMeta']:
 
-    other_info = [fic.ffn_story_fandom, " ☘︎ "]
+        other_info = [fic.response['meta']['rawExtendedMeta']['raw_fandom'], "  ☘︎  "]
 
-    for var in [fic.ffn_story_genre,
-                fic.ffn_story_characters]:
-        if var is not None:
-            other_info.append(str(var))
-            other_info.append(" ☘︎ ")
+        for var in [fic.response['meta']['rawExtendedMeta']['genres'] if 'genres' in fic.response['meta']['rawExtendedMeta'] else "",
+                    fic.response['meta']['rawExtendedMeta']['characters']]:
+            if var is not None:
+                other_info.append(str(var))
+                other_info.append("  ☘︎  ")
 
-    other_info = ''.join(other_info[:len(other_info)-1])
+        other_info = ''.join(other_info[:len(other_info)-1])
 
-    if len(list(other_info)) > 100:
-        other_info = other_info[:100] + "..."
+        if len(list(other_info)) > 100:
+            other_info = other_info[:100] + "..."
 
-    if other_info:
-        embed.add_field(name=f":bookmark: Rating: {fic.ffn_story_rating}",
-                        value=other_info, inline=False)
+        if other_info:
+            embed.add_field(name=f":bookmark: Rating: {fic.response['meta']['rawExtendedMeta']['rated']}",
+                            value=other_info, inline=False)
 
-    if fic.ffn_story_metainfo:
+        fic_stats = f"**Reviews:** {fic.response['meta']['rawExtendedMeta']['reviews']}  ☘︎  **Favs:** {fic.response['meta']['rawExtendedMeta']['favorites']}  ☘︎  **Follows:** {fic.response['meta']['rawExtendedMeta']['follows']}"
         embed.add_field(name="📊 Stats",
-                        value=fic.ffn_story_metainfo, inline=False)
+                        value=fic_stats, inline=False)
 
     embed.add_field(name="\u200b",  # zero-width whitespace character
-                    value="*If this content violates the server rules, react with 👎 and it will be removed.*", inline=False)
+                    value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is using Fichub.net API's archive metadata. Latest data is not guaranteed!*", inline=False)
 
     embed.set_author(
-        name=fic.ffn_author_name, url=fic.ffn_author_url,
+        name=fic.response['meta']['author'], url=fic.response['meta']['authorUrl'],
         icon_url="https://pbs.twimg.com/profile_images/843841615122784256/WXbuqyjo_bigger.jpg")
-
-    if fic.ffn_story_image:
-        embed.set_thumbnail(
-            url=f"https://www.fanfiction.net{fic.ffn_story_image}")
-
+    print("embed",embed)
     return embed
+
+    

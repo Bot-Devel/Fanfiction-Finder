@@ -97,3 +97,39 @@ def get_ffn_url(query):
         return ffn_url.group(0)
     else:
         return None
+
+
+def get_fic_url(query):
+    fic_list = []
+    href = []
+    try:
+        for engine in search_engines:
+            url = f'https://www.{engine}.com/search?q={query}+fanfiction'
+            page = requests.get(url)
+            logger.debug(f"GET: {page.status_code}: {url}")
+
+            if page.status_code == 200:
+                soup = BeautifulSoup(page.content, 'html.parser')
+                found = soup.findAll('a')
+
+                for link in found:
+                    href.append(link['href'])
+                print(href)
+                for i in range(len(href)):
+                    logger.info(f"URL FOUND: {href[i]}")
+                    fic_list.append(href[i])
+                if not fic_list:
+                    logger.error(f"URL NOT FOUND using {engine}")
+                    continue
+                else:
+                    break
+            else:
+                continue
+    except Exception:
+        pass
+    
+    if fic_list:
+        fic_list = re.search(URL_VALIDATE, fic_list[0])
+        return fic_list.group(0)
+    else:
+        return None
