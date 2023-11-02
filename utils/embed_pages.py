@@ -18,8 +18,8 @@ def get_embed(page=0):
 
         embed.add_field(
             name="Other Fichub supported sites Searching:",
-            value="`linkfic [fic name]` \
-            \n **Example:**\n`linkfic cadmean victory`",
+            value="`linkfic [fic name] [site_name]` \
+            \n **Example:**\n`linkfic high tide spacebattle`",
             inline=False
         )
         embed.add_field(
