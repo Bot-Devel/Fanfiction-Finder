@@ -2,9 +2,12 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from loguru import logger
+import os
+from dotenv import load_dotenv
 
-
+load_dotenv()
 URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"
+FICHUB_SITES = os.getenv('FICHUB_SITES').split(',')
 search_engines = ['google', 'bing']
 
 
@@ -95,5 +98,44 @@ def get_ffn_url(query):
     if ffn_list:
         ffn_url = re.search(URL_VALIDATE, ffn_list[0])
         return ffn_url.group(0)
+    else:
+        return None
+
+
+def get_fic_url(query):
+    fic_list = []
+    href = []
+    try:
+        for engine in search_engines:
+            url = f'https://www.{engine}.com/search?q={query}+fanfiction'
+            page = requests.get(url)
+            logger.debug(f"GET: {page.status_code}: {url}")
+
+            if page.status_code == 200:
+                soup = BeautifulSoup(page.content, 'html.parser')
+                found = soup.findAll('a')
+
+                for link in found:
+                    href.append(link['href'])
+                print(href)
+                for i in range(len(href)):
+                    logger.info(f"URL FOUND: {href[i]}")
+                    fic_list.append(href[i])
+                if not fic_list:
+                    logger.error(f"URL NOT FOUND using {engine}")
+                    continue
+                else:
+                    break
+            else:
+                continue
+    except Exception:
+        pass
+    
+    if fic_list:
+        # Check if any of the found URLs match the FICHUB_SITES list
+        for url in fic_list:
+            if any(site.strip() in url.strip() for site in FICHUB_SITES):
+                fic_list = re.search(URL_VALIDATE, url)
+                return fic_list.group(0)
     else:
         return None

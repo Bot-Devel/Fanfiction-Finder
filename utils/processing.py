@@ -70,3 +70,8 @@ def get_ao3_series_works_index(ao3_soup):
     ao3_series_works_index = '\n'.join(ao3_series_works_index)
 
     return ao3_series_works_index
+
+def timestamp_unix_to_local(unix_time):
+    utc_time = datetime.utcfromtimestamp(int(unix_time))
+    return utc_time.strftime(r'%d %b, %Y').lstrip('0')
+

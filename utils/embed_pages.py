@@ -2,7 +2,7 @@ from discord import Embed
 
 
 def get_embed(page=0):
-    page_limit = 4
+    page_limit = 3
 
     if page == 0:
         embed = Embed(
@@ -17,9 +17,9 @@ def get_embed(page=0):
         )
 
         embed.add_field(
-            name="FFN Searching:",
-            value="`linkffn [fic name]` \
-            \n **Example:**\n`linkffn cadmean victory`",
+            name="Other Fichub supported sites Searching:",
+            value="`linkfic [fic name] [site_name]` \
+            \n **Example:**\n`linkfic high tide spacebattle`",
             inline=False
         )
         embed.add_field(
@@ -29,9 +29,9 @@ def get_embed(page=0):
         )
         embed.add_field(
             name="Search using single-lined code blocks or backquote:",
-            value="This will search ffn first and if it can't find it in ffn, it will search in ao3. "
-            "Use this when you are not sure if the fanfiction is from ffn or ao3.\n**Example:**\n"
-            "\`cadmean victory\` will default to ffnet.\n\`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series."
+            value="This will search Fichub first and if it can't find it in Fichub, it will search in ao3. "
+            "\n**Example:**\n"
+            "\`cadmean victory\` will default to Fichub.\n\`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series."
         )
 
     elif page == 1:
@@ -74,12 +74,6 @@ def get_embed(page=0):
             title="Bot Support",
             description="Join the Bot's Discord Support Server if you want to report any bugs or want to suggest new features." +
             "\n[Discord Support Server](https://discord.gg/bRzzr3EBqH)"
-        )
-
-    elif page == 3:
-        embed = Embed(
-            title="Bugfix for the broken config commands - 22nd May, 2021",
-            description="Few weeks back, the config commands i.e. `,allow`, `,disallow` etc were broken due to a Discord API change.\nTo fix the bug, the bot needs to have `manage_permissions=True` in all the channel settings.\nTwo temporary commands have been added: `,getChannels` & `,refreshPerms` to make the fix easier.\n Use `,getChannels` first, the bot will DM you a comma separated list of channels in which the bot has `send_messages=True` perms.\n Then give the bot admin perm, and use the `,refreshPerms channel_ids`, where channel_ids is the comma separated list of channels.\nEg: `,refreshPerms 752196383066554535, 852196383066554538, 751199383066554538`\nAfter you receive the success message, remove the admin perms from the bot.\n\n**It is not necessary to apply this fix unless you need to use the config commands since this bug doesn't stop the bot from functioning.**",
         )
 
     else:
