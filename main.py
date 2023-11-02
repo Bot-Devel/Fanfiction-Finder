@@ -12,9 +12,6 @@ from dotenv import load_dotenv
 
 from utils.metadata import ao3_metadata, fichub_metadata
 
-# to use repl+uptime monitor
-# from utils.bot_uptime import start_server
-
 
 load_dotenv()
 TOKEN = os.environ["DISCORD_TOKEN"]
