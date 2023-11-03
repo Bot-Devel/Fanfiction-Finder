@@ -99,6 +99,8 @@ class HelpView(discord.ui.View):
         self.pages = HELP_PAGE_LOOKUP
         self.page_index = 0
 
+        self.disable_page_buttons()
+
     async def on_timeout(self) -> None:
         """Deletes all buttons when the view times out."""
 
