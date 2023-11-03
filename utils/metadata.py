@@ -211,23 +211,16 @@ def fichub_metadata(query):
         .replace("<p>","").replace("</p>","").replace("<hr />","\n\n"),
         colour=Colour(0x272b28))
 
-    if fic.response['meta']["status"] == "complete":
-        fic_last_update = timestamp_unix_to_local(fic.response['meta']['rawExtendedMeta']['updated']) if 'updated' in fic.response['meta']['rawExtendedMeta'] else ""
-        embed.add_field(
-            name='📜 Last Updated',
-            value= fic_last_update + "✓" + fic.response['meta']["status"], inline=True)
-
-    elif fic.response['meta']["status"] == "ongoing":
-        fic_last_update = timestamp_unix_to_local(fic.response['meta']['rawExtendedMeta']['updated']) if 'updated' in fic.response['meta']['rawExtendedMeta'] else ""
-        embed.add_field(
-            name='📜 Last Updated',
-            value= fic_last_update + "✓" + fic.response['meta']["status"], inline=True)
-
     embed.add_field(
         name='📖 Length',
         value=str(fic.response['meta']['words']) +
-        " words in "+str(fic.response['meta']['chapters'])+" chapter(s)", inline=True)
+        " words in "+str(fic.response['meta']['chapters'])+" chapter(s)",inline=True)
+    
     if fic.response['meta']['rawExtendedMeta']:
+        fic_last_update = timestamp_unix_to_local(fic.response['meta']['rawExtendedMeta']['updated']) if 'updated' in fic.response['meta']['rawExtendedMeta'] else ""
+        embed.add_field(
+            name='📜 Last Updated',
+            value= fic_last_update + "✓" + fic.response['meta']["status"], inline=True)
 
         other_info = [fic.response['meta']['rawExtendedMeta']['raw_fandom'], "  ☘︎  "]
 
@@ -249,7 +242,12 @@ def fichub_metadata(query):
         fic_stats = f"**Reviews:** {fic.response['meta']['rawExtendedMeta']['reviews']}  ☘︎  **Favs:** {fic.response['meta']['rawExtendedMeta']['favorites']}  ☘︎  **Follows:** {fic.response['meta']['rawExtendedMeta']['follows']}"
         embed.add_field(name="📊 Stats",
                         value=fic_stats, inline=False)
-
+    else:
+        fic_last_update = ""
+        embed.add_field(
+                name='📜 Last Updated',
+                value= fic_last_update + "✓" + fic.response['meta']["status"], inline=True)
+    
     embed.add_field(name="\u200b",  # zero-width whitespace character
                     value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is using Fichub.net API's archive metadata. Latest data is not guaranteed!*", inline=False)
 
