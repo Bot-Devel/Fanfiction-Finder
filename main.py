@@ -29,19 +29,24 @@ class FicFinder(commands.Bot):
             intents=discord.Intents(guilds=True, messages=True, message_content=True),
         )
 
+        # Make sure all commands only can occur in guilds.
+        self.add_check(commands.guild_only().predicate)
+
     async def setup_hook(self) -> None:
         """Load extensions after the bot is logged in, but before it connects to the Discord Gateway."""
 
         await self.load_extension("cogs.settings")
         await self.load_extension("cogs.help")
+        await self.load_extension("cogs.link")
 
-    async def on_message(self, message: discord.Message):
+    async def on_message(self, message: discord.Message) -> None:
         """Command to search and find the fanfiction by scraping google"""
+        # TODO: Re-evaluate logging for messages containing "-log".
+
+        # To run client.commands & client.event simultaneously
+        await super().on_message(message)
 
         try:
-            # To run client.commands & client.event simultaneously
-            await self.process_commands(message)
-
             query = message.content.lower()
             msg = list(message.content.lower())
 
@@ -49,64 +54,13 @@ class FicFinder(commands.Bot):
                 logger.info("Not allowed to reply to DMs.")
                 return  # Do not reply to DMs
 
-            elif re.search(r"^linkao3\b", query) is not None:
-                logger.info("linkao3 command was used. Searching ao3")
-                await message.channel.typing()
-                logger.info("Sleeping for 1s to avoid ratelimit")
-                await asyncio.sleep(1)
-
-                msg = (
-                    query.replace("linkao3", "")
-                    .replace("linkffn", "")
-                    .replace("linkfic", "")
-                )
-
-                embed_pg = ao3_metadata(msg)
-
-                if embed_pg is None:  # if not found in AO3, search in Fichub
-                    logger.info("Fanfiction not found in AO3, trying to search Fichub")
-                    embed_pg = fichub_metadata(msg)
-
-                logger.info(
-                    f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}"
-                )
-                try:
-                    sent_msg = await message.reply(embed=embed_pg, mention_author=False)
-                except Exception as err:
-                    logger.error(err)
-                    sent_msg = await message.channel.send(embed=embed_pg)
-
-            elif re.search(r"^linkfic\b", query) is not None:
-                logger.info("linkfic command was used. Searching Fichub")
-                await message.channel.typing()
-                logger.info("Sleeping for 1s to avoid ratelimit")
-                await asyncio.sleep(1)
-
-                msg = (
-                    query.replace("linkffn", "")
-                    .replace("linkfic", "")
-                    .replace("linkao3", "")
-                )
-
-                embed_pg = fichub_metadata(msg)
-
-                if embed_pg is None:  # if not found in FFN, search in AO3
-                    logger.info("Fanfiction not found in Fichub, trying to search AO3")
-                    embed_pg = ao3_metadata(msg)
-
-                logger.info(
-                    f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}"
-                )
-                try:
-                    sent_msg = await message.reply(embed=embed_pg, mention_author=False)
-                except Exception as err:
-                    logger.error(err)
-                    sent_msg = await message.channel.send(embed=embed_pg)
+            # Known since we must be in a guild.
+            assert isinstance(message.channel, discord.abc.GuildChannel)
 
             # if in code blocks
-            elif re.search(r"`(.*?)`", query) is not None:
+            if re.search(r"`(.*?)`", query) is not None:
                 logger.info("The backquote search was used. Searching Fichub")
-                str_found = re.findall(r"`(.*?)`", query.lower(), re.MULTILINE)
+                str_found = re.findall(r"`(.*?)`", query, re.MULTILINE)
                 str_found = str_found[:1]  # to limit the search query to 1 only
 
                 for i in str_found:
@@ -139,12 +93,12 @@ class FicFinder(commands.Bot):
                         logger.error(err)
                         sent_msg = await message.channel.send(embed=embed_pg)
 
-            elif re.search(URL_VALIDATE, query) is not None:
+            elif (
+                url_found := re.search(URL_VALIDATE, query, re.MULTILINE)
+            ) is not None:
                 logger.info("URL was passed. Verifying if URL is supported")
-                url_found = re.findall(URL_VALIDATE, query.lower(), re.MULTILINE)
-
                 # to limit the url to 1 only
-                supported_url = url_found[:1]
+                supported_url = (url_found.string,)
 
                 for url in supported_url:
                     await message.channel.typing()
@@ -171,27 +125,22 @@ class FicFinder(commands.Bot):
                             except Exception as err:
                                 logger.error(err)
                                 sent_msg = await message.channel.send(embed=embed_pg)
-                    else:
-                        if not re.search(r"fanfiction.net/u/", url):
-                            # Check if the URL is in the FICHUB_SITES list
-                            if any(
-                                site.strip() in url.strip() for site in FICHUB_SITES
-                            ):
-                                logger.info("URL was passed. Searching Fichub")
-                                embed_pg = fichub_metadata(url)
+                    elif not re.search(r"fanfiction.net/u/", url):
+                        # Check if the URL is in the FICHUB_SITES list
+                        if any(site.strip() in url.strip() for site in FICHUB_SITES):
+                            logger.info("URL was passed. Searching Fichub")
+                            embed_pg = fichub_metadata(url)
 
-                                logger.info(
-                                    f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}"
+                            logger.info(
+                                f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}"
+                            )
+                            try:
+                                sent_msg = await message.reply(
+                                    embed=embed_pg, mention_author=False
                                 )
-                                try:
-                                    sent_msg = await message.reply(
-                                        embed=embed_pg, mention_author=False
-                                    )
-                                except Exception as err:
-                                    logger.error(err)
-                                    sent_msg = await message.channel.send(
-                                        embed=embed_pg
-                                    )
+                            except Exception as err:
+                                logger.error(err)
+                                sent_msg = await message.channel.send(embed=embed_pg)
 
         except Exception:
             logger.error(traceback.format_exc())
