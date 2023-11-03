@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import os
+
 import re
 import asyncio
 import traceback
@@ -8,15 +8,11 @@ from loguru import logger
 
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
 
+from config import TOKEN, OWNER_ID, FICHUB_SITES
 from utils.metadata import ao3_metadata, fichub_metadata
 
 
-load_dotenv()
-TOKEN = os.environ["DISCORD_TOKEN"]
-OWNER_ID = os.environ["OWNER_ID"]
-FICHUB_SITES = os.environ["FICHUB_SITES"].split(",")
 URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"
 
 

@@ -1,13 +1,13 @@
-import os
 import re
 
 import requests
 from bs4 import BeautifulSoup
 from loguru import logger
 
+from config import FICHUB_SITES
+
 
 URL_VALIDATE = r"(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/[^\s]*)?"
-FICHUB_SITES = os.environ['FICHUB_SITES'].split(',')
 search_engines = ['google', 'bing']
 
 
@@ -29,15 +29,20 @@ def get_ao3_url(query: str):
 
             if re.search(r"\bseries\b", url):  # if the query has series
                 for i in range(len(href)):
-                    if re.search(r"\barchiveofourown.org/series/\b", href[i]) is not None:
+                    if (
+                        re.search(r"\barchiveofourown.org/series/\b", href[i])
+                        is not None
+                    ):
                         logger.info(f"URL FOUND: {href[i]}")
                         ao3_list.append(href[i])
 
             else:  # if query is unspecified
                 for i in range(len(href)):
-
                     # append /works/ first
-                    if re.search(r"\barchiveofourown.org/works/\b", href[i]) is not None:
+                    if (
+                        re.search(r"\barchiveofourown.org/works/\b", href[i])
+                        is not None
+                    ):
                         logger.info(f"URL FOUND: {href[i]}")
                         ao3_list.append(href[i])
 
@@ -47,7 +52,10 @@ def get_ao3_url(query: str):
                     #     ao3_list.append(href[i])
 
                     # append /series/ next
-                    if re.search(r"\barchiveofourown.org/series/\b", href[i]) is not None:
+                    if (
+                        re.search(r"\barchiveofourown.org/series/\b", href[i])
+                        is not None
+                    ):
                         logger.info(f"URL FOUND: {href[i]}")
                         ao3_list.append(href[i])
 
@@ -94,7 +102,7 @@ def get_ffn_url(query: str):
                 continue
     except Exception:
         pass
-    
+
     if ffn_list:
         ffn_url = re.search(URL_VALIDATE, ffn_list[0])
         return ffn_url.group(0)
@@ -130,7 +138,7 @@ def get_fic_url(query: str):
                 continue
     except Exception:
         pass
-    
+
     if fic_list:
         # Check if any of the found URLs match the FICHUB_SITES list
         for url in fic_list:

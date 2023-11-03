@@ -32,7 +32,7 @@ PAGE0 = (
         value=(
             "This will search Fichub first and if it can't find it in Fichub, it will search in ao3. "
             '\n**Example:**\n'
-            r'\`cadmean victory\` will default to Fichub.\n\`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series.'
+            '\`cadmean victory\` will default to Fichub.\n\`rogue knight ao3\` for ao3.\n\`prince of slytherin ao3 series\` for ao3 series.'
         ),
     )
 )
