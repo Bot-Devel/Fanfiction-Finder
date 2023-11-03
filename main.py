@@ -29,7 +29,7 @@ class FicFinder(commands.Bot):
             intents=discord.Intents(guilds=True, messages=True, message_content=True),
         )
 
-        # Make sure all commands only can occur in guilds.
+        # Make sure all commands can only be invoked within guilds.
         self.add_check(commands.guild_only().predicate)
 
     async def setup_hook(self) -> None:

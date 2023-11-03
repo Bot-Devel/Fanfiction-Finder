@@ -14,19 +14,16 @@ class Settings(commands.Cog):
     ) -> None:
         # Handle all errors that occur within this cog.
         if isinstance(error, commands.MissingPermissions):
+            embed = discord.Embed(
+                description="You are missing Administrator permission to run this command."
+            )
             try:
-                await ctx.send(  # send message in channel
-                    embed=discord.Embed(
-                        description="You are missing Administrator permission to run this command."
-                    )
-                )
+                # send message in channel
+                await ctx.send(embed=embed)
             except Exception:
                 logger.error(error)
-                await ctx.author.send(  # send a DM if send message perms is not enabled
-                    embed=discord.Embed(
-                        description="You are missing Administrator permission to run this command."
-                    )
-                )
+                # send a DM if send message perms is not enabled
+                await ctx.author.send(embed=embed)
         else:
             logger.error(error)
 

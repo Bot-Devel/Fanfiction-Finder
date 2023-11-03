@@ -6,7 +6,7 @@ import time
 from loguru import logger
 
 headers = {
-    'User-Agent': f'Fanfiction-Finder-Bot/RogueOne'
+    'User-Agent': 'Fanfiction-Finder-Bot/RogueOne'
 }
 
 retry_strategy = Retry(

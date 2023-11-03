@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import discord
 from discord.ext import commands
+from loguru import logger
 
 from utils.embed_pages import HelpView
 
@@ -18,11 +19,14 @@ class Help(commands.Cog):
 
     @help.error
     async def help_error(self, ctx: commands.Context, error: commands.CommandError):
+        """Error handler for the help command."""
         if isinstance(error, commands.BotMissingPermissions):
             embed = discord.Embed(
                 description="The bot is not allowed to send messages in that channel. Ask one of the server admins to use the `,allow` command in that channel to enable it."
             )
             await ctx.author.send(embed=embed)
+        else:
+            logger.error(error)
 
 
 async def setup(client: commands.Bot):

@@ -1,42 +1,36 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 import re
 
 from bs4 import BeautifulSoup
 
 
-def story_last_up_clean(story_last_up, _type):
+def story_last_up_clean(story_last_up, _type: Literal[1, 2]):
     curr_time = datetime.now()
     if _type == 1:  # ffn last updated
         datetimeFormat = '%Y-%m-%d %H:%M:%S'
-        story_last_up = datetime.strptime(str(story_last_up), datetimeFormat)
-        story_last_updated = story_last_up.strftime(r'%d %b, %Y').lstrip('0')
-
     elif _type == 2:  # ao3 last updated
         datetimeFormat = '%Y-%m-%d'
-        story_last_up = datetime.strptime(str(story_last_up), datetimeFormat)
-        story_last_updated = story_last_up.strftime(r'%d %b, %Y').lstrip('0')
+
+    story_last_up = datetime.strptime(str(story_last_up), datetimeFormat)
+    story_last_updated = story_last_up.strftime(r'%d %b, %Y').lstrip('0')
 
     diff_in_time = curr_time - story_last_up
 
     # only amend hours & minutes diff
-    if diff_in_time.days:
-        pass
-    elif hours := (diff_in_time.seconds // 3600):
-        if hours == 1:
-            story_last_updated += f"☘︎ {hours} hour ago"
-        else:
-            story_last_updated += f"☘︎ {hours} hours ago"
+    if not diff_in_time.days:
+        if hours := (diff_in_time.seconds // 3600):
+            normalized_noun = "hour" if hours == 1 else "hours"
+            story_last_updated += f"☘︎ {hours} {normalized_noun} ago"
 
-    elif minutes := (diff_in_time.seconds // 60):
-        if minutes == 1:
-            story_last_updated += f"☘︎ {minutes} minute ago"
-        else:
-            story_last_updated += f"☘︎ {minutes} minutes ago"
-
-    return str(story_last_updated)
+        elif minutes := (diff_in_time.seconds // 60):
+            normalized_noun = "minute" if hours == 1 else "minutes"
+            story_last_updated += f"☘︎ {minutes} {normalized_noun} ago"
+            
+    return story_last_updated
 
 
 def get_ao3_series_works_index(ao3_soup):
