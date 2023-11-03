@@ -15,9 +15,11 @@ class Link(commands.Cog):
     def __init__(self, client: commands.Bot) -> None:
         self.client = client
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.guild_only()
     async def linkao3(self, ctx: commands.Context[commands.Bot], *, query: str) -> None:
+        """Command to search AO3. Fallback to Fichub if not found in AO3."""
+
         # Known at runtime
         assert isinstance(ctx.channel, discord.abc.GuildChannel)
 
@@ -36,9 +38,11 @@ class Link(commands.Cog):
             if embed_pg:
                 await ctx.reply(embed=embed_pg, mention_author=False)
 
-    @commands.command()
+    @commands.hybrid_command()
     @commands.guild_only()
     async def linkfic(self, ctx: commands.Context[commands.Bot], *, query: str) -> None:
+        """Command to search Fichub. Fallback to AO3 if not found in AO3."""
+
         # Known at runtime
         assert isinstance(ctx.channel, discord.abc.GuildChannel)
 

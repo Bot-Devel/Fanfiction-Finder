@@ -143,7 +143,6 @@ class FicFinder(commands.Bot):
 
         finally:
             try:
-
                 def check(reaction, user):
                     return (
                         str(reaction.emoji) == "👎"
