@@ -159,7 +159,6 @@ class FicFinder(commands.Bot):
                 pass
 
 
-# start_server()
 if __name__ == "__main__":
     client = FicFinder()
     client.run(TOKEN)

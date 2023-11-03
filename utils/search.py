@@ -43,12 +43,10 @@ def get_ao3_url(query: str):
                         re.search(r"\barchiveofourown.org/works/\b", href[i])
                         is not None
                     ):
-                        logger.info(f"URL FOUND: {href[i]}")
                         ao3_list.append(href[i])
 
                     # append /chapters/ next
                     # if re.search(r"\barchiveofourown.org/chapters/\b", href[i]) is not None:
-                    #     logger.info(f"URL FOUND: {href[i]}")
                     #     ao3_list.append(href[i])
 
                     # append /series/ next
@@ -56,7 +54,6 @@ def get_ao3_url(query: str):
                         re.search(r"\barchiveofourown.org/series/\b", href[i])
                         is not None
                     ):
-                        logger.info(f"URL FOUND: {href[i]}")
                         ao3_list.append(href[i])
 
             if not ao3_list:
