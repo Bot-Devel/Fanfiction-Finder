@@ -13,7 +13,7 @@ class Help(commands.Cog):
 
     @commands.hybrid_command(name="help")
     async def help(self, ctx: commands.Context):
-    """Help menu for the bot"""
+        """Help menu for the bot"""
     
         async with ctx.typing():
             view = HelpView()
