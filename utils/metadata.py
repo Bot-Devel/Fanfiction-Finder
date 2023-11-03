@@ -97,9 +97,18 @@ def ao3_metadata(query: str):
             embed.add_field(name="📊 Stats",
                             value=fic.ao3_works_metainfo, inline=False)
 
-        embed.add_field(name="\u200b",  # zero-width whitespace character
-                        value="*If this content violates the server rules, react with 👎 and it will be removed.*", inline=False)
+        parsed_download_data = []
+        for file_format, download_url in fic.files.items():
+            formatted_data = f"[{file_format}]({download_url})"
+            parsed_download_data.append(formatted_data)
+        
+        embed.add_field(
+                    name=':arrow_down: Download',
+                    value= " | ".join(parsed_download_data), inline=True)
 
+        embed.add_field(name="\u200b",  # zero-width whitespace character
+                        value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from ArchiveOfOwnOwn.net.*", inline=False)
+        
         embed.set_author(
             name=fic.ao3_author_name, url=fic.ao3_author_url,
             icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
@@ -148,8 +157,8 @@ def ao3_metadata(query: str):
             " words in "+fic.ao3_series_works+" work(s)", inline=True)
 
         embed.add_field(name="\u200b",  # zero-width whitespace character
-                        value="*If this content violates the server rules, react with 👎 and it will be removed.*", inline=False)
-
+                        value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from ArchiveOfOwnOwn.net.*", inline=False)
+        
         embed.set_author(
             name=fic.ao3_author_name, url=fic.ao3_author_url,
             icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
@@ -247,14 +256,26 @@ def fichub_metadata(query):
         embed.add_field(
                 name='📜 Last Updated',
                 value= fic_last_update + "✓" + fic.response['meta']["status"], inline=True)
+
+    parsed_download_data = []
+    for file_name, file_data in fic.files.items():
+        file_format = file_name.split('.')[-1]  # Extract the file format from the filename
+        download_url = file_data['download_url']
+        formatted_data = f"[{file_format}]({download_url})"
+        parsed_download_data.append(formatted_data)
+    
+    embed.add_field(
+                name=':arrow_down: Download',
+                value= " | ".join(parsed_download_data), inline=False)
     
     embed.add_field(name="\u200b",  # zero-width whitespace character
-                    value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is using Fichub.net API's archive metadata. Latest data is not guaranteed!*", inline=False)
+                    value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from Fichub.net API. Data can be stale!*", inline=False)
 
     embed.set_author(
-        name=fic.response['meta']['author'], url=fic.response['meta']['authorUrl'],
-        icon_url="https://pbs.twimg.com/profile_images/843841615122784256/WXbuqyjo_bigger.jpg")
-    print("embed",embed)
+        name=fic.response['meta']['author'],
+        url=fic.response['meta']['authorUrl'] if fic.response['meta']['authorUrl'].startswith('http') else "",
+        icon_url="https://pbs.twimg.com/profile_images/843841615122784256/WXbuqyjo_bigger.jpg"
+    )
     return embed
 
     

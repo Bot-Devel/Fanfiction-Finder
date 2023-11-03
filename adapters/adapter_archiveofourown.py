@@ -193,6 +193,33 @@ class ArchiveOfOurOwn:
             else:  # username not found
                 self.ao3_author_name = "Anonymous"
 
+            # fetch download urls
+            try:
+                self.ao3_works_download = ao3_soup.find(
+                    'ul', attrs={'class': 'expandable secondary'}).findAll('a')
+
+            except AttributeError:
+                logger.info(
+                    "ao3_works_download is missing. Fanfiction not available for download.")
+                self.ao3_works_download = None
+
+            self.files = {}
+            for url in self.ao3_works_download:
+                if re.search("epub", url['href'], re.I):
+                    self.files["epub"] = f"https://archiveofourown.org{url['href']}"
+
+                if re.search("mobi", url['href'], re.I):
+                    self.files["mobi"] = f"https://archiveofourown.org{url['href']}"
+
+                if re.search("pdf", url['href'], re.I):
+                    self.files["pdf"] = f"https://archiveofourown.org{url['href']}"
+
+                if re.search("html", url['href'], re.I):
+                    self.files["html"] = f"https://archiveofourown.org{url['href']}"
+
+                if re.search("azw3", url['href'], re.I):
+                    self.files["azw3"]= f"https://archiveofourown.org{url['href']}"
+
             if len(list(self.ao3_works_summary)) > 2048:
                 self.ao3_works_summary = self.ao3_works_summary[:2030] + "..."
 

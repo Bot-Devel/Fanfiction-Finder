@@ -69,7 +69,6 @@ class FicHub:
                     self.file_format.append(".zip")
 
             self.files = {}
-            self.files["meta"] = self.response['meta']
             for file_format in self.file_format:
                 self.files[self.response['urls']['epub'].split(
                     "/")[4].split("?")[0].replace(".epub", file_format)] = {
