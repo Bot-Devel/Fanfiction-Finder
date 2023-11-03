@@ -202,6 +202,18 @@ class Settings(commands.Cog):
             delete_after=3.0,  # Delete the bot's message
         )
 
+    @commands.command(aliases=["sync"])
+    @commands.is_owner()
+    async def tree_sync(self, ctx: commands.Context[commands.Bot]) -> None:
+        """Sync all the Slash Commands"""
+
+        # Known at runtime
+        assert ctx.guild
+        assert isinstance(ctx.author, discord.Member)
+        assert isinstance(ctx.channel, discord.abc.GuildChannel)
+
+        await self.client.tree.sync()
+        await ctx.send(embed=discord.Embed(description="Syncing all the slash commands!"))
 
 async def setup(client: commands.Bot):
     await client.add_cog(Settings(client))

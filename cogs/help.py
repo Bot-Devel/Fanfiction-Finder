@@ -11,8 +11,10 @@ class Help(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    @commands.command()
+    @commands.hybrid_command(name="help")
     async def help(self, ctx: commands.Context):
+    """Help menu for the bot"""
+    
         async with ctx.typing():
             view = HelpView()
             view.message = await ctx.send(embed=view.get_first_page(), view=view)
