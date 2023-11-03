@@ -1,68 +1,33 @@
-from discord.ext.commands import command, Cog
+from __future__ import annotations
+
 import discord
-import re
+from discord.ext import commands
+from loguru import logger
 
-from utils.embed_pages import get_embed
+from utils.embed_pages import HelpView
 
 
-class Help(Cog):
-    def __init__(self, client):
+class Help(commands.Cog):
+    def __init__(self, client: commands.Bot):
         self.client = client
 
-    @command()
-    async def help(self, ctx):
+    @commands.command()
+    async def help(self, ctx: commands.Context):
+        async with ctx.typing():
+            view = HelpView()
+            view.message = await ctx.send(embed=view.get_first_page(), view=view)
 
-        try:
-            embed_pg, page_limit = get_embed(0)
-            message = await ctx.send(embed=embed_pg)
-            await message.add_reaction('⏮')
-            await message.add_reaction('◀')
-            await message.add_reaction('▶')
-            await message.add_reaction('⏭')
-
-            def check(reaction, user):
-                return user == ctx.author
-
-            page = 0
-            reaction = None
-            while True:
-                if str(reaction) == '⏮':
-                    page = 0
-                    embed_pg, page_limit = get_embed(page)
-                    await message.edit(embed=embed_pg)
-                elif str(reaction) == '◀':
-                    if page > 0:
-                        page -= 1
-                        embed_pg, page_limit = get_embed(page)
-                        await message.edit(embed=embed_pg)
-                elif str(reaction) == '▶':
-                    if page < page_limit:
-                        page += 1
-                        embed_pg, page_limit = get_embed(page)
-                        await message.edit(embed=embed_pg)
-                elif str(reaction) == '⏭':
-                    page = page_limit-1
-                    embed_pg, page_limit = get_embed(page)
-                    await message.edit(embed=embed_pg)
-
-                reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
-                await message.remove_reaction(reaction, user)
-        except Exception as error:
-
-            if re.search("Missing Permissions", str(error), re.IGNORECASE):
-                embed = discord.Embed(
-                    description="The bot is not allowed to send messages in that channel. Ask one of the server admins to use the `,allow` command in that channel to enable it."
-                )
-                await ctx.author.send(embed=embed)
-            elif re.search("TimeoutError", str(error), re.IGNORECASE):
-                pass  # ignore Timeout errors
-
-        finally:
-            try:
-                await message.clear_reactions()
-            except UnboundLocalError:
-                pass  # ignore this
+    @help.error
+    async def help_error(self, ctx: commands.Context, error: commands.CommandError):
+        """Error handler for the help command."""
+        if isinstance(error, commands.BotMissingPermissions):
+            embed = discord.Embed(
+                description="The bot is not allowed to send messages in that channel. Ask one of the server admins to use the `,allow` command in that channel to enable it."
+            )
+            await ctx.author.send(embed=embed)
+        else:
+            logger.error(error)
 
 
-def setup(client):
-    client.add_cog(Help(client))
+async def setup(client: commands.Bot):
+    await client.add_cog(Help(client))
