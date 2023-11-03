@@ -104,7 +104,7 @@ def ao3_metadata(query: str):
         
         embed.add_field(
                     name=':arrow_down: Download',
-                    value= " | ".join(parsed_download_data), inline=True)
+                    value= " ☘︎ ".join(parsed_download_data), inline=True)
 
         embed.add_field(name="\u200b",  # zero-width whitespace character
                         value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from ArchiveOfOwnOwn.net.*", inline=False)
@@ -219,11 +219,11 @@ def fichub_metadata(query):
         description=fic.response['meta']['description']
         .replace("<p>","").replace("</p>","").replace("<hr />","\n\n"),
         colour=Colour(0x272b28))
-
+    
     embed.add_field(
         name='📖 Length',
-        value=str(fic.response['meta']['words']) +
-        " words in "+str(fic.response['meta']['chapters'])+" chapter(s)",inline=True)
+        value="{:,}".format(int(str(fic.response['meta']['words']))) +
+        " words in "+"{:,}".format(int(fic.response['meta']['chapters']))+" chapter(s)",inline=True)
     
     if fic.response['meta']['rawExtendedMeta']:
         fic_last_update = timestamp_unix_to_local(fic.response['meta']['rawExtendedMeta']['updated']) if 'updated' in fic.response['meta']['rawExtendedMeta'] else ""
@@ -266,7 +266,7 @@ def fichub_metadata(query):
     
     embed.add_field(
                 name=':arrow_down: Download',
-                value= " | ".join(parsed_download_data), inline=False)
+                value= " ☘︎ ".join(parsed_download_data), inline=False)
     
     embed.add_field(name="\u200b",  # zero-width whitespace character
                     value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from Fichub.net API. Data can be stale!*", inline=False)
