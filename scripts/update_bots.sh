@@ -1,3 +1,4 @@
+#!/bin/bash
 # Script to update the bots and restart the services in the VPS
 
 # Updating the bots
