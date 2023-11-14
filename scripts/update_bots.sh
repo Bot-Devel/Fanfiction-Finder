@@ -13,5 +13,5 @@ git pull
 sudo cp /home/arbaaz/Projects/Quote-Finder/Quote-Finder.service  /etc/systemd/system/Quote-Finder.service
 sudo cp /home/arbaaz/Projects/Fanfiction-Finder/Fanfiction-Finder.service  /etc/systemd/system/Fanfiction-Finder.service
 sudo systemctl daemon-reload
-sudo systemctl restart /etc/systemd/system/Fanfiction-Finder.service
-sudo systemctl restart /etc/systemd/system/Quote-Finder.service
+sudo systemctl restart Fanfiction-Finder.service
+sudo systemctl restart Quote-Finder.service
