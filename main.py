@@ -38,7 +38,10 @@ class FicFinder(commands.Bot):
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent) -> None:
         channel = self.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
-        await message.delete()
+        
+        # Check if the message was sent by the bot
+        if message.author == self.user:
+            await message.delete()
 
     async def on_message(self, message: discord.Message) -> None:
         """Command to search and find the fanfiction by scraping google"""
