@@ -22,7 +22,7 @@ class FicFinder(commands.Bot):
         super().__init__(
             command_prefix=",",
             help_command=None,
-            intents=discord.Intents(guilds=True, messages=True, message_content=True),
+            intents=discord.Intents(guilds=True, messages=True, reactions=True, message_content=True),
         )
 
         # Make sure all commands can only be invoked within guilds.
@@ -34,6 +34,11 @@ class FicFinder(commands.Bot):
         await self.load_extension("cogs.settings")
         await self.load_extension("cogs.help")
         await self.load_extension("cogs.link")
+
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent) -> None:
+        channel = self.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        await message.delete()
 
     async def on_message(self, message: discord.Message) -> None:
         """Command to search and find the fanfiction by scraping google"""
@@ -60,11 +65,11 @@ class FicFinder(commands.Bot):
                 str_found = str_found[:1]  # to limit the search query to 1 only
 
                 for i in str_found:
-                    await message.channel.typing()
                     logger.info("Sleeping for 1s to avoid ratelimit")
                     await asyncio.sleep(1)
 
                     i = i.replace("-log", "")
+                    await message.channel.typing()
                     embed_pg = fichub_metadata(i)
 
                     # if not found in FFN, search in AO3
@@ -82,12 +87,12 @@ class FicFinder(commands.Bot):
                         f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}"
                     )
                     try:
-                        sent_msg = await message.reply(
+                        await message.reply(
                             embed=embed_pg, mention_author=False
                         )
                     except Exception as err:
                         logger.error(err)
-                        sent_msg = await message.channel.send(embed=embed_pg)
+                        await message.channel.send(embed=embed_pg)
 
             elif (
                 url_found := re.search(URL_VALIDATE, query, re.MULTILINE)
@@ -97,13 +102,13 @@ class FicFinder(commands.Bot):
                 supported_url = (url_found.string,)
 
                 for url in supported_url:
-                    await message.channel.typing()
                     logger.info("Sleeping for 2s to avoid ratelimit")
                     await asyncio.sleep(2)
 
                     if re.search(r"archiveofourown.org\b", url) is not None:
                         # ignore /users/ endpoint
                         if not re.search(r"/users/", url):
+                            await message.channel.typing()
                             logger.info(
                                 "archiveofourown.org URL was passed. Searching ao3"
                             )
@@ -115,15 +120,17 @@ class FicFinder(commands.Bot):
                             )
 
                             try:
-                                sent_msg = await message.reply(
+                                await message.reply(
                                     embed=embed_pg, mention_author=False
                                 )
                             except Exception as err:
                                 logger.error(err)
-                                sent_msg = await message.channel.send(embed=embed_pg)
+                                await message.channel.send(embed=embed_pg)
+
                     elif not re.search(r"fanfiction.net/u/", url):
                         # Check if the URL is in the FICHUB_SITES list
                         if any(site.strip() in url.strip() for site in FICHUB_SITES):
+                            await message.channel.typing()
                             logger.info("URL was passed. Searching Fichub")
                             embed_pg = fichub_metadata(url)
 
@@ -131,32 +138,15 @@ class FicFinder(commands.Bot):
                                 f"Sending embed to Channel-> {message.channel.guild}:{message.channel.name}"
                             )
                             try:
-                                sent_msg = await message.reply(
+                                await message.reply(
                                     embed=embed_pg, mention_author=False
                                 )
                             except Exception as err:
                                 logger.error(err)
-                                sent_msg = await message.channel.send(embed=embed_pg)
+                                await message.channel.send(embed=embed_pg)
 
         except Exception:
             logger.error(traceback.format_exc())
-
-        finally:
-            try:
-                def check(reaction, user):
-                    return (
-                        str(reaction.emoji) == "👎"
-                        and not user.bot
-                        and reaction.message.id == sent_msg.id
-                        and user.id == message.author.id
-                    )
-
-                await self.wait_for("reaction_add", check=check, timeout=30.0)
-                await sent_msg.delete()
-
-            except Exception:
-                pass
-
 
 if __name__ == "__main__":
     client = FicFinder()
