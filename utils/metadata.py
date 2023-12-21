@@ -234,7 +234,7 @@ def fichub_metadata(query):
         other_info = [fic.response['meta']['rawExtendedMeta']['raw_fandom'], "  ☘︎  "]
 
         for var in [fic.response['meta']['rawExtendedMeta']['genres'] if 'genres' in fic.response['meta']['rawExtendedMeta'] else "",
-                    fic.response['meta']['rawExtendedMeta']['characters']]:
+                    fic.response['meta']['rawExtendedMeta']['characters']  if 'characters' in fic.response['meta']['rawExtendedMeta'] else ""]:
             if var is not None:
                 other_info.append(str(var))
                 other_info.append("  ☘︎  ")
