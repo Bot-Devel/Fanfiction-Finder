@@ -122,7 +122,6 @@ def get_fic_url(query: str):
 
                 for link in found:
                     href.append(link['href'])
-                print(href)
                 for i in range(len(href)):
                     logger.info(f"URL FOUND: {href[i]}")
                     fic_list.append(href[i])

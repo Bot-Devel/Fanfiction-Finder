@@ -37,142 +37,146 @@ def ao3_metadata(query: str):
 
     logger.info(f"Processing {ao3_url}")
 
-    if re.search(r"/works/\b", ao3_url) is not None:
+    try:
+        if re.search(r"/works/\b", ao3_url) is not None:
 
-        # extract work id from the url
-        ao3_works_id = str(re.search(r"\d+", ao3_url).group(0))
-        ao3_url = "https://archiveofourown.org/works/"+ao3_works_id
-        fic = ArchiveOfOurOwn(ao3_url)
-        fic.get_ao3_works_metadata()
-        fic.get_author_profile_image()
-        if fic.ao3_works_name is None:
-            return Embed(description="Fanfiction not found",
-                         colour=Colour.red())
+            # extract work id from the url
+            ao3_works_id = str(re.search(r"\d+", ao3_url).group(0))
+            ao3_url = "https://archiveofourown.org/works/"+ao3_works_id
+            fic = ArchiveOfOurOwn(ao3_url)
+            fic.get_ao3_works_metadata()
+            fic.get_author_profile_image()
+            if fic.ao3_works_name is None:
+                return Embed(description="Fanfiction not found",
+                            colour=Colour.red())
 
-        embed = Embed(
-            title=fic.ao3_works_name,
-            url=fic.BaseUrl,
-            description=fic.ao3_works_summary,
-            colour=Colour(0x272b28))
+            embed = Embed(
+                title=fic.ao3_works_name,
+                url=fic.BaseUrl,
+                description=fic.ao3_works_summary,
+                colour=Colour(0x272b28))
 
-        if fic.ao3_works_status == "Completed":
+            if fic.ao3_works_status == "Completed":
 
-            embed.add_field(
-                name='📜 Last Updated',
-                value=fic.ao3_works_last_up +
-                " ✓Complete", inline=True)
+                embed.add_field(
+                    name='📜 Last Updated',
+                    value=fic.ao3_works_last_up +
+                    " ✓Complete", inline=True)
 
-        elif fic.ao3_works_status == "Updated":
+            elif fic.ao3_works_status == "Updated":
 
-            embed.add_field(
-                name='📜 Last Updated',
-                value=fic.ao3_works_last_up, inline=True)
+                embed.add_field(
+                    name='📜 Last Updated',
+                    value=fic.ao3_works_last_up, inline=True)
 
-        elif fic.ao3_works_status is None:
-            embed.add_field(
-                name='📜 Last Updated',
-                value=fic.ao3_works_last_up, inline=True)
-
-        embed.add_field(
-            name='📖 Length',
-            value=fic.ao3_works_length +
-            " words in "+fic.ao3_works_chapters+" chapter(s)", inline=True)
-
-        other_info = [fic.ao3_works_fandom, "  ☘︎  "]
-
-        for var in [fic.ao3_works_relationships, fic.ao3_works_characters]:
-            if var is not None:
-                other_info.append(str(var))
-                other_info.append("  ☘︎  ")
-
-        other_info = ''.join(other_info[:len(other_info)-1])
-        if len(list(other_info)) > 100:
-            other_info = other_info[:100] + "..."
-
-        if other_info:
-            embed.add_field(name=f":bookmark: Rating: {fic.ao3_works_rating}",
-                            value=other_info, inline=False)
-
-        if fic.ao3_works_metainfo:
-            embed.add_field(name="📊 Stats",
-                            value=fic.ao3_works_metainfo, inline=False)
-
-        parsed_download_data = []
-        for file_format, download_url in fic.files.items():
-            formatted_data = f"[{file_format}]({download_url})"
-            parsed_download_data.append(formatted_data)
-        
-        embed.add_field(
-                    name=':arrow_down: Download',
-                    value= " ☘︎ ".join(parsed_download_data), inline=True)
-
-        embed.add_field(name="\u200b",  # zero-width whitespace character
-                        value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from ArchiveOfOwnOwn.net.*", inline=False)
-        
-        embed.set_author(
-            name=fic.ao3_author_name, url=fic.ao3_author_url,
-            icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
-
-    elif re.search(r"/series/\b", ao3_url) is not None:
-
-        # extract series id from the url
-        ao3_series_id = str(re.search(r"\d+", ao3_url).group(0))
-        ao3_url = "https://archiveofourown.org/series/"+ao3_series_id
-
-        fic = ArchiveOfOurOwn(ao3_url)
-        fic.get_ao3_series_metadata()
-        fic.get_author_profile_image()
-
-        if fic.ao3_series_name is None:
-            return Embed(description="Fanfiction not found",
-                         colour=Colour.red())
-
-        embed = Embed(
-            title=fic.ao3_series_name,
-            url=fic.BaseUrl,
-            description=fic.ao3_series_summary,
-            colour=Colour(0x272b28))
-
-        if fic.ao3_series_status == "Completed":
+            elif fic.ao3_works_status is None:
+                embed.add_field(
+                    name='📜 Last Updated',
+                    value=fic.ao3_works_last_up, inline=True)
 
             embed.add_field(
-                name='📜 Last Updated',
-                value=fic.ao3_series_last_up +
-                " ✓Complete", inline=True)
+                name='📖 Length',
+                value=fic.ao3_works_length +
+                " words in "+fic.ao3_works_chapters+" chapter(s)", inline=True)
 
-        elif fic.ao3_series_status == "Updated":
+            other_info = [fic.ao3_works_fandom, "  ☘︎  "]
+
+            for var in [fic.ao3_works_relationships, fic.ao3_works_characters]:
+                if var is not None:
+                    other_info.append(str(var))
+                    other_info.append("  ☘︎  ")
+
+            other_info = ''.join(other_info[:len(other_info)-1])
+            if len(list(other_info)) > 100:
+                other_info = other_info[:100] + "..."
+
+            if other_info:
+                embed.add_field(name=f":bookmark: Rating: {fic.ao3_works_rating}",
+                                value=other_info, inline=False)
+
+            if fic.ao3_works_metainfo:
+                embed.add_field(name="📊 Stats",
+                                value=fic.ao3_works_metainfo, inline=False)
+
+            parsed_download_data = []
+            for file_format, download_url in fic.files.items():
+                formatted_data = f"[{file_format}]({download_url})"
+                parsed_download_data.append(formatted_data)
+            
+            embed.add_field(
+                        name=':arrow_down: Download',
+                        value= " ☘︎ ".join(parsed_download_data), inline=True)
+
+            embed.add_field(name="\u200b",  # zero-width whitespace character
+                            value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from ArchiveOfOwnOwn.net.*", inline=False)
+            
+            embed.set_author(
+                name=fic.ao3_author_name, url=fic.ao3_author_url,
+                icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
+                
+        elif re.search(r"/series/\b", ao3_url) is not None:
+
+            # extract series id from the url
+            ao3_series_id = str(re.search(r"\d+", ao3_url).group(0))
+            ao3_url = "https://archiveofourown.org/series/"+ao3_series_id
+
+            fic = ArchiveOfOurOwn(ao3_url)
+            fic.get_ao3_series_metadata()
+            fic.get_author_profile_image()
+
+            if fic.ao3_series_name is None:
+                return Embed(description="Fanfiction not found",
+                            colour=Colour.red())
+
+            embed = Embed(
+                title=fic.ao3_series_name,
+                url=fic.BaseUrl,
+                description=fic.ao3_series_summary,
+                colour=Colour(0x272b28))
+
+            if fic.ao3_series_status == "Completed":
+
+                embed.add_field(
+                    name='📜 Last Updated',
+                    value=fic.ao3_series_last_up +
+                    " ✓Complete", inline=True)
+
+            elif fic.ao3_series_status == "Updated":
+
+                embed.add_field(
+                    name='📜 Last Updated',
+                    value=fic.ao3_series_last_up, inline=True)
+
+            elif fic.ao3_series_status is None:
+                embed.add_field(
+                    name='📜 Last Updated',
+                    value=fic.ao3_series_last_up, inline=True)
 
             embed.add_field(
-                name='📜 Last Updated',
-                value=fic.ao3_series_last_up, inline=True)
+                name='📖 Length',
+                value=fic.ao3_series_length +
+                " words in "+fic.ao3_series_works+" work(s)", inline=True)
 
-        elif fic.ao3_series_status is None:
-            embed.add_field(
-                name='📜 Last Updated',
-                value=fic.ao3_series_last_up, inline=True)
+            embed.add_field(name="\u200b",  # zero-width whitespace character
+                            value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from ArchiveOfOwnOwn.net.*", inline=False)
+            
+            embed.set_author(
+                name=fic.ao3_author_name, url=fic.ao3_author_url,
+                icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
 
-        embed.add_field(
-            name='📖 Length',
-            value=fic.ao3_series_length +
-            " words in "+fic.ao3_series_works+" work(s)", inline=True)
+        else:
+            embed = Embed(
+                description="Fanfiction not found",
+                colour=Colour.red())
 
-        embed.add_field(name="\u200b",  # zero-width whitespace character
-                        value="*If this content violates the server rules, react with 👎 and it will be removed.\nThe bot is fetching data from ArchiveOfOwnOwn.net.*", inline=False)
-        
-        embed.set_author(
-            name=fic.ao3_author_name, url=fic.ao3_author_url,
-            icon_url="https://archiveofourown.org/images/ao3_logos/logo_42.png")
+        if fic.ao3_author_img:
+            embed.set_thumbnail(
+                url=fic.ao3_author_img)
 
-    else:
-        embed = Embed(
-            description="Fanfiction not found",
-            colour=Colour.red())
-
-    if fic.ao3_author_img:
-        embed.set_thumbnail(
-            url=fic.ao3_author_img)
-
-    return embed
+        return embed
+    except Exception as err:
+        logger.error(err)
+        return fichub_metadata(query)
 
 
 def fichub_metadata(query):
@@ -209,7 +213,6 @@ def fichub_metadata(query):
     fic.get_fic_metadata(fic_url)
 
     if str(fic.response['err']).strip() != "0":
-        print("h1")
         return Embed(description="Fanfiction not found",
                      colour=Colour.red())
 
@@ -231,7 +234,7 @@ def fichub_metadata(query):
             name='📜 Last Updated',
             value= fic_last_update + "✓" + fic.response['meta']["status"], inline=True)
 
-        other_info = [fic.response['meta']['rawExtendedMeta']['raw_fandom'], "  ☘︎  "]
+        other_info = [fic.response['meta']['rawExtendedMeta']['raw_fandom'] if 'raw_fandom' in fic.response['meta']['rawExtendedMeta'] else "", "  ☘︎  "]
 
         for var in [fic.response['meta']['rawExtendedMeta']['genres'] if 'genres' in fic.response['meta']['rawExtendedMeta'] else "",
                     fic.response['meta']['rawExtendedMeta']['characters']  if 'characters' in fic.response['meta']['rawExtendedMeta'] else ""]:
@@ -244,11 +247,16 @@ def fichub_metadata(query):
         if len(list(other_info)) > 100:
             other_info = other_info[:100] + "..."
 
-        if other_info:
+        if other_info and "rated" in fic.response['meta']['rawExtendedMeta']:
             embed.add_field(name=f":bookmark: Rating: {fic.response['meta']['rawExtendedMeta']['rated']}",
                             value=other_info, inline=False)
+    
+        fic_stats_fields = ['reviews', 'favorites', 'follows']
+        fic_stats = ""
+        for fic_stat in fic_stats_fields:
+            if fic_stat in fic.response['meta']['rawExtendedMeta']:
+                fic_stats += f"**{fic_stat.capitalize()}** {fic.response['meta']['rawExtendedMeta'][fic_stat]}  ☘︎  "
 
-        fic_stats = f"**Reviews:** {fic.response['meta']['rawExtendedMeta']['reviews']}  ☘︎  **Favs:** {fic.response['meta']['rawExtendedMeta']['favorites']}  ☘︎  **Follows:** {fic.response['meta']['rawExtendedMeta']['follows']}"
         embed.add_field(name="📊 Stats",
                         value=fic_stats, inline=False)
     else:

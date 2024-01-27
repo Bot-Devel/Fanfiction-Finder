@@ -78,7 +78,6 @@ class FicHub:
         # Error: 'epub_url'
         # Reason: Unsupported URL
         except (KeyError, UnboundLocalError) as e:
-            print("str(e)",str(e))
             logger.error(f"Error: {str(e)} not found!")
             logger.error(f"GET:Response: {str(self.response)}")
             logger.error(
