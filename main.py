@@ -40,10 +40,11 @@ class FicFinder(commands.Bot):
         message = await channel.fetch_message(payload.message_id)
         
         # Check if the message was sent by the bot
-        if message.author == self.user and payload.emoji.name == "👎":
-            await message.delete()
-        else:
-            await message.remove_reaction(payload.emoji, payload.member)
+        if message.author == self.user:
+            if payload.emoji.name == "👎":
+                await message.delete()
+            else:
+                await message.remove_reaction(payload.emoji, payload.member)
             
     async def on_message(self, message: discord.Message) -> None:
         """Command to search and find the fanfiction by scraping google"""
