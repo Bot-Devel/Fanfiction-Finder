@@ -10,7 +10,7 @@ Group=arbaaz
 
 WorkingDirectory=/home/arbaaz/Projects/Fanfiction-Finder
 
-ExecStart=/home/arbaaz/.pyenv/versions/fanfic-finder-bot/bin/python main.py
+ExecStart=/home/arbaaz/Projects/Fanfiction-Finder/.venv/bin/python /home/arbaaz/Projects/Fanfiction-Finder/main.py
 
 Restart=on-failure
 RestartSec=5
